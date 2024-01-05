@@ -119,7 +119,7 @@ jobs:
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
-          cd deploy && zip -r deploy.zip .
+          cd deploy && zip -r deploy.zip . -x '*.git*' './src/*' './aws/*' './node_modules/*' awscliv2.zip
 
       - name: Beanstalk Deploy
         uses: einaregilsson/beanstalk-deploy@v20
@@ -131,7 +131,7 @@ jobs:
           version_label: github-action-${{steps.current-time.outputs.formattedTime}}
           region: ap-northeast-2
           deployment_package: deploy/deploy.zip
-          wait_for_environment_recovery: 60
+          wait_for_environment_recovery: 300
 
       - name: Cleanup Gradle Cache
         if: ${{ always() }}
