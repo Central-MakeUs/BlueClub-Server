@@ -57,7 +57,7 @@ public class SecurityConfig {
                 .and()
 
                 //== URL별 권한 관리 옵션 ==//
-                .authorizeRequests()
+                .authorizeHttpRequests()
 
                 // 아이콘, css, js 관련
                 // 기본 페이지, css, image, js 하위 폴더에 있는 자료들은 모두 접근 가능, h2-console에 접근 가능
@@ -136,7 +136,6 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        JwtAuthenticationProcessingFilter jwtAuthenticationFilter = new JwtAuthenticationProcessingFilter(jwtService, userRepository);
-        return jwtAuthenticationFilter;
+        return new JwtAuthenticationProcessingFilter(jwtService, userRepository);
     }
 }
