@@ -1,4 +1,4 @@
-package blueclub.server.auth.dto;
+package blueclub.server.auth.dto.request;
 
 import blueclub.server.auth.domain.*;
 import blueclub.server.user.domain.Email;
@@ -7,7 +7,6 @@ import lombok.Builder;
 import lombok.Getter;
 
 import java.util.Map;
-import java.util.UUID;
 
 /**
  * 각 소셜에서 받아오는 데이터가 다르므로
