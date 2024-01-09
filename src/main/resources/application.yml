@@ -57,6 +57,19 @@ jwt:
     expiration: 1209600000 # 2주
     header: Authorization-refresh
 
+cloud:
+  aws:
+    s3:
+      bucket: ${s3.bucket}
+    credentials:
+      access-key: ${s3.access.key}
+      secret-key: ${s3.secret.key}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false
+
 logging:
   level:
     root: info
