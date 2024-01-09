@@ -1,5 +1,7 @@
 package blueclub.server.auth.handler;
 
+import blueclub.server.auth.domain.RefreshToken;
+import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.user.domain.Email;
 import blueclub.server.user.repository.UserRepository;
@@ -16,6 +18,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     @Value("${jwt.access.expiration}")
     private String accessTokenExpiration;
@@ -31,8 +34,7 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         userRepository.findByEmail(Email.from(email))
                 .ifPresent(user -> {
-                    user.updateRefreshToken(refreshToken);
-                    userRepository.saveAndFlush(user);
+                    refreshTokenRepository.save(RefreshToken.createRefreshToken(user.getId(), refreshToken));
                 });
         // log.info("로그인에 성공하였습니다. 이메일 : {}", email);
         // log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);

@@ -1,5 +1,7 @@
 package blueclub.server.auth.service;
 
+import blueclub.server.auth.domain.RefreshToken;
+import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.repository.UserRepository;
@@ -46,6 +48,7 @@ public class JwtService {
     private static final String BEARER = "Bearer ";
 
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     /**
      * AccessToken 생성 메소드
@@ -129,7 +132,7 @@ public class JwtService {
             return Optional.ofNullable(JWT.require(Algorithm.HMAC512(secretKey))
                     .build() // 반환된 빌더로 JWT verifier 생성
                     .verify(accessToken) // accessToken을 검증하고 유효하지 않다면 예외 발생
-                    .getClaim(EMAIL_CLAIM) // claim(Emial) 가져오기
+                    .getClaim(EMAIL_CLAIM) // claim(Email) 가져오기
                     .asString());
         } catch (Exception e) {
             return Optional.empty();
@@ -151,14 +154,14 @@ public class JwtService {
     }
 
     /**
-     * RefreshToken DB 저장(업데이트)
+     * RefreshToken DB 저장
      */
     @Transactional
     public void updateRefreshToken(Long id, String refreshToken) {
-        userRepository.findById(id)
+        refreshTokenRepository.findById(id)
                 .ifPresentOrElse(
-                        user -> user.updateRefreshToken(refreshToken),
-                        () -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR)
+                        token -> token.updateRefreshToken(refreshToken),
+                        () -> refreshTokenRepository.save(RefreshToken.createRefreshToken(id, refreshToken))
                 );
     }
 
@@ -167,9 +170,9 @@ public class JwtService {
      */
     @Transactional
     public void deleteRefreshToken(Long id) {
-        userRepository.findById(id)
+        refreshTokenRepository.findById(id)
                 .ifPresentOrElse(
-                        user -> user.deleteRefreshToken(),
+                        user -> refreshTokenRepository.deleteById(id),
                         () -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR)
                 );
     }
