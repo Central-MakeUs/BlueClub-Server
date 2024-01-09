@@ -2,10 +2,7 @@ package blueclub.server.auth.config;
 
 import blueclub.server.auth.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import blueclub.server.auth.filter.JwtAuthenticationProcessingFilter;
-import blueclub.server.auth.handler.LoginFailureHandler;
-import blueclub.server.auth.handler.LoginSuccessHandler;
-import blueclub.server.auth.handler.OAuth2LoginFailureHandler;
-import blueclub.server.auth.handler.OAuth2LoginSuccessHandler;
+import blueclub.server.auth.handler.*;
 import blueclub.server.auth.service.AuthService;
 import blueclub.server.auth.service.CustomOAuth2UserService;
 import blueclub.server.auth.service.JwtService;
@@ -19,7 +16,6 @@ import org.springframework.security.authentication.ProviderManager;
 import org.springframework.security.authentication.dao.DaoAuthenticationProvider;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
-import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.factory.PasswordEncoderFactories;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.web.SecurityFilterChain;
@@ -40,6 +36,7 @@ public class SecurityConfig {
     private final ObjectMapper objectMapper;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
+    private final OAuth2LogoutHandler oAuth2LogoutHandler;
     private final CustomOAuth2UserService customOAuth2UserService;
 
     @Bean
@@ -52,9 +49,8 @@ public class SecurityConfig {
                 .and()
 
                 // 세션 사용 X
-                .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
-
-                .and()
+                // .sessionManagement().sessionCreationPolicy(SessionCreationPolicy.STATELESS)
+                // .and()
 
                 //== URL별 권한 관리 옵션 ==//
                 .authorizeHttpRequests()
@@ -64,6 +60,12 @@ public class SecurityConfig {
                 .requestMatchers("/index.html", "/","/css/**","/images/**","/js/**","/favicon.ico","/h2-console/**").permitAll()
                 .requestMatchers("/register", "/login/**").permitAll() // 회원가입, 로그인 접근 가능
                 .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
+                .and()
+
+                .logout()
+                .addLogoutHandler(oAuth2LogoutHandler)
+                .deleteCookies()
+                .logoutSuccessUrl("/login")
                 .and()
 
                 //== 소셜 로그인 설정 ==//

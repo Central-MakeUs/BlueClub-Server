@@ -45,28 +45,19 @@ public class User extends BaseTimeEntity {
     @Enumerated(EnumType.STRING)
     private SocialType socialType;
 
-    private String socialId; // 로그인한 소셜 타입의 식별자 값 (일반 로그인인 경우 null)
+    private String socialId; // 로그인한 소셜 타입의 식별자 값
 
-    private String refreshToken; // 리프레시 토큰
+    private String refreshToken;
 
     public void authorizeUser() {
         this.role = Role.USER;
-    }
-
-    public void passwordEncode(PasswordEncoder passwordEncoder) {
-        this.password = passwordEncoder.encode(this.password);
     }
 
     public void updateRefreshToken(String updateRefreshToken) {
         this.refreshToken = updateRefreshToken;
     }
 
-    public static User createUser(Email email, String password, String name, String phoneNumber) {
-        return User.builder()
-                .email(email)
-                .password(password)
-                .name(name)
-                .phoneNumber(phoneNumber)
-                .build();
+    public void deleteRefreshToken() {
+        this.refreshToken = null;
     }
 }

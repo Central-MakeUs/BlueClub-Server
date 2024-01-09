@@ -1,6 +1,7 @@
 package blueclub.server.auth.service;
 
-import blueclub.server.user.domain.Email;
+import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
@@ -153,11 +154,23 @@ public class JwtService {
      * RefreshToken DB 저장(업데이트)
      */
     @Transactional
-    public void updateRefreshToken(String email, String refreshToken) {
-        userRepository.findByEmail(Email.from(email))
+    public void updateRefreshToken(Long id, String refreshToken) {
+        userRepository.findById(id)
                 .ifPresentOrElse(
                         user -> user.updateRefreshToken(refreshToken),
-                        () -> new Exception("일치하는 회원이 없습니다.")
+                        () -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR)
+                );
+    }
+
+    /**
+     * RefreshToken DB 삭제
+     */
+    @Transactional
+    public void deleteRefreshToken(Long id) {
+        userRepository.findById(id)
+                .ifPresentOrElse(
+                        user -> user.deleteRefreshToken(),
+                        () -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR)
                 );
     }
 
