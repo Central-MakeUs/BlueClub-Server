@@ -3,6 +3,7 @@ package blueclub.server.auth.config;
 import blueclub.server.auth.filter.CustomJsonUsernamePasswordAuthenticationFilter;
 import blueclub.server.auth.filter.JwtAuthenticationProcessingFilter;
 import blueclub.server.auth.handler.*;
+import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.AuthService;
 import blueclub.server.auth.service.CustomOAuth2UserService;
 import blueclub.server.auth.service.JwtService;
@@ -33,6 +34,7 @@ public class SecurityConfig {
     private final AuthService authService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
     private final ObjectMapper objectMapper;
     private final OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
     private final OAuth2LoginFailureHandler oAuth2LoginFailureHandler;
@@ -109,7 +111,7 @@ public class SecurityConfig {
      */
     @Bean
     public LoginSuccessHandler loginSuccessHandler() {
-        return new LoginSuccessHandler(jwtService, userRepository);
+        return new LoginSuccessHandler(jwtService, userRepository, refreshTokenRepository);
     }
 
     /**
@@ -138,6 +140,6 @@ public class SecurityConfig {
 
     @Bean
     public JwtAuthenticationProcessingFilter jwtAuthenticationProcessingFilter() {
-        return new JwtAuthenticationProcessingFilter(jwtService, userRepository);
+        return new JwtAuthenticationProcessingFilter(jwtService, userRepository, refreshTokenRepository);
     }
 }

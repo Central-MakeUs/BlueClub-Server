@@ -1,5 +1,7 @@
 package blueclub.server.auth.filter;
 
+import blueclub.server.auth.domain.RefreshToken;
+import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.auth.utils.PasswordUtil;
 import blueclub.server.user.domain.Email;
@@ -40,6 +42,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private final RefreshTokenRepository refreshTokenRepository;
 
     private GrantedAuthoritiesMapper authoritiesMapper = new NullAuthoritiesMapper();
 
@@ -82,9 +85,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      *  그 후 JwtService.sendAccessTokenAndRefreshToken()으로 응답 헤더에 보내기
      */
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
-        userRepository.findByRefreshToken(refreshToken)
-                .ifPresent(user -> {
-                    String reIssuedRefreshToken = reIssueRefreshToken(user);
+        refreshTokenRepository.findByToken(refreshToken)
+                .ifPresent(token -> {
+                    User user = userRepository.findById(token.getId()).orElseThrow();
+                    String reIssuedRefreshToken = reIssueRefreshToken(token);
                     jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail().getValue()),
                             reIssuedRefreshToken);
                 });
@@ -95,10 +99,10 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      * jwtService.createRefreshToken()으로 리프레시 토큰 재발급 후
      * DB에 재발급한 리프레시 토큰 업데이트 후 Flush
      */
-    private String reIssueRefreshToken(User user) {
+    private String reIssueRefreshToken(RefreshToken token) {
         String reIssuedRefreshToken = jwtService.createRefreshToken();
-        user.updateRefreshToken(reIssuedRefreshToken);
-        userRepository.saveAndFlush(user);
+        token.updateRefreshToken(reIssuedRefreshToken);
+        refreshTokenRepository.save(token);
         return reIssuedRefreshToken;
     }
 
