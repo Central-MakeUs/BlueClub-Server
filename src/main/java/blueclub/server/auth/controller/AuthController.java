@@ -7,8 +7,8 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.net.URI;
@@ -17,8 +17,8 @@ import java.net.URI;
 @RequiredArgsConstructor
 public class AuthController {
 
-    @GetMapping("/auth/{socialType}")
-    public ResponseEntity<?> redirect(@PathVariable String socialType) {
+    @RequestMapping("/login/{socialType}")
+    public ResponseEntity<?> socialLogin(@PathVariable String socialType) {
         HttpHeaders headers = new HttpHeaders();
         if (socialType.equals(SocialType.KAKAO.toString().toLowerCase())) {
             headers.setLocation(URI.create("/oauth2/authorization/kakao"));

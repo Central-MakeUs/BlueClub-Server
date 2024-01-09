@@ -2,7 +2,7 @@ package blueclub.server.auth.service;
 
 import blueclub.server.auth.domain.CustomOAuth2User;
 import blueclub.server.auth.domain.SocialType;
-import blueclub.server.auth.dto.OAuthAttributes;
+import blueclub.server.auth.dto.request.OAuthAttributes;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -60,6 +60,7 @@ public class CustomOAuth2UserService implements OAuth2UserService<OAuth2UserRequ
                 Collections.singleton(new SimpleGrantedAuthority(createdUser.getRole().getKey())),
                 attributes,
                 extractAttributes.getNameAttributeKey(),
+                createdUser.getId(),
                 createdUser.getEmail().getValue(),
                 createdUser.getRole()
         );
