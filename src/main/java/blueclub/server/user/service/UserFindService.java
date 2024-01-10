@@ -21,4 +21,9 @@ public class UserFindService {
         return userRepository.findByEmail(Email.from(userDetails.getUsername()))
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR));
     }
+
+    public User findById(Long id) {
+        return userRepository.findById(id)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR));
+    }
 }
