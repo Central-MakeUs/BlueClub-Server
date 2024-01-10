@@ -57,6 +57,7 @@ public class CustomJsonUsernamePasswordAuthenticationFilter extends AbstractAuth
      * (여기서 AuthenticationManager 객체는 ProviderManager -> SecurityConfig에서 설정)
      */
     @Override
+    @SuppressWarnings("unchecked")
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response) throws AuthenticationException, IOException {
         if(request.getContentType() == null || !request.getContentType().equals(CONTENT_TYPE)  ) {
             throw new AuthenticationServiceException("Authentication Content-Type not supported: " + request.getContentType());
