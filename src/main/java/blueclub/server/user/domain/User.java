@@ -44,6 +44,8 @@ public class User extends BaseTimeEntity {
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
+    private String socialAccessToken;
+
     public void authorizeUser() {
         this.role = Role.USER;
     }
@@ -53,5 +55,9 @@ public class User extends BaseTimeEntity {
         this.job = job;
         this.jobStart = jobStart;
         this.tosAgree = tosAgree;
+    }
+
+    public void addSocialAccessToken(String socialAccessToken) {
+        this.socialAccessToken = socialAccessToken;
     }
 }

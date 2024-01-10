@@ -4,6 +4,7 @@ import blueclub.server.auth.domain.CustomOAuth2User;
 import blueclub.server.auth.dto.response.SocialLoginResponse;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.global.response.BaseResponse;
+import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -22,6 +23,7 @@ import static blueclub.server.global.response.BaseResponseStatus.SUCCESS;
 public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
 
     private final JwtService jwtService;
+    private final UserService userService;
     private ObjectMapper objectMapper = new ObjectMapper();
 
     private static final String BEARER = "Bearer ";
@@ -58,6 +60,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         String result = objectMapper.writeValueAsString(baseResponse);
         response.getWriter().write(result);
 
+        userService.addSocialAccessToken(oAuth2User);
         // jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken);
         jwtService.updateRefreshToken(oAuth2User.getId(), refreshToken);
     }

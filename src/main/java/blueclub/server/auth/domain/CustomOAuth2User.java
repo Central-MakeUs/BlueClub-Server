@@ -15,15 +15,17 @@ import java.util.Map;
 public class CustomOAuth2User extends DefaultOAuth2User {
 
     private Long id;
+    private String oauthAccessToken;
     private String nickname;
     private String email;
     private Role role;
 
     public CustomOAuth2User(Collection<? extends GrantedAuthority> authorities,
                             Map<String, Object> attributes, String nameAttributeKey,
-                            Long id, String nickname, String email, Role role) {
+                            Long id, String oauthAccessToken, String nickname, String email, Role role) {
         super(authorities, attributes, nameAttributeKey);
         this.id = id;
+        this.oauthAccessToken = oauthAccessToken;
         this.nickname = nickname;
         this.email = email;
         this.role = role;
