@@ -9,6 +9,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getId() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -19,6 +20,19 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
+    public String getName() {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+        if (response == null) {
+            return null;
+        }
+
+        return (String) response.get("name");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public String getEmail() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -30,6 +44,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getNickname() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -41,6 +56,7 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getImageUrl() {
         Map<String, Object> response = (Map<String, Object>) attributes.get("response");
 
@@ -49,5 +65,17 @@ public class NaverOAuth2UserInfo extends OAuth2UserInfo {
         }
 
         return (String) response.get("profile_image");
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public String getPhoneNumber() {
+        Map<String, Object> response = (Map<String, Object>) attributes.get("response");
+
+        if (response == null) {
+            return null;
+        }
+
+        return (String) response.get("mobile");
     }
 }

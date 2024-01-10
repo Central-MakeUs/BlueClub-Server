@@ -14,6 +14,12 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    public String getName() {
+        return null;
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
     public String getEmail() {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
 
@@ -25,6 +31,7 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getNickname() {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
 
@@ -42,6 +49,7 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public String getImageUrl() {
         Map<String, Object> account = (Map<String, Object>) attributes.get("kakao_account");
 
@@ -56,5 +64,10 @@ public class KakaoOAuth2UserInfo extends OAuth2UserInfo {
         }
 
         return (String) profile.get("thumbnail_image_url");
+    }
+
+    @Override
+    public String getPhoneNumber() {
+        return null;
     }
 }
