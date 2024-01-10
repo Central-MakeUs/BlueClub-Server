@@ -31,9 +31,11 @@ spring:
             redirect-uri: ${oauth.redirect.uri}/login/oauth2/code/naver
             authorization-grant-type: authorization_code
             scope:
+              - name
               - email
               - nickname
               - profile_image
+              - mobile
             client-name: naver
         provider:
           kakao:
