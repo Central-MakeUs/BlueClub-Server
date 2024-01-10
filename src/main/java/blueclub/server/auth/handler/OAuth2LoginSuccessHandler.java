@@ -45,6 +45,7 @@ public class OAuth2LoginSuccessHandler implements AuthenticationSuccessHandler {
         response.setCharacterEncoding("utf-8");
         SocialLoginResponse socialLoginResponse = SocialLoginResponse.builder()
                 .id(oAuth2User.getId())
+                .nickname(oAuth2User.getNickname())
                 .accessToken(BEARER + accessToken)
                 .refreshToken(BEARER + refreshToken)
                 .build();
