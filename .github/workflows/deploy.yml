@@ -43,6 +43,11 @@ jobs:
         run: ./gradlew clean build
         shell: bash # (8) 빌드 시작
 
+      - name: 디버그
+        run: |
+          pwd
+          ls -R
+
       - name: Get current time
         uses: 1466587594/get-current-time@v2
         id: current-time
