@@ -2,8 +2,7 @@ package blueclub.server.global;
 
 import blueclub.server.auth.config.TestSecurityConfig;
 import blueclub.server.auth.controller.AuthController;
-import blueclub.server.auth.handler.OAuth2LoginSuccessHandler;
-import blueclub.server.auth.service.CustomOAuth2UserService;
+import blueclub.server.auth.service.AuthService;
 import blueclub.server.user.controller.UserController;
 import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +39,7 @@ public class ControllerTest {
     protected ObjectMapper objectMapper;
 
     @MockBean
-    protected OAuth2LoginSuccessHandler oAuth2LoginSuccessHandler;
+    protected AuthService authService;
 
     @MockBean
     protected UserService userService;
