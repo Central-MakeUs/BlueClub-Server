@@ -29,7 +29,7 @@ repositories {
 
 swaggerSources {
 	sample {
-		setInputFile(file("build/resources/main/static/docs/index.yaml"))
+		setInputFile(file("build/api-spec/index.yaml"))
 		code {
 			language = 'spring'
 		}
@@ -50,14 +50,13 @@ openapi3 {
 	description = "BlueClub Spring REST Docs with Swagger UI."
 	version = "0.0.1"
 	format = "yaml"
-	outputDirectory = 'build/resources/main/static/docs'
 	outputFileNamePrefix = 'index'
 }
 
 task swaggerConfig {
 	dependsOn 'openapi3'
 	doFirst {
-		def swaggerUIFile = file('build/resources/main/static/docs/index.yaml')
+		def swaggerUIFile = file('build/api-spec/index.yaml')
 
 		def securitySchemesContent =  "  securitySchemes:\n" +  \
                                       "    bearerAuth:\n" +  \
@@ -122,7 +121,6 @@ dependencies {
 	testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 	swaggerUI 'org.webjars:swagger-ui:4.18.1'
-	compileJava.dependsOn swaggerSources.sample.code
 }
 
 tasks.named('test') {
