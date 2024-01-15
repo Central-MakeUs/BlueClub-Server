@@ -3,7 +3,6 @@ package blueclub.server.auth.handler;
 import blueclub.server.auth.domain.RefreshToken;
 import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.JwtService;
-import blueclub.server.user.domain.Email;
 import blueclub.server.user.repository.UserRepository;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
@@ -32,13 +31,10 @@ public class LoginSuccessHandler extends SimpleUrlAuthenticationSuccessHandler {
 
         jwtService.sendAccessAndRefreshToken(response, accessToken, refreshToken); // 응답 헤더에 AccessToken, RefreshToken 실어서 응답
 
-        userRepository.findByEmail(Email.from(email))
+        userRepository.findByEmail(email)
                 .ifPresent(user -> {
                     refreshTokenRepository.save(RefreshToken.createRefreshToken(user.getId(), refreshToken));
                 });
-        // log.info("로그인에 성공하였습니다. 이메일 : {}", email);
-        // log.info("로그인에 성공하였습니다. AccessToken : {}", accessToken);
-        // log.info("발급된 AccessToken 만료 기간 : {}", accessTokenExpiration);
     }
 
     private String extractUsername(Authentication authentication) {
