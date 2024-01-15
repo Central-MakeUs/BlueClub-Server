@@ -45,14 +45,14 @@ openapi3 {
 	description = "BlueClub Spring REST Docs with Swagger UI."
 	version = "0.0.1"
 	format = "yaml"
-	outputDirectory = 'build/resources/main/static/docs'
+	outputDirectory = 'src/main/resources/static/docs'
 	outputFileNamePrefix = 'index'
 }
 
 task swaggerConfig {
 	dependsOn 'openapi3'
 	doFirst {
-		def swaggerUIFile = file('build/resources/main/static/docs/index.yaml')
+		def swaggerUIFile = file('src/main/resources/static/docs/index.yaml')
 
 		def securitySchemesContent =  "  securitySchemes:\n" +  \
                                       "    bearerAuth:\n" +  \
@@ -125,8 +125,8 @@ tasks.named('test') {
 
 task copyConfig {
 	copy {
-		from 'build/resources/main/static/docs'
-		into 'src/main/resources/static/docs'
+		from 'src/main/resources/static/docs'
+		into 'build/resources/main/static/docs'
 	}
 }
 
