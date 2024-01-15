@@ -82,7 +82,6 @@ public class UserControllerTest extends ControllerTest {
     @DisplayName("회원 탈퇴 API [DELETE /user/withdrawal]")
     class withdraw {
         private static final String BASE_URL = "/user/withdrawal";
-        private static final String SOCIAL_TYPE = "kakao";
 
         @Test
         @DisplayName("회원 탈퇴에 성공한다")
@@ -94,7 +93,7 @@ public class UserControllerTest extends ControllerTest {
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .delete(BASE_URL, SOCIAL_TYPE)
+                    .delete(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
