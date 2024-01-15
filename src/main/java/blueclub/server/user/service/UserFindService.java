@@ -2,7 +2,6 @@ package blueclub.server.user.service;
 
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
-import blueclub.server.user.domain.Email;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -18,7 +17,7 @@ public class UserFindService {
     private final UserRepository userRepository;
 
     public User findByUserDetails(UserDetails userDetails) {
-        return userRepository.findByEmail(Email.from(userDetails.getUsername()))
+        return userRepository.findByEmail(userDetails.getUsername())
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR));
     }
 

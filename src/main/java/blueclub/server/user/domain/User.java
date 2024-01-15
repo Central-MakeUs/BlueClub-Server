@@ -18,9 +18,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Email email;
-
-    // private String password; // 자체 로그인 도입 시 필요
+    private String email;
 
     private String name;
 
@@ -44,8 +42,6 @@ public class User extends BaseTimeEntity {
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
-    private String socialAccessToken;
-
     public void authorizeUser() {
         this.role = Role.USER;
     }
@@ -55,9 +51,6 @@ public class User extends BaseTimeEntity {
         this.job = job;
         this.jobStart = jobStart;
         this.tosAgree = tosAgree;
-    }
-
-    public void addSocialAccessToken(String socialAccessToken) {
-        this.socialAccessToken = socialAccessToken;
+        this.role = Role.USER;
     }
 }

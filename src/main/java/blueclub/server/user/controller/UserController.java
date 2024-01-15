@@ -25,11 +25,10 @@ public class UserController {
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
-    @DeleteMapping("/withdrawal/{socialType}")
-    public ResponseEntity<BaseResponse> withdrawalUser(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable String socialType) {
-        userService.withdrawalUser(userDetails, socialType);
-        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.DELETED);
+    @DeleteMapping("/withdrawal")
+    public ResponseEntity<BaseResponse> withdrawUser(
+            @AuthenticationPrincipal UserDetails userDetails) {
+        userService.withdrawUser(userDetails);
+        return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
 }
