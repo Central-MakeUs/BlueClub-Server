@@ -1,7 +1,3 @@
-import com.sun.security.ntlm.Server
-import org.hidetake.gradle.swagger.generator.GenerateSwaggerUI
-import org.springframework.boot.gradle.tasks.bundling.BootJar
-
 buildscript {
 	ext {
 		restdocsApiSpecVersion = '0.17.1'
@@ -27,35 +23,59 @@ java {
 	sourceCompatibility = '17'
 }
 
-configurations {
-	compileOnly {
-		extendsFrom annotationProcessor
-	}
-}
-
 repositories {
 	mavenCentral()
 }
 
 swaggerSources {
 	sample {
-		setInputFile(file("${project.buildDir}/api-spec/openapi3.yaml"))
+		setInputFile(file("build/resources/main/static/docs/index.yaml"))
+		code {
+			language = 'spring'
+		}
 	}
 }
 
 openapi3 {
 	servers = [
+			{ url = "https://blueclubserver.shop" },
 			{ url = "http://localhost:8080" }
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
 	version = "0.0.1"
-	format = "yaml" // API 문서 출력 포맷 (default = JSON)
+	format = "yaml"
+	outputDirectory = 'build/resources/main/static/docs'
+	outputFileNamePrefix = 'index'
+}
+
+task swaggerConfig {
+	dependsOn 'openapi3'
+	doFirst {
+		def swaggerUIFile = file('build/resources/main/static/docs/index.yaml')
+
+		def securitySchemesContent =  "  securitySchemes:\n" +  \
+                                      "    bearerAuth:\n" +  \
+                                      "      type: http\n" +  \
+                                      "      scheme: bearer\n" +  \
+                                      "      bearerFormat: JWT\n" + \
+                                      "security:\n" +
+									  "  - bearerAuth: []"
+
+		swaggerUIFile.append(securitySchemesContent)
+	}
+}
+
+configurations {
+	compileOnly {
+		extendsFrom annotationProcessor
+	}
 }
 
 dependencies {
 	// Web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
 
 	// JPA
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
@@ -95,6 +115,7 @@ dependencies {
 	// Rest Docs & Swagger
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 	swaggerUI 'org.webjars:swagger-ui:4.18.1'
 }
 
@@ -102,26 +123,14 @@ tasks.named('test') {
 	useJUnitPlatform()
 }
 
-tasks.withType(GenerateSwaggerUI) {
-	dependsOn 'openapi3'
-	doFirst {
-		def swaggerUIFile = file("${openapi3.outputDirectory}/openapi3.yaml")
-
-		def securitySchemesContent =  "  securitySchemes:\n" +  \
-                                      "    APIKey:\n" +  \
-                                      "      type: apiKey\n" +  \
-                                      "      name: Authorization\n" +  \
-                                      "      in: header\n" + \
-                                      "security:\n" +
-				"  - APIKey: []  # Apply the security scheme here"
-
-		swaggerUIFile.append securitySchemesContent
+task copyConfig {
+	copy {
+		from 'build/resources/main/static/docs'
+		into 'src/main/resources/static/docs'
 	}
 }
 
 bootJar {
-	dependsOn generateSwaggerUISample
-	from("${generateSwaggerUISample.outputDir}") {
-		into 'static/docs'
-	}
+	dependsOn 'swaggerConfig'
+	dependsOn 'copyConfig'
 }
