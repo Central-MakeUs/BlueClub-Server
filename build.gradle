@@ -36,6 +36,11 @@ swaggerSources {
 	}
 }
 
+task debug(type: Exec) {
+	commandLine 'pwd'
+	commandLine 'ls', '-R'
+}
+
 openapi3 {
 	servers = [
 			{ url = "https://blueclubserver.shop" },
@@ -45,14 +50,14 @@ openapi3 {
 	description = "BlueClub Spring REST Docs with Swagger UI."
 	version = "0.0.1"
 	format = "yaml"
-	outputDirectory = 'src/main/resources/static/docs'
+	outputDirectory = 'build/resources/main/static/docs'
 	outputFileNamePrefix = 'index'
 }
 
 task swaggerConfig {
 	dependsOn 'openapi3'
 	doFirst {
-		def swaggerUIFile = file('src/main/resources/static/docs/index.yaml')
+		def swaggerUIFile = file('build/resources/main/static/docs/index.yaml')
 
 		def securitySchemesContent =  "  securitySchemes:\n" +  \
                                       "    bearerAuth:\n" +  \
@@ -121,12 +126,13 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
+	finalizedBy 'debug'
 }
 
 task copyConfig {
 	copy {
-		from 'src/main/resources/static/docs'
-		into 'build/resources/main/static/docs'
+		from 'build/resources/main/static/docs'
+		into 'src/main/resources/static/docs'
 	}
 }
 
