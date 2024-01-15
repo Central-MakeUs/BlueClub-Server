@@ -14,17 +14,16 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import static blueclub.server.fixture.JwtTokenFixture.ACCESS_TOKEN;
 import static blueclub.server.fixture.JwtTokenFixture.BEARER;
 import static blueclub.server.fixture.UserFixture.WIZ;
-import static com.epages.restdocs.apispec.ResourceDocumentation.*;
-import static org.mockito.ArgumentMatchers.anyString;
-import static org.mockito.Mockito.doNothing;
+import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
+import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.doNothing;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
 import static org.springframework.restdocs.payload.PayloadDocumentation.fieldWithPath;
 import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
-import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 
 @DisplayName("User [Controller Layer] -> UserController 테스트")
 public class UserControllerTest extends ControllerTest {
@@ -60,13 +59,10 @@ public class UserControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("User API")
                                             .summary("회원 추가정보 작성 API")
-                                            .requestHeaders(
-                                                    headerWithName(AUTHORIZATION).description("Access Token")
-                                            )
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("닉네임"),
                                                     fieldWithPath("jobTitle").type(STRING).description("직업명"),
-                                                    fieldWithPath("jobStart").type(NUMBER).description("직업 시작 연도"),
+                                                    fieldWithPath("jobStart").type(NUMBER).description("직업 시작년도"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("선택약관 동의 여부")
                                             )
                                             .responseFields(
@@ -83,18 +79,18 @@ public class UserControllerTest extends ControllerTest {
     }
 
     @Nested
-    @DisplayName("회원 탈퇴 API [DELETE /user/withdrawal/{socialType}]")
-    class withdrawal {
-        private static final String BASE_URL = "/user/withdrawal/{socialType}";
+    @DisplayName("회원 탈퇴 API [DELETE /user/withdrawal]")
+    class withdraw {
+        private static final String BASE_URL = "/user/withdrawal";
         private static final String SOCIAL_TYPE = "kakao";
 
         @Test
         @DisplayName("회원 탈퇴에 성공한다")
-        void withdrawalSuccess() throws Exception {
+        void withdrawSuccess() throws Exception {
             // given
             doNothing()
                     .when(userService)
-                    .withdrawalUser(any(UserDetails.class), anyString());
+                    .withdrawUser(any(UserDetails.class));
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
@@ -112,12 +108,6 @@ public class UserControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("User API")
                                             .summary("회원 탈퇴 API")
-                                            .requestHeaders(
-                                                    headerWithName(AUTHORIZATION).description("Access Token")
-                                            )
-                                            .pathParameters(
-                                                    parameterWithName("socialType").description("소셜 타입")
-                                            )
                                             .build()
                             )
                     ));
