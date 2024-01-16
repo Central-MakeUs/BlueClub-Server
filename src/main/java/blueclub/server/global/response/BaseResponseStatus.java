@@ -32,10 +32,13 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     // Auth
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "AUTH_001", "이메일 형식이 올바르지 않습니다."),
     INVALID_PASSWORD_FORMAT(HttpStatus.BAD_REQUEST, "AUTH_002", "비밀번호 형식이 올바르지 않습니다."),
+    DUPLICATED_NICKNAME(HttpStatus.CONFLICT, "AUTH_003", "해당 닉네임은 중복입니다."),
+    DUPLICATED_EMAIL(HttpStatus.CONFLICT, "AUTH_004", "해당 이메일은 중복입니다."),
 
     // Member
-    MEMBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_001", "존재하지 않는 사용자 입니다."),
-    MEMBER_STATUS_NOT_VALID_ERROR(HttpStatus.NOT_FOUND, "MEMBER_003", "이미 삭제된 회원입니다"),
+    MEMBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_001", "존재하지 않는 사용자입니다."),
+    MEMBER_STATUS_NOT_VALID_ERROR(HttpStatus.NOT_FOUND, "MEMBER_002", "이미 삭제된 회원입니다"),
+    JOB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_003", "존재하지 않는 직업입니다."),
 
     /**
      * 500 : 응답 실패

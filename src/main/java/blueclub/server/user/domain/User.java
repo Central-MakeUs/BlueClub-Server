@@ -5,9 +5,6 @@ import blueclub.server.auth.domain.SocialType;
 import blueclub.server.global.entity.BaseTimeEntity;
 import jakarta.persistence.*;
 import lombok.*;
-import org.springframework.format.annotation.DateTimeFormat;
-
-import java.time.LocalDate;
 
 @Entity
 @Getter
@@ -21,9 +18,7 @@ public class User extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    private Email email;
-
-    private String password;
+    private String email;
 
     private String name;
 
@@ -35,8 +30,9 @@ public class User extends BaseTimeEntity {
 
     private Job job;
 
-    @DateTimeFormat(pattern = "yyyy-MM-dd")
-    private LocalDate jobStart;
+    private Integer jobStart;
+
+    private Boolean tosAgree;
 
     @Enumerated(EnumType.STRING)
     private Role role;
@@ -47,6 +43,14 @@ public class User extends BaseTimeEntity {
     private String socialId; // 로그인한 소셜 타입의 식별자 값
 
     public void authorizeUser() {
+        this.role = Role.USER;
+    }
+
+    public void addDetails(String nickname, Job job, Integer jobStart, Boolean tosAgree) {
+        this.nickname = nickname;
+        this.job = job;
+        this.jobStart = jobStart;
+        this.tosAgree = tosAgree;
         this.role = Role.USER;
     }
 }

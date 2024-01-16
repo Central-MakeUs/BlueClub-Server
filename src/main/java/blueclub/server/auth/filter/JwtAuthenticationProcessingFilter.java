@@ -3,8 +3,6 @@ package blueclub.server.auth.filter;
 import blueclub.server.auth.domain.RefreshToken;
 import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.JwtService;
-import blueclub.server.auth.utils.PasswordUtil;
-import blueclub.server.user.domain.Email;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
 import jakarta.servlet.FilterChain;
@@ -38,7 +36,7 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/login"; // "/login"으로 들어오는 요청은 Filter 작동 X
+    private static final String NO_CHECK_URL = "/auth"; // "/auth"으로 들어오는 요청은 Filter 작동 X
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -89,7 +87,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .ifPresent(token -> {
                     User user = userRepository.findById(token.getId()).orElseThrow();
                     String reIssuedRefreshToken = reIssueRefreshToken(token);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail().getValue()),
+                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
                             reIssuedRefreshToken);
                 });
     }
@@ -119,7 +117,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
-                        .ifPresent(email -> userRepository.findByEmail(Email.from(email))
+                        .ifPresent(email -> userRepository.findByEmail(email)
                                 .ifPresent(this::saveAuthentication)));
 
         filterChain.doFilter(request, response);
@@ -141,14 +139,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      * setAuthentication()을 이용하여 위에서 만든 Authentication 객체에 대한 인증 허가 처리
      */
     public void saveAuthentication(User myUser) {
-        String password = myUser.getPassword();
-        if (password == null) { // 소셜 로그인 유저의 비밀번호 임의로 설정 하여 소셜 로그인 유저도 인증 되도록 설정
-            password = PasswordUtil.generateRandomPassword();
-        }
-
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(myUser.getEmail().getValue())
-                .password(password)
+                .username(myUser.getEmail())
                 .roles(myUser.getRole().name())
                 .build();
 

@@ -17,6 +17,13 @@ public class BaseResponse {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private Object result;
 
+    // Http Status만 Response로 반환하는 경우 (DELETE)
+    public static ResponseEntity<BaseResponse> toResponseEntity(BaseResponseStatus baseResponseStatus) {
+        return ResponseEntity
+                .status(baseResponseStatus.getStatus())
+                .body(null);
+    }
+
     // Http Status만 Response로 반환하는 경우
     public static ResponseEntity<BaseResponse> toResponseEntityContainsStatus(BaseResponseStatus baseResponseStatus) {
         return ResponseEntity
