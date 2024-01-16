@@ -36,11 +36,6 @@ swaggerSources {
 	}
 }
 
-task debug(type: Exec) {
-	commandLine 'pwd'
-	commandLine 'ls', '-R'
-}
-
 openapi3 {
 	servers = [
 			{ url = "https://blueclubserver.shop" },
@@ -125,7 +120,6 @@ dependencies {
 
 tasks.named('test') {
 	useJUnitPlatform()
-	finalizedBy 'debug'
 }
 
 task copyConfig {
