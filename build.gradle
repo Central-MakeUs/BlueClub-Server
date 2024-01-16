@@ -124,6 +124,10 @@ tasks.named('test') {
 
 task copyConfig {
 	copy {
+		from 'build/api-spec'
+		into 'build/resources/main/static/docs'
+	}
+	copy {
 		from 'build/resources/main/static/docs'
 		into 'src/main/resources/static/docs'
 	}
