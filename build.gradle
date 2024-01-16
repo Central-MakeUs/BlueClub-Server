@@ -1,8 +1,19 @@
+buildscript {
+	ext {
+		restdocsApiSpecVersion = '0.17.1'
+	}
+}
+
 plugins {
 	id 'java'
 	id 'org.springframework.boot' version '3.2.1'
 	id 'io.spring.dependency-management' version '1.1.4'
-	id 'org.asciidoctor.jvm.convert' version '3.3.2'
+
+	// RestDocs
+	id 'com.epages.restdocs-api-spec' version "${restdocsApiSpecVersion}"
+
+	// Swagger
+	id 'org.hidetake.swagger.generator' version '2.18.2'
 }
 
 group = 'blueclub'
@@ -12,39 +23,117 @@ java {
 	sourceCompatibility = '17'
 }
 
+repositories {
+	mavenCentral()
+}
+
+swaggerSources {
+	sample {
+		setInputFile(file("build/api-spec/index.yaml"))
+		code {
+			language = 'spring'
+		}
+	}
+}
+
+openapi3 {
+	servers = [
+			{ url = "https://blueclubserver.shop" },
+			{ url = "http://localhost:8080" }
+	]
+	title = "BlueClub Swagger UI"
+	description = "BlueClub Spring REST Docs with Swagger UI."
+	version = "0.0.1"
+	format = "yaml"
+	outputFileNamePrefix = 'index'
+}
+
+task swaggerConfig {
+	dependsOn 'openapi3'
+	doFirst {
+		def swaggerUIFile = file('build/api-spec/index.yaml')
+
+		def securitySchemesContent =  "  securitySchemes:\n" +  \
+                                      "    bearerAuth:\n" +  \
+                                      "      type: http\n" +  \
+                                      "      scheme: bearer\n" +  \
+                                      "      bearerFormat: JWT\n" + \
+                                      "security:\n" +
+									  "  - bearerAuth: []"
+
+		swaggerUIFile.append(securitySchemesContent)
+	}
+}
+
 configurations {
 	compileOnly {
 		extendsFrom annotationProcessor
 	}
 }
 
-repositories {
-	mavenCentral()
-}
-
-ext {
-	set('snippetsDir', file("build/generated-snippets"))
-}
-
 dependencies {
-	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
-	// implementation 'org.springframework.boot:spring-boot-starter-security'
-	implementation 'org.springframework.boot:spring-boot-starter-validation'
+	// Web
 	implementation 'org.springframework.boot:spring-boot-starter-web'
+	implementation 'org.springframework.boot:spring-boot-starter-webflux'
+
+	// JPA
+	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
+
+	// OAuth & JWT
+	implementation 'org.springframework.boot:spring-boot-starter-security'
+	implementation 'org.springframework.security:spring-security-config:6.0.2'
+	implementation 'org.springframework.boot:spring-boot-starter-oauth2-client'
+	runtimeOnly 'com.auth0:java-jwt:4.2.1'
+	implementation 'com.auth0:java-jwt:4.2.1'
+
+	// Validation
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+	// lombok
 	compileOnly 'org.projectlombok:lombok'
-	runtimeOnly 'com.mysql:mysql-connector-j'
+	testCompileOnly 'org.projectlombok:lombok'
 	annotationProcessor 'org.projectlombok:lombok'
+	testAnnotationProcessor 'org.projectlombok:lombok'
+	testImplementation 'org.projectlombok:lombok:1.18.26'
+
+	// DB
+	runtimeOnly 'com.mysql:mysql-connector-j'
+	runtimeOnly 'com.h2database:h2'
+
+	// Redis
+	implementation 'it.ozimov:embedded-redis:0.7.2'
+	implementation 'org.springframework.boot:spring-boot-starter-data-redis'
+
+	// AWS S3
+	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+
+	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
-	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
 	testImplementation 'org.springframework.security:spring-security-test'
+
+	// Rest Docs & Swagger
+	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'
+	testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
+	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
+	swaggerUI 'org.webjars:swagger-ui:4.18.1'
 }
 
 tasks.named('test') {
-	outputs.dir snippetsDir
 	useJUnitPlatform()
 }
 
-tasks.named('asciidoctor') {
-	inputs.dir snippetsDir
-	dependsOn test
+task copyConfig {
+	copy {
+		from 'build/api-spec'
+		into 'build/resources/main/static/docs'
+	}
+	copy {
+		from 'build/resources/main/static/docs'
+		into 'src/main/resources/static/docs'
+	}
+}
+
+bootJar {
+	dependsOn 'swaggerConfig'
+	dependsOn 'copyConfig'
 }
