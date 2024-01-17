@@ -112,6 +112,14 @@ jobs:
         run: echo "CurrentTime=${{steps.current-time.outputs.formattedTime}}"
         shell: bash # (10) 확보한 시간 표시
 
+      - name: Test
+        run: |
+          pwd
+          ls -alR
+          cd build
+          pwd
+          ls -alR
+
       - name: Generate deployment package
         run: |
           mkdir -p deploy
