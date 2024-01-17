@@ -10,6 +10,7 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -141,6 +142,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void saveAuthentication(User myUser) {
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
                 .username(myUser.getEmail())
+                .password(RandomStringUtils.random(10)) // 임시 비밀번호
                 .roles(myUser.getRole().name())
                 .build();
 
