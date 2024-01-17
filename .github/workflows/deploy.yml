@@ -116,6 +116,7 @@ jobs:
         run: |
           mkdir -p deploy
           cp build/libs/*.jar deploy/application.jar
+          cp build/resources/main/static/docs/index.yaml deploy/static/docs/index.yaml
           cp Procfile deploy/Procfile
           cp -r .ebextensions deploy/.ebextensions
           cp -r .platform deploy/.platform
