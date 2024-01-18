@@ -38,7 +38,7 @@ swaggerSources {
 
 openapi3 {
 	servers = [
-			{ url = "https://blueclubserver.shop" },
+			{ url = "https://www.blueclubserver.shop" },
 			{ url = "http://localhost:8080" }
 	]
 	title = "BlueClub Swagger UI"
