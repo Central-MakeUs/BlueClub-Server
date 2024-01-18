@@ -98,7 +98,7 @@ jobs:
         shell: bash # (6) 권한 부여
 
       - name: Build with Gradle
-        run: ./gradlew clean build -Pprofile=prod --refresh-dependencies --info
+        run: ./gradlew clean bootjar -Pprofile=prod --info
         shell: bash # (8) 빌드 시작
 
       - name: Get current time
