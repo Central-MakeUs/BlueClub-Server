@@ -9,8 +9,7 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addCorsMappings(final CorsRegistry registry) {
         registry.addMapping("/**")
-                .allowedOrigins("https://blueclubserver.shop")
-                .allowedOrigins("http://localhost:8080")
+                .allowedOrigins("https://blueclubserver.shop", "https://www.blueclubserver.shop", "http://localhost:8080")
                 .allowedMethods("GET", "POST", "DELETE", "PATCH")
                 .maxAge(3000);
     }
