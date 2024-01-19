@@ -14,7 +14,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.www.BasicAuthenticationFilter;
 
 /**
- * 인증은 CustomJsonUsernamePasswordAuthenticationFilter에서 authenticate()로 인증된 사용자로 처리
  * JwtAuthenticationProcessingFilter는 AccessToken, RefreshToken 재발급
  */
 @Configuration
@@ -47,6 +46,7 @@ public class SecurityConfig {
                 .requestMatchers("/", "/css/**", "/images/**", "/js/**", "/favicon.ico", "/h2-console/**", "/health").permitAll()
                 .requestMatchers("/docs/**", "/swagger-ui/**", "/swagger", "/v3/api-docs/**").permitAll() // Swagger 접근 가능
                 .requestMatchers("/auth/**").permitAll() // 회원가입, 로그인 접근 가능
+                .requestMatchers("/error").permitAll() // 에러 핸들링 가능
                 .anyRequest().authenticated() // 위의 경로 이외에는 모두 인증된 사용자만 접근 가능
                 .and()
 
