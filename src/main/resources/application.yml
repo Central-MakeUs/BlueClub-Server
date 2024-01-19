@@ -50,6 +50,10 @@ logging:
         util:
           EC2MetadataUtils: error
 
+slack:
+  webhook:
+    url: ${slack.webhook.url}
+
 ---
 
 spring:
