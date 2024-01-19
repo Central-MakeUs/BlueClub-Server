@@ -23,6 +23,8 @@ public class AuthService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
+    private static final Integer NICKNAME_MAX_LENGTH = 10;
+
     public SocialLoginResponse socialLogin(SocialLoginRequest socialLoginRequest) {
         User user = isRegister(socialLoginRequest);
         String refreshToken = jwtService.createRefreshToken();
@@ -37,7 +39,7 @@ public class AuthService {
                     .phoneNumber(user.getPhoneNumber())
                     .profileImage(user.getProfileImage())
                     .job(user.getJob().getTitle())
-                    .jobStart(user.getJobStart())
+                    .monthlyTargetIncome(user.getMonthlyTargetIncome())
                     .tosAgree(user.getTosAgree())
                     .role(user.getRole().getTitle())
                     .socialType(user.getSocialType().name())
@@ -77,8 +79,8 @@ public class AuthService {
         // 이메일 중복여부 체크
         if (userRepository.existsByEmail(email))
             throw new BaseException(BaseResponseStatus.DUPLICATED_EMAIL);
-        // 분기 처리, 닉네임 중복 시 뒤에 랜덤값 추가
-        if (checkNickname(nickname))
+        // 분기 처리, 닉네임 중복 또는 공백 시 뒤에 랜덤값 추가
+        if (nickname.isBlank() || checkNickname(nickname))
             nickname = createTemporaryNickname(nickname);
         return User.builder()
                 .socialId(socialId)
@@ -97,6 +99,6 @@ public class AuthService {
         return stringBuilder
                 .append(nickname)
                 .append("#")
-                .append(RandomStringUtils.randomAlphabetic(3)).toString();
+                .append(RandomStringUtils.randomAlphabetic(NICKNAME_MAX_LENGTH-nickname.length()-1)).toString();
     }
 }

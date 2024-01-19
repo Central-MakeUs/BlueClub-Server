@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.0.1"
+	version = "0.2.15"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
