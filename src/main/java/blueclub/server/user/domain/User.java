@@ -30,7 +30,7 @@ public class User extends BaseTimeEntity {
 
     private Job job;
 
-    private Integer jobStart;
+    private Long monthlyTargetIncome;
 
     private Boolean tosAgree;
 
@@ -46,10 +46,10 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;
     }
 
-    public void addDetails(String nickname, Job job, Integer jobStart, Boolean tosAgree) {
+    public void addDetails(String nickname, Job job, Long monthlyTargetIncome, Boolean tosAgree) {
         this.nickname = nickname;
         this.job = job;
-        this.jobStart = jobStart;
+        this.monthlyTargetIncome = monthlyTargetIncome;
         this.tosAgree = tosAgree;
         this.role = Role.USER;
     }
