@@ -6,10 +6,15 @@ import blueclub.server.auth.service.AuthService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
+@Validated
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/auth")
@@ -18,7 +23,7 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse> socialLogin(@RequestBody SocialLoginRequest socialLoginRequest) {
+    public ResponseEntity<BaseResponse> socialLogin(@Valid @RequestBody SocialLoginRequest socialLoginRequest) {
         SocialLoginResponse socialLoginResponse = authService.socialLogin(socialLoginRequest);
         if (socialLoginResponse.role() == null)
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, socialLoginResponse);
@@ -26,7 +31,11 @@ public class AuthController {
     }
 
     @GetMapping("/duplicated")
-    public ResponseEntity<BaseResponse> checkNickname(@RequestParam("nickname") String nickname) {
+    public ResponseEntity<BaseResponse> checkNickname(
+            @RequestParam("nickname")
+            @NotBlank(message = "닉네임을 입력해주세요")
+            @Length(max = 10, message = "닉네임은 10글자 이하로 작성해주세요")
+            String nickname) {
         if (authService.checkNickname(nickname))
             throw new BaseException(BaseResponseStatus.DUPLICATED_NICKNAME);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);

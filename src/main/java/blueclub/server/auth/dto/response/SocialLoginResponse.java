@@ -18,7 +18,7 @@ public record SocialLoginResponse(
 
         String job,
 
-        Integer jobStart,
+        Long monthlyTargetIncome,
 
         Boolean tosAgree,
 

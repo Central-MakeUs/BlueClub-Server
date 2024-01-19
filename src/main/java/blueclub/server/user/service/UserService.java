@@ -24,7 +24,7 @@ public class UserService {
         user.addDetails(
                 addDetailsRequest.nickname(),
                 Job.findByTitle(addDetailsRequest.jobTitle()),
-                addDetailsRequest.jobStart(),
+                addDetailsRequest.monthlyTargetIncome(),
                 addDetailsRequest.tosAgree()
         );
     }

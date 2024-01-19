@@ -9,8 +9,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum UserFixture {
-    WIZ(1L, "wiz@naver.com", "김위즈", "위즈", "010-0000-0000", "test.png",
-            Job.CADDY, 2023, true, Role.USER, SocialType.KAKAO, "testsocialid");
+    WIZ(1L, "wiz@naver.com", "김위즈", "위즈", "010-0000-0000",
+            "https://github.com/Central-MakeUs/BlueClub-Server/assets/90232934/ae25da66-5bfa-44be-acbc-6e15cb949198",
+            Job.CADDY, 700000L, true, Role.USER, SocialType.NAVER, "testsocialid");
 
     private final Long id;
     private final String email;
@@ -19,7 +20,7 @@ public enum UserFixture {
     private final String phoneNumber;
     private final String profileImage;
     private final Job job;
-    private final Integer jobStart;
+    private final Long monthlyTargetIncome;
     private final boolean tosAgree;
     private final Role role;
     private final SocialType socialType;

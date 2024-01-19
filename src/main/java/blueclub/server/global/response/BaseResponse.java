@@ -17,6 +17,17 @@ public class BaseResponse {
     @JsonInclude(JsonInclude.Include.ALWAYS)
     private Object result;
 
+    // Valid Handling
+    public static ResponseEntity<BaseResponse> toResponseEntityContainsCustomMessage(BaseResponseStatus baseResponseStatus, String message) {
+        return ResponseEntity
+                .status(baseResponseStatus.getStatus())
+                .body(BaseResponse.builder()
+                        .code(baseResponseStatus.getCode())
+                        .message(message)
+                        .result(null)
+                        .build());
+    }
+
     // Http Status만 Response로 반환하는 경우 (DELETE)
     public static ResponseEntity<BaseResponse> toResponseEntity(BaseResponseStatus baseResponseStatus) {
         return ResponseEntity
