@@ -4,6 +4,7 @@ import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.dto.request.AddDetailsRequest;
 import blueclub.server.user.service.UserService;
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -20,7 +21,7 @@ public class UserController {
     @PostMapping("/details")
     public ResponseEntity<BaseResponse> addUserDetails(
             @AuthenticationPrincipal UserDetails userDetails,
-            @RequestBody AddDetailsRequest addDetailsRequest) {
+            @Valid @RequestBody AddDetailsRequest addDetailsRequest) {
         userService.addUserDetails(userDetails, addDetailsRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
