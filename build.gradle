@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.0.1-SNAPSHOT'
+version = '0.3.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.2.15"
+	version = "0.3.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -117,6 +117,9 @@ dependencies {
 	testImplementation 'com.epages:restdocs-api-spec-mockmvc:' + restdocsApiSpecVersion
 	implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.0.4'
 	swaggerUI 'org.webjars:swagger-ui:4.18.1'
+
+	// Slack
+	implementation 'com.slack.api:slack-api-client:1.29.0'
 }
 
 tasks.named('test') {
