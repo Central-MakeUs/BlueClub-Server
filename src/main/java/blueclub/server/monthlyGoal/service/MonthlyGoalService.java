@@ -57,12 +57,12 @@ public class MonthlyGoalService {
             monthlyGoalRepository.save(newMonthlyGoal);
             return GetMonthlyGoalResponse.builder()
                     .targetIncome(recentMonthlyGoal)
-                    .progress((int) Math.floor(diaryService.getTotalMonthlyIncome(user, yearMonth)/recentMonthlyGoal*100))
+                    .progress((int) Math.floor((double) diaryService.getTotalMonthlyIncome(user, yearMonth)/recentMonthlyGoal*100))
                     .build();
         }
         return GetMonthlyGoalResponse.builder()
                 .targetIncome(monthlyGoal.get().getTargetIncome())
-                .progress((int) Math.floor(diaryService.getTotalMonthlyIncome(user, yearMonth)/monthlyGoal.get().getTargetIncome()*100))
+                .progress((int) Math.floor((double) diaryService.getTotalMonthlyIncome(user, yearMonth)/monthlyGoal.get().getTargetIncome()*100))
                 .build();
     }
 }
