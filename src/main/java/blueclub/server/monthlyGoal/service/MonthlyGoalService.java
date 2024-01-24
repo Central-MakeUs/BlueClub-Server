@@ -40,6 +40,7 @@ public class MonthlyGoalService {
                 .build());
     }
 
+    @Transactional(readOnly = true)
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
