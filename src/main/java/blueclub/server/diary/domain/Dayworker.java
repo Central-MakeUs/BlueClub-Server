@@ -27,4 +27,11 @@ public class Dayworker {
 
     @ColumnDefault("0.0")
     private Double numberOfWork;
+
+    public void update(String place, Long dailyWage, String typeOfJob, Double numberOfWork) {
+        this.place = place;
+        this.dailyWage = dailyWage;
+        this.typeOfJob = typeOfJob;
+        this.numberOfWork = numberOfWork;
+    }
 }
