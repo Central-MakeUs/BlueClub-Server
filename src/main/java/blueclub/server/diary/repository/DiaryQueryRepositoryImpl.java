@@ -1,5 +1,6 @@
 package blueclub.server.diary.repository;
 
+import blueclub.server.diary.domain.Diary;
 import blueclub.server.diary.domain.Worktype;
 import blueclub.server.diary.dto.response.GetDailyInfoResponse;
 import blueclub.server.diary.dto.response.MonthlyRecord;
@@ -71,6 +72,17 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                         diary.workAt.month().eq(yearMonth.getMonthValue()))
                 .limit(4)
                 .orderBy(diary.workAt.desc())
+                .fetch();
+    }
+
+    @Override
+    public List<Diary> getDiaryById(Long diaryId) {
+        return queryFactory
+                .selectDistinct(diary)
+                .from(diary)
+                .leftJoin(diary.image)
+                .fetchJoin()
+                .where(diary.id.eq(diaryId))
                 .fetch();
     }
 
