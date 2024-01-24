@@ -62,4 +62,13 @@ public class Diary extends BaseTimeEntity {
     public void setDayworker(Dayworker dayworker) {
         this.dayworker = dayworker;
     }
+
+    public void update(Worktype worktype, String memo, List<String> image, Long income, Long expenditure, Long saving) {
+        this.worktype = worktype;
+        this.memo = memo;
+        this.image = image;
+        this.income = income;
+        this.expenditure = expenditure;
+        this.saving = saving;
+    }
 }

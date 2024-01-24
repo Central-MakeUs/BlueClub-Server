@@ -28,4 +28,11 @@ public class Caddy {
 
     @ColumnDefault("false")
     private Boolean topdressing;
+
+    public void update(Long rounding, Long caddyFee, Long overFee, Boolean topdressing) {
+        this.rounding = rounding;
+        this.caddyFee = caddyFee;
+        this.overFee = overFee;
+        this.topdressing = topdressing;
+    }
 }

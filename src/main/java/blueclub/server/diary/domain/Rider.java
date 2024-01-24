@@ -28,4 +28,11 @@ public class Rider {
 
     @ColumnDefault("0")
     private Long incomeOfPromotions;
+
+    public void update(Long numberOfDeliveries, Long incomeOfDeliveries, Long numberOfPromotions, Long incomeOfPromotions) {
+        this.numberOfDeliveries = numberOfDeliveries;
+        this.incomeOfDeliveries = incomeOfDeliveries;
+        this.numberOfPromotions = numberOfPromotions;
+        this.incomeOfPromotions = incomeOfPromotions;
+    }
 }
