@@ -129,6 +129,7 @@ dependencies {
 	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
 
 	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'org.apache.commons:commons-collections4:4.0'
 }
 
 def querydslSrcDir = 'src/main/generated'
