@@ -16,6 +16,6 @@ public record GetCaddyDiaryDetailsResponse (
         Long rounding,
         Long caddyFee,
         Long overFee,
-        Boolean topDressing
+        Boolean topdressing
 ) {
 }

@@ -91,6 +91,6 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
             return diary.caddy.rounding;
         else if (Job.RIDER.equals(user.getJob()))
             return diary.rider.numberOfDeliveries;
-        return Expressions.numberPath(Long.class, "-1L");
+        return null;
     }
 }

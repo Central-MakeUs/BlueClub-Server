@@ -189,7 +189,7 @@ public class DiaryService {
                     .rounding(diary.get(0).getCaddy().getRounding())
                     .caddyFee(diary.get(0).getCaddy().getCaddyFee())
                     .overFee(diary.get(0).getCaddy().getOverFee())
-                    .topDressing(diary.get(0).getCaddy().getTopdressing())
+                    .topdressing(diary.get(0).getCaddy().getTopdressing())
                     .build();
         } else if (user.getJob().equals(Job.RIDER)) {
             return GetRiderDiaryDetailsResponse.builder()
