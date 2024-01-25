@@ -28,6 +28,7 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
      * 400 : 요청 실패
      */
     INVALID_INPUT_VALUE(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_001", "잘못된 요청입니다."),
+    INVALID_INPUT_DTO(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_002", "잘못된 DTO 형식입니다."),
 
     // Auth
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "AUTH_001", "이메일 형식이 올바르지 않습니다."),
@@ -39,6 +40,14 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     MEMBER_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_001", "존재하지 않는 사용자입니다."),
     MEMBER_STATUS_NOT_VALID_ERROR(HttpStatus.NOT_FOUND, "MEMBER_002", "이미 삭제된 회원입니다"),
     JOB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_003", "존재하지 않는 직업입니다."),
+
+    // MonthlyGoal
+    RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MONTHLY_GOAL_001", "월 목표 수입을 작성한 적이 없습니다."),
+
+    // Diary
+    WORKTYPE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_001", "존재하지 않는 근무 형태입니다."),
+    DIARY_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_002", "존재하지 않는 근무 일지입니다."),
+
 
     /**
      * 500 : 응답 실패

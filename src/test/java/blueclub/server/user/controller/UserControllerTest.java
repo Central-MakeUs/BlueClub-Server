@@ -267,10 +267,10 @@ public class UserControllerTest extends ControllerTest {
         }
 
         @Test
-        @DisplayName("월 목표 수입이 1000만원 초과이면 회원 추가정보 작성에 실패한다")
+        @DisplayName("월 목표 수입이 9999만원 초과이면 회원 추가정보 작성에 실패한다")
         void throwExceptionByOverMonthlyTargetIncome() throws Exception {
             // given
-            String validExceptionMessage = "월 수입 목표는 1000만원 이하로 입력해주세요";
+            String validExceptionMessage = "월 수입 목표는 9999만원 이하로 입력해주세요";
 
             // when
             final AddDetailsRequest addDetailsRequest = OverMonthlyTargetIncomeAddDetailsRequest();

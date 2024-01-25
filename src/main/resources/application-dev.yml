@@ -5,6 +5,7 @@ spring:
     username: root
     password:
   jpa:
+    generate-ddl: true
     open-in-view: false
     hibernate:
       ddl-auto: create
