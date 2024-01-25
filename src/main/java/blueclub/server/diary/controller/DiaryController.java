@@ -43,7 +43,7 @@ public class DiaryController {
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.CREATED);
     }
 
-    @PutMapping("/{diaryId}")
+    @PatchMapping("/{diaryId}")
     public ResponseEntity<BaseResponse> updateDiary(
             @AuthenticationPrincipal UserDetails userDetails,
             @PathVariable("diaryId") Long diaryId,
