@@ -3,6 +3,10 @@ package blueclub.server.global;
 import blueclub.server.auth.config.TestSecurityConfig;
 import blueclub.server.auth.controller.AuthController;
 import blueclub.server.auth.service.AuthService;
+import blueclub.server.diary.controller.DiaryController;
+import blueclub.server.diary.service.DiaryService;
+import blueclub.server.monthlyGoal.controller.MonthlyGoalController;
+import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.user.controller.UserController;
 import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,7 +30,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
 
 @WebMvcTest(value = {
         AuthController.class,
-        UserController.class
+        UserController.class,
+        DiaryController.class,
+        MonthlyGoalController.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @Import(TestSecurityConfig.class)
@@ -43,6 +49,12 @@ public class ControllerTest {
 
     @MockBean
     protected UserService userService;
+
+    @MockBean
+    protected DiaryService diaryService;
+
+    @MockBean
+    protected MonthlyGoalService monthlyGoalService;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {

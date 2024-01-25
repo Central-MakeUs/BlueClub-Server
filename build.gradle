@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.3.0-SNAPSHOT'
+version = '0.4.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.3.0"
+	version = "0.4.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -52,6 +52,7 @@ task swaggerConfig {
 	dependsOn 'openapi3'
 	doFirst {
 		def swaggerUIFile = file('build/api-spec/index.yaml')
+		def newSwaggerUIFile = new File('build/api-spec/new.yaml')
 
 		def securitySchemesContent =  "  securitySchemes:\n" +  \
                                       "    bearerAuth:\n" +  \
@@ -62,6 +63,184 @@ task swaggerConfig {
 									  "  - bearerAuth: []"
 
 		swaggerUIFile.append(securitySchemesContent)
+
+		def PostDiaryContent =
+				"""
+      requestBody:
+        content:
+          multipart/form-data:
+            schema:
+              type: object
+              properties:
+                dto:
+                  type: object
+                  description: 근무 일지 DTO
+                  example:
+                    worktype: 근무
+                    memo: memo1
+                    income: 200000
+                    expenditure: 0
+                    saving: 0
+                    date: 2024-01-25
+                    imageUrlList: null
+                    jobTitle: 골프 캐디
+                    rounding: 3
+                    caddyFee: 200000
+                    overFee: 0
+                    topdressing: true
+                image:
+                  type: string
+                  description: 사진
+                  format: binary
+"""
+
+		def PostDiaryDTOContent =
+				"""
+    UpdateCaddyDiaryRequest:
+      title: UpdateCaddyDiaryRequest
+      type: object
+      description: 골프 캐디 근무 일지 DTO
+      properties:
+        worktype:
+          type: string
+          description: "[필수] 근무 형태 (근무, 조퇴, 휴무)"
+        memo:
+          type: string
+          description: "메모"
+        income:
+          type: number
+          description: "[필수] 총 수입"
+        expenditure:
+          type: number
+          description: "지출액"
+        saving:
+          type: number
+          description: "저축액"
+        date:
+          type: string
+          description: "[필수] 근무 일자 // 형식 : yyyy-mm-dd"
+        imageUrlList:
+          type: string
+          description: "기존 이미지 URL 리스트 (or null)"
+        jobTitle:
+          type: string
+          description: "[필수] 직업명"
+        rounding:
+          type: number
+          description: "[필수] 라운딩 수"
+        caddyFee:
+          type: number
+          description: "[필수] 캐디피 수입"
+        overFee:
+          type: number
+          description: "오버피 수입"
+        topdressing:
+          type: boolean
+          description: "배토 여부"
+    UpdateRiderDiaryRequest:
+      title: UpdateRiderDiaryRequest
+      type: object
+      description: 배달 라이더 근무 일지 DTO
+      properties:
+        worktype:
+          type: string
+          description: "[필수] 근무 형태 (근무, 조퇴, 휴무)"
+        memo:
+          type: string
+          description: "메모"
+        income:
+          type: number
+          description: "[필수] 총 수입"
+        expenditure:
+          type: number
+          description: "지출액"
+        saving:
+          type: number
+          description: "저축액"
+        date:
+          type: string
+          description: "[필수] 근무 일자 // 형식 : yyyy-mm-dd"
+        imageUrlList:
+          type: string
+          description: "기존 이미지 URL 리스트 (or null)"
+        jobTitle:
+          type: string
+          description: "[필수] 직업명"
+        numberOfDeliveries:
+          type: number
+          description: "[필수] 배달 건수"
+        incomeOfDeliveries:
+          type: number
+          description: "[필수] 배달 수입"
+        numberOfPromotions:
+          type: number
+          description: "프로모션 건수"
+        incomeOfPromotions:
+          type: number
+          description: "프로모션 수입"
+    UpdateDayworkerDiaryRequest:
+      title: UpdateDayworkerDiaryRequest
+      type: object
+      description: 일용직 노동자 근무 일지 DTO
+      properties:
+        worktype:
+          type: string
+          description: "[필수] 근무 형태 (근무, 조퇴, 휴무)"
+        memo:
+          type: string
+          description: "메모"
+        income:
+          type: number
+          description: "[필수] 총 수입"
+        expenditure:
+          type: number
+          description: "지출액"
+        saving:
+          type: number
+          description: "저축액"
+        date:
+          type: string
+          description: "[필수] 근무 일자 // 형식 : yyyy-mm-dd"
+        imageUrlList:
+          type: string
+          description: "기존 이미지 URL 리스트 (or null)"
+        jobTitle:
+          type: string
+          description: "[필수] 직업명"
+        place:
+          type: string
+          description: "[필수] 현장명"
+        dailyWage:
+          type: number
+          description: "[필수] 일급"
+        typeOfJob:
+          type: string
+          description: "직종"
+        numberOfWork:
+          type: number
+          description: "공수"
+"""
+
+		def line = ""
+		def outputStream = new FileOutputStream(newSwaggerUIFile)
+		def writer = new PrintWriter(outputStream)
+		def inputStream = new FileInputStream(swaggerUIFile)
+		def reader = new BufferedReader(new InputStreamReader(inputStream))
+
+		while ((line = reader.readLine()) != null) {
+			if (line == "  securitySchemes:")
+				writer.print(PostDiaryDTOContent)
+			writer.println(line)
+			if (line == "      operationId: SaveCaddyDiary" || line == "      operationId: UpdateCaddyDiary")
+				writer.print(PostDiaryContent)
+		}
+		writer.flush()
+		writer.close()
+		inputStream.close()
+
+		swaggerUIFile.delete()
+		newSwaggerUIFile.renameTo(swaggerUIFile)
+		newSwaggerUIFile.delete()
 	}
 	finalizedBy 'copyConfig'
 }
@@ -120,6 +299,37 @@ dependencies {
 
 	// Slack
 	implementation 'com.slack.api:slack-api-client:1.29.0'
+
+	// Querydsl
+	implementation "com.querydsl:querydsl-jpa:5.0.0:jakarta"
+	implementation "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "com.querydsl:querydsl-apt:5.0.0:jakarta"
+	annotationProcessor "jakarta.annotation:jakarta.annotation-api"
+	annotationProcessor "jakarta.persistence:jakarta.persistence-api"
+
+	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
+	implementation 'org.apache.commons:commons-collections4:4.0'
+}
+
+def querydslSrcDir = 'src/main/generated'
+sourceSets {
+	main {
+		java {
+			srcDirs += [ querydslSrcDir ]
+		}
+	}
+}
+
+compileJava {
+	options.compilerArgs << '-Aquerydsl.generatedAnnotationClass=javax.annotation.Generated'
+}
+
+tasks.withType(JavaCompile) {
+	options.generatedSourceOutputDirectory = file(querydslSrcDir)
+}
+
+clean {
+	delete file(querydslSrcDir)
 }
 
 tasks.named('test') {

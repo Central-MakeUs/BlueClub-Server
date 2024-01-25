@@ -2,9 +2,16 @@ package blueclub.server.user.domain;
 
 import blueclub.server.auth.domain.Role;
 import blueclub.server.auth.domain.SocialType;
+import blueclub.server.diary.domain.Diary;
 import blueclub.server.global.entity.BaseTimeEntity;
+import blueclub.server.monthlyGoal.domain.MonthlyGoal;
 import jakarta.persistence.*;
 import lombok.*;
+
+import java.util.ArrayList;
+import java.util.List;
+
+import static jakarta.persistence.CascadeType.PERSIST;
 
 @Entity
 @Getter
@@ -41,6 +48,14 @@ public class User extends BaseTimeEntity {
     private SocialType socialType;
 
     private String socialId; // 로그인한 소셜 타입의 식별자 값
+
+    // 회원 탈퇴시 작성한 근무수첩 모두 삭제
+    @OneToMany(mappedBy = "user", cascade = PERSIST, orphanRemoval = true)
+    private List<Diary> diaryList = new ArrayList<>();
+
+    // 회원 탈퇴시 작성한 월 목표 수입 모두 삭제
+    @OneToMany(mappedBy = "user", cascade = PERSIST, orphanRemoval = true)
+    private List<MonthlyGoal> monthlyGoalList = new ArrayList<>();
 
     public void authorizeUser() {
         this.role = Role.USER;

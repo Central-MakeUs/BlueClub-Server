@@ -15,7 +15,7 @@ public record AddDetailsRequest (
         @NotBlank(message = "직업을 선택해주세요")
         String jobTitle,
         @Min(value = 100000, message = "월 수입 목표는 10만원 이상으로 입력해주세요")
-        @Max(value = 10000000, message = "월 수입 목표는 1000만원 이하로 입력해주세요")
+        @Max(value = 99990000, message = "월 수입 목표는 9999만원 이하로 입력해주세요")
         Long monthlyTargetIncome,
         @NotNull(message = "선택약관 동의여부를 입력해주세요")
         Boolean tosAgree
