@@ -7,6 +7,7 @@ import jakarta.validation.constraints.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 import org.springframework.format.annotation.DateTimeFormat;
 
 import java.time.LocalDate;
@@ -15,14 +16,15 @@ import java.util.List;
 @JsonTypeInfo(
         use = JsonTypeInfo.Id.NAME,
         include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "jobType",
+        property = "jobTitle",
         visible = true
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(name = "CADDY", value = UpdateCaddyDiaryRequest.class),
-        @JsonSubTypes.Type(name = "RIDER", value = UpdateRiderDiaryRequest.class),
-        @JsonSubTypes.Type(name = "DAYWORKER", value = UpdateDayworkerDiaryRequest.class)
+        @JsonSubTypes.Type(name = "골프 캐디", value = UpdateCaddyDiaryRequest.class),
+        @JsonSubTypes.Type(name = "배달 라이더", value = UpdateRiderDiaryRequest.class),
+        @JsonSubTypes.Type(name = "일용직 노동자", value = UpdateDayworkerDiaryRequest.class)
 })
+@SuperBuilder
 @Getter
 @NoArgsConstructor
 @AllArgsConstructor
@@ -46,7 +48,6 @@ public abstract class UpdateDiaryRequest {
 
     private List<String> imageUrlList;
 
-    public enum JobType {
-        CADDY, RIDER, DAYWORKER;
-    }
+    @NotBlank(message = "직업명은 필수입니다")
+    private String jobTitle;
 }
