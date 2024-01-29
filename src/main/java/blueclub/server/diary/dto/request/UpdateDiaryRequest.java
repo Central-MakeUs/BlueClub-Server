@@ -14,15 +14,12 @@ import java.time.LocalDate;
 import java.util.List;
 
 @JsonTypeInfo(
-        use = JsonTypeInfo.Id.NAME,
-        include = JsonTypeInfo.As.EXISTING_PROPERTY,
-        property = "jobTitle",
-        visible = true
+        use = JsonTypeInfo.Id.DEDUCTION
 )
 @JsonSubTypes({
-        @JsonSubTypes.Type(name = "골프 캐디", value = UpdateCaddyDiaryRequest.class),
-        @JsonSubTypes.Type(name = "배달 라이더", value = UpdateRiderDiaryRequest.class),
-        @JsonSubTypes.Type(name = "일용직 노동자", value = UpdateDayworkerDiaryRequest.class)
+        @JsonSubTypes.Type(UpdateCaddyDiaryRequest.class),
+        @JsonSubTypes.Type(UpdateRiderDiaryRequest.class),
+        @JsonSubTypes.Type(UpdateDayworkerDiaryRequest.class)
 })
 @SuperBuilder
 @Getter
@@ -47,7 +44,4 @@ public abstract class UpdateDiaryRequest {
     private LocalDate date;
 
     private List<String> imageUrlList;
-
-    @NotBlank(message = "직업명은 필수입니다")
-    private String jobTitle;
 }
