@@ -172,13 +172,13 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
-    public Object getDiaryDetails(UserDetails userDetails, Long diaryId) {
+    public Object getDiaryDetails(UserDetails userDetails, String jobTitle, Long diaryId) {
         User user = userFindService.findByUserDetails(userDetails);
         List<Diary> diary = diaryRepository.getDiaryById(diaryId);
         if (diary.isEmpty()) {
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
         }
-        if (user.getJob().equals(Job.CADDY)) {
+        if (Job.CADDY.getTitle().equals(jobTitle)) {
             return GetCaddyDiaryDetailsResponse.builder()
                     .worktype(diary.get(0).getWorktype().getKey())
                     .memo(diary.get(0).getMemo())
@@ -191,7 +191,7 @@ public class DiaryService {
                     .overFee(diary.get(0).getCaddy().getOverFee())
                     .topdressing(diary.get(0).getCaddy().getTopdressing())
                     .build();
-        } else if (user.getJob().equals(Job.RIDER)) {
+        } else if (Job.RIDER.getTitle().equals(jobTitle)) {
             return GetRiderDiaryDetailsResponse.builder()
                     .worktype(diary.get(0).getWorktype().getKey())
                     .memo(diary.get(0).getMemo())
@@ -204,7 +204,7 @@ public class DiaryService {
                     .incomeOfPromotions(diary.get(0).getRider().getIncomeOfPromotions())
                     .numberOfPromotions(diary.get(0).getRider().getNumberOfPromotions())
                     .build();
-        } else if (user.getJob().equals(Job.DAYWORKER)) {
+        } else if (Job.DAYWORKER.getTitle().equals(jobTitle)) {
             return GetDayworkerDiaryDetailsResponse.builder()
                     .worktype(diary.get(0).getWorktype().getKey())
                     .memo(diary.get(0).getMemo())

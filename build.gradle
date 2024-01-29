@@ -64,6 +64,17 @@ task swaggerConfig {
 
 		swaggerUIFile.append(securitySchemesContent)
 
+		def PostDiaryQueryContent =
+				"""
+      parameters:
+      - name: job
+        in: query
+        description: "[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"
+        required: true
+        schema:
+          type: string
+"""
+
 		def PostDiaryContent =
 				"""
       requestBody:
@@ -122,9 +133,6 @@ task swaggerConfig {
         imageUrlList:
           type: string
           description: "기존 이미지 URL 리스트 (or null)"
-        jobTitle:
-          type: string
-          description: "[필수] 직업명"
         rounding:
           type: number
           description: "[필수] 라운딩 수"
@@ -163,9 +171,6 @@ task swaggerConfig {
         imageUrlList:
           type: string
           description: "기존 이미지 URL 리스트 (or null)"
-        jobTitle:
-          type: string
-          description: "[필수] 직업명"
         numberOfDeliveries:
           type: number
           description: "[필수] 배달 건수"
@@ -204,9 +209,6 @@ task swaggerConfig {
         imageUrlList:
           type: string
           description: "기존 이미지 URL 리스트 (or null)"
-        jobTitle:
-          type: string
-          description: "[필수] 직업명"
         place:
           type: string
           description: "[필수] 현장명"
@@ -231,6 +233,8 @@ task swaggerConfig {
 			if (line == "  securitySchemes:")
 				writer.print(PostDiaryDTOContent)
 			writer.println(line)
+			if (line == "      operationId: SaveCaddyDiary")
+				writer.print(PostDiaryQueryContent)
 			if (line == "      operationId: SaveCaddyDiary" || line == "      operationId: UpdateCaddyDiary")
 				writer.print(PostDiaryContent)
 		}

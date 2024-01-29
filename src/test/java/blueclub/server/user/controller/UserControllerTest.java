@@ -1,7 +1,7 @@
 package blueclub.server.user.controller;
 
 import blueclub.server.global.ControllerTest;
-import blueclub.server.user.dto.request.AddDetailsRequest;
+import blueclub.server.user.dto.request.AddUserDetailsRequest;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import org.junit.jupiter.api.DisplayName;
@@ -39,15 +39,15 @@ public class UserControllerTest extends ControllerTest {
             // given
             doNothing()
                     .when(userService)
-                    .addUserDetails(any(UserDetails.class), any(AddDetailsRequest.class));
+                    .addUserDetails(any(UserDetails.class), any(AddUserDetailsRequest.class));
 
             // when
-            final AddDetailsRequest addDetailsRequest = addDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = addDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -71,7 +71,7 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result").type(NULL).description("null 반환")
                                             )
-                                            .requestSchema(Schema.schema("AddDetailsRequest"))
+                                            .requestSchema(Schema.schema("AddUserDetailsRequest"))
                                             .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
@@ -85,12 +85,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "닉네임을 입력해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = blankNicknameAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = blankNicknameAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -132,12 +132,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "닉네임은 10글자 이하로 작성해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = OverLengthNicknameAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = OverLengthNicknameAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -179,12 +179,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "직업을 선택해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = BlankJobTitleAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = BlankJobTitleAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -226,12 +226,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "월 수입 목표는 10만원 이상으로 입력해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = UnderMonthlyTargetIncomeAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = UnderMonthlyTargetIncomeAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -273,12 +273,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "월 수입 목표는 9999만원 이하로 입력해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = OverMonthlyTargetIncomeAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = OverMonthlyTargetIncomeAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -320,12 +320,12 @@ public class UserControllerTest extends ControllerTest {
             String validExceptionMessage = "선택약관 동의여부를 입력해주세요";
 
             // when
-            final AddDetailsRequest addDetailsRequest = NullTosAgreeAddDetailsRequest();
+            final AddUserDetailsRequest addUserDetailsRequest = NullTosAgreeAddDetailsRequest();
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .post(BASE_URL)
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
                     .contentType(APPLICATION_JSON)
-                    .content(objectMapper.writeValueAsString(addDetailsRequest));
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -396,8 +396,8 @@ public class UserControllerTest extends ControllerTest {
         }
     }
 
-    private AddDetailsRequest addDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest addDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
@@ -405,8 +405,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest blankNicknameAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest blankNicknameAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname("")
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
@@ -414,8 +414,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest OverLengthNicknameAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest OverLengthNicknameAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname("ThisIsOverLengthNickname")
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
@@ -423,8 +423,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest BlankJobTitleAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest BlankJobTitleAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
                 .jobTitle("")
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
@@ -432,8 +432,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest UnderMonthlyTargetIncomeAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest UnderMonthlyTargetIncomeAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(99L)
@@ -441,8 +441,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest OverMonthlyTargetIncomeAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest OverMonthlyTargetIncomeAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(9999999999L)
@@ -450,8 +450,8 @@ public class UserControllerTest extends ControllerTest {
                 .build();
     }
 
-    private AddDetailsRequest NullTosAgreeAddDetailsRequest() {
-        return AddDetailsRequest.builder()
+    private AddUserDetailsRequest NullTosAgreeAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
                 .jobTitle(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
