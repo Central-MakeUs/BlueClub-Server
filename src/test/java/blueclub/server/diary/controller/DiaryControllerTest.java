@@ -29,8 +29,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resourceDetails;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyLong;
+import static org.mockito.ArgumentMatchers.*;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
@@ -44,6 +43,11 @@ import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.
 
 @DisplayName("Diary [Controller Layer] -> DiaryController 테스트")
 public class DiaryControllerTest extends ControllerTest {
+
+    private static final String JOB = "job";
+    private static final String CADDY = "골프 캐디";
+    private static final String RIDER = "배달 라이더";
+    private static final String DAYWORKER = "일용직 노동자";
 
     @Nested
     @DisplayName("근무 일지 작성 API [POST /diary]")
@@ -73,7 +77,8 @@ public class DiaryControllerTest extends ControllerTest {
                     .file(file)
                     .file(mockRequest)
                     .accept(APPLICATION_JSON)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -103,7 +108,6 @@ public class DiaryControllerTest extends ControllerTest {
                                     fieldWithPath("saving").type(NUMBER).description("저축액"),
                                     fieldWithPath("date").type(STRING).description("[필수] 근무 일자 // 형식 : yyyy-mm-dd"),
                                     fieldWithPath("imageUrlList").type(ARRAY).description("사진 URL 리스트"),
-                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
                                     fieldWithPath("rounding").type(NUMBER).description("[필수] 라운딩 수"),
                                     fieldWithPath("caddyFee").type(NUMBER).description("[필수] 캐디피 수입"),
                                     fieldWithPath("overFee").type(NUMBER).description("오버피 수입"),
@@ -146,7 +150,8 @@ public class DiaryControllerTest extends ControllerTest {
                     .file(file)
                     .file(mockRequest)
                     .accept(APPLICATION_JSON)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
 
             requestBuilder.with(new RequestPostProcessor() {
                 @Override
@@ -167,6 +172,9 @@ public class DiaryControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("Diary API")
                                             .summary("근무 일지 수정 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
                                             )
@@ -192,12 +200,13 @@ public class DiaryControllerTest extends ControllerTest {
             // given
             doReturn(getCaddyDiaryDetailsResponse())
                     .when(diaryService)
-                    .getDiaryDetails(any(), anyLong());
+                    .getDiaryDetails(any(), anyString(), anyLong());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL, 1L)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -210,6 +219,9 @@ public class DiaryControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
                                             )
@@ -239,12 +251,13 @@ public class DiaryControllerTest extends ControllerTest {
             // given
             doReturn(getRiderDiaryDetailsResponse())
                     .when(diaryService)
-                    .getDiaryDetails(any(), anyLong());
+                    .getDiaryDetails(any(), anyString(), anyLong());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL, 1L)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, RIDER);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -257,6 +270,9 @@ public class DiaryControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
                                             )
@@ -286,12 +302,13 @@ public class DiaryControllerTest extends ControllerTest {
             // given
             doReturn(getDayworkerDiaryDetailsResponse())
                     .when(diaryService)
-                    .getDiaryDetails(any(), anyLong());
+                    .getDiaryDetails(any(), anyString(), anyLong());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL, 1L)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, DAYWORKER);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -304,6 +321,9 @@ public class DiaryControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
                                             )
@@ -470,7 +490,6 @@ public class DiaryControllerTest extends ControllerTest {
                 .saving(CADDY_DIARY.getSaving())
                 .date(CADDY_DIARY.getDate())
                 .imageUrlList(CADDY_DIARY.getImageUrlList())
-                .jobTitle(CADDY_DIARY.getJobTitle())
                 .rounding(CADDY_DIARY.getRounding())
                 .caddyFee(CADDY_DIARY.getCaddyFee())
                 .overFee(CADDY_DIARY.getOverFee())

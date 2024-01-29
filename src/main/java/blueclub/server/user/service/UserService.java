@@ -3,7 +3,8 @@ package blueclub.server.user.service;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
-import blueclub.server.user.dto.request.AddDetailsRequest;
+import blueclub.server.user.dto.request.AddUserDetailsRequest;
+import blueclub.server.user.dto.request.UpdateUserDetailsRequest;
 import blueclub.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,14 +20,18 @@ public class UserService {
     private final JwtService jwtService;
     private final UserRepository userRepository;
 
-    public void addUserDetails(UserDetails userDetails, AddDetailsRequest addDetailsRequest) {
+    public void addUserDetails(UserDetails userDetails, AddUserDetailsRequest addUserDetailsRequest) {
         User user = userFindService.findByUserDetails(userDetails);
         user.addDetails(
-                addDetailsRequest.nickname(),
-                Job.findByTitle(addDetailsRequest.jobTitle()),
-                addDetailsRequest.monthlyTargetIncome(),
-                addDetailsRequest.tosAgree()
+                addUserDetailsRequest.nickname(),
+                Job.findByTitle(addUserDetailsRequest.jobTitle()),
+                addUserDetailsRequest.monthlyTargetIncome(),
+                addUserDetailsRequest.tosAgree()
         );
+    }
+
+    public void updateUserDetails(UserDetails userDetails, UpdateUserDetailsRequest updateUserDetailsRequest) {
+
     }
 
     public void withdrawUser(UserDetails userDetails) {
