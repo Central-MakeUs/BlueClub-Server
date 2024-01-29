@@ -8,7 +8,7 @@ import lombok.Builder;
 import org.hibernate.validator.constraints.Length;
 
 @Builder
-public record AddDetailsRequest (
+public record AddUserDetailsRequest(
         @NotBlank(message = "닉네임을 입력해주세요")
         @Length(max = 10, message = "닉네임은 10글자 이하로 작성해주세요")
         String nickname,
