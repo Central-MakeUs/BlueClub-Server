@@ -8,8 +8,10 @@ import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
+import blueclub.server.user.service.UserFindService;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -21,6 +23,8 @@ import java.util.Optional;
 public class AuthService {
 
     private final JwtService jwtService;
+    private final FcmTokenService fcmTokenService;
+    private final UserFindService userFindService;
     private final UserRepository userRepository;
 
     private static final Integer NICKNAME_MAX_LENGTH = 10;
@@ -31,6 +35,7 @@ public class AuthService {
         jwtService.updateRefreshToken(user.getId(), refreshToken);
         // 유저 정보, accesstoken, refreshtoken 전달 필요
         if (user.getRole().equals(Role.USER)) {
+            fcmTokenService.saveFcmToken(user.getId(), socialLoginRequest.fcmToken());
             return SocialLoginResponse.builder()
                     .id(user.getId())
                     .email(user.getEmail())
@@ -58,6 +63,12 @@ public class AuthService {
 
     public boolean checkNickname(String nickname) {
         return userRepository.existsByNickname(nickname).equals(true);
+    }
+
+    public void logout(UserDetails userDetails) {
+        User user = userFindService.findByUserDetails(userDetails);
+        jwtService.deleteRefreshToken(user.getId());
+        fcmTokenService.deleteFcmToken(user.getId());
     }
 
     // 분기 처리, 유저 정보 반환

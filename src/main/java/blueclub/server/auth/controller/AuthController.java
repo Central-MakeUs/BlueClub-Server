@@ -11,6 +11,8 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
@@ -23,7 +25,9 @@ public class AuthController {
     private final AuthService authService;
 
     @PostMapping("")
-    public ResponseEntity<BaseResponse> socialLogin(@Valid @RequestBody SocialLoginRequest socialLoginRequest) {
+    public ResponseEntity<BaseResponse> socialLogin(
+            @Valid @RequestBody SocialLoginRequest socialLoginRequest
+    ) {
         SocialLoginResponse socialLoginResponse = authService.socialLogin(socialLoginRequest);
         if (socialLoginResponse.role() == null)
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, socialLoginResponse);
@@ -35,9 +39,17 @@ public class AuthController {
             @RequestParam("nickname")
             @NotBlank(message = "닉네임을 입력해주세요")
             @Length(max = 10, message = "닉네임은 10글자 이하로 작성해주세요")
-            String nickname) {
+            String nickname
+    ) {
         if (authService.checkNickname(nickname))
             throw new BaseException(BaseResponseStatus.DUPLICATED_NICKNAME);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/logout")
+    public ResponseEntity<BaseResponse> logout(@AuthenticationPrincipal UserDetails userDetails
+    ) {
+        authService.logout(userDetails);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 }
