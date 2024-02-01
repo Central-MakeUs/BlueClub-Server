@@ -13,6 +13,7 @@ public record SocialLoginRequest(
         String nickname,
         String email,
         String phoneNumber,
-        String profileImage
+        String profileImage,
+        String fcmToken
 ) {
 }
