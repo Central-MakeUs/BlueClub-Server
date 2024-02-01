@@ -3,6 +3,7 @@ package blueclub.server.user.controller;
 import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
+import blueclub.server.user.dto.request.UpdateAgreementRequest;
 import blueclub.server.user.dto.request.UpdateUserDetailsRequest;
 import blueclub.server.user.service.UserService;
 import jakarta.validation.Valid;
@@ -23,14 +24,16 @@ public class UserController {
     @PostMapping("/details")
     public ResponseEntity<BaseResponse> addUserDetails(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody AddUserDetailsRequest addUserDetailsRequest) {
+            @Valid @RequestBody AddUserDetailsRequest addUserDetailsRequest
+    ) {
         userService.addUserDetails(userDetails, addUserDetailsRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @DeleteMapping("/withdrawal")
     public ResponseEntity<BaseResponse> withdrawUser(
-            @AuthenticationPrincipal UserDetails userDetails) {
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
         userService.withdrawUser(userDetails);
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
@@ -40,7 +43,17 @@ public class UserController {
             @AuthenticationPrincipal UserDetails userDetails,
             @Valid @RequestPart("dto") UpdateUserDetailsRequest updateUserDetailsRequest,
             @RequestPart(value = "image", required = false) MultipartFile multipartFile
-            ) {
+    ) {
+        userService.updateUserDetails(userDetails, updateUserDetailsRequest, multipartFile);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/agreement")
+    public ResponseEntity<BaseResponse> updateAgreement(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @Valid @RequestBody UpdateAgreementRequest updateAgreementRequest
+    ) {
+        userService.updateAgreement(userDetails, updateAgreementRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 }
