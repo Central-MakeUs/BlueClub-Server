@@ -10,6 +10,10 @@ spring:
     host: 127.0.0.1
     port: 6379
 
+  config:
+    import:
+      - application-firebase.yml
+
 jwt:
   token:
     secret-key: ${jwt.secret}

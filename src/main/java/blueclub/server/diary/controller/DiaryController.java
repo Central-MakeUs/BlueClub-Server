@@ -36,7 +36,8 @@ public class DiaryController {
             @AuthenticationPrincipal UserDetails userDetails,
             @NotBlank(message = "직업명은 필수입니다") @RequestParam("job") String jobTitle,
             @Valid @RequestPart("dto") UpdateDiaryRequest updateDiaryRequest,
-            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList) {
+            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
+    ) {
         if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             diaryService.saveCaddyDiary(userDetails, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList);
         } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
@@ -54,7 +55,8 @@ public class DiaryController {
             @NotBlank(message = "직업명은 필수입니다") @RequestParam("job") String jobTitle,
             @PathVariable("diaryId") Long diaryId,
             @Valid @RequestPart("dto") UpdateDiaryRequest updateDiaryRequest,
-            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList) {
+            @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
+    ) {
         if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             diaryService.updateCaddyDiary(userDetails, diaryId, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList);
         } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
@@ -70,14 +72,16 @@ public class DiaryController {
     public ResponseEntity<BaseResponse> getDiaryDetails(
             @AuthenticationPrincipal UserDetails userDetails,
             @NotBlank(message = "직업명은 필수입니다") @RequestParam("job") String jobTitle,
-            @PathVariable("diaryId") Long diaryId) {
+            @PathVariable("diaryId") Long diaryId
+    ) {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetails(userDetails, jobTitle, diaryId));
     }
 
     @DeleteMapping("/{diaryId}")
     public ResponseEntity<BaseResponse> deleteDiary(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("diaryId") Long diaryId) {
+            @PathVariable("diaryId") Long diaryId
+    ) {
         diaryService.deleteDiary(userDetails, diaryId);
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
@@ -85,14 +89,16 @@ public class DiaryController {
     @GetMapping("/calendar/{yearMonth}")
     public ResponseEntity<BaseResponse> getDailyInfo(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth) {
+            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+    ) {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getDailyInfo(userDetails, yearMonth));
     }
 
     @GetMapping("/record/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyRecord(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth) {
+            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+    ) {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, yearMonth));
     }
 }

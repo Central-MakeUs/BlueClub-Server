@@ -26,7 +26,8 @@ public class MonthlyGoalController {
     @PostMapping("")
     public ResponseEntity<BaseResponse> updateMonthlyGoal(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestBody UpdateMonthlyGoalRequest updateMonthlyGoalRequest) {
+            @Valid @RequestBody UpdateMonthlyGoalRequest updateMonthlyGoalRequest
+    ) {
         monthlyGoalService.updateMonthlyGoal(userDetails, updateMonthlyGoalRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
@@ -34,7 +35,8 @@ public class MonthlyGoalController {
     @GetMapping("/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyGoalAndProgress(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth) {
+            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+    ) {
         return BaseResponse.toResponseEntityContainsResult(monthlyGoalService.getMonthlyGoalAndProgress(userDetails, yearMonth));
     }
 }
