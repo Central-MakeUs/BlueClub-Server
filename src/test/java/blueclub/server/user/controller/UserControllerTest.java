@@ -2,14 +2,21 @@ package blueclub.server.user.controller;
 
 import blueclub.server.global.ControllerTest;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
+import blueclub.server.user.dto.request.UpdateAgreementRequest;
+import blueclub.server.user.dto.request.UpdateUserDetailsRequest;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
+import org.springframework.test.web.servlet.request.RequestPostProcessor;
+
+import java.nio.charset.StandardCharsets;
 
 import static blueclub.server.fixture.JwtTokenFixture.ACCESS_TOKEN;
 import static blueclub.server.fixture.JwtTokenFixture.BEARER;
@@ -62,7 +69,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -109,7 +116,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -156,7 +163,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -203,7 +210,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -250,7 +257,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -297,7 +304,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
                                             )
@@ -344,7 +351,7 @@ public class UserControllerTest extends ControllerTest {
                                             .summary("회원 추가정보 작성 API")
                                             .requestFields(
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
-                                                    fieldWithPath("jobTitle").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
                                                     fieldWithPath("tosAgree").type(NULL).description("[필수] 선택약관 동의 여부")
                                             )
@@ -396,10 +403,116 @@ public class UserControllerTest extends ControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("회원 추가정보 수정 API [PATCH /user/details]")
+    class updateUserDetails {
+        private static final String BASE_URL = "/user/details";
+
+        @Test
+        @DisplayName("회원 추가정보 수정에 성공한다")
+        void updateUserDetailsSuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(userService)
+                    .updateUserDetails(any(UserDetails.class), any(UpdateUserDetailsRequest.class), any());
+
+            // when
+            final UpdateUserDetailsRequest updateUserDetailsRequest = updateUserDetailsRequest();
+            MockMultipartFile file = new MockMultipartFile("image", null,
+                    "multipart/form-data", new byte[]{});
+            MockMultipartFile mockRequest = new MockMultipartFile("dto", null,
+                    "application/json", objectMapper.writeValueAsString(updateUserDetailsRequest).getBytes(StandardCharsets.UTF_8));
+
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .multipart(BASE_URL)
+                    .file(file)
+                    .file(mockRequest)
+                    .accept(APPLICATION_JSON)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            requestBuilder.with(new RequestPostProcessor() {
+                @Override
+                public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                    request.setMethod("PATCH");
+                    return request;
+                }
+            });
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "UpdateUserDetails",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("User API")
+                                            .summary("회원 추가정보 수정 API")
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
+    @Nested
+    @DisplayName("알림 설정 API [POST /user/agreement]")
+    class updateAgreement {
+        private static final String BASE_URL = "/user/agreement";
+
+        @Test
+        @DisplayName("알림 설정에 성공한다")
+        void updateAgreementSuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(userService)
+                    .updateAgreement(any(UserDetails.class), any(UpdateAgreementRequest.class));
+
+            // when
+            final UpdateAgreementRequest updateAgreementRequest = updateAgreementRequest();
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .post(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateAgreementRequest));
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "UserUpdateAgreement",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("User API")
+                                            .summary("알림 설정 API")
+                                            .requestFields(
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의여부")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .requestSchema(Schema.schema("UpdateAgreementRequest"))
+                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
     private AddUserDetailsRequest addDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -408,7 +521,7 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest blankNicknameAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname("")
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -417,7 +530,7 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest OverLengthNicknameAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname("ThisIsOverLengthNickname")
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -426,7 +539,7 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest BlankJobTitleAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
-                .jobTitle("")
+                .job("")
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -435,7 +548,7 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest UnderMonthlyTargetIncomeAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(99L)
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -444,7 +557,7 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest OverMonthlyTargetIncomeAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(9999999999L)
                 .tosAgree(WIZ.isTosAgree())
                 .build();
@@ -453,9 +566,24 @@ public class UserControllerTest extends ControllerTest {
     private AddUserDetailsRequest NullTosAgreeAddDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
-                .jobTitle(WIZ.getJob().getTitle())
+                .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(null)
+                .build();
+    }
+
+    private UpdateAgreementRequest updateAgreementRequest() {
+        return UpdateAgreementRequest.builder()
+                .tosAgree(true)
+                .pushAgree(true)
+                .build();
+    }
+
+    private UpdateUserDetailsRequest updateUserDetailsRequest() {
+        return UpdateUserDetailsRequest.builder()
+                .nickname(WIZ.getNickname())
+                .job(WIZ.getJob().getTitle())
+                .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .build();
     }
 }
