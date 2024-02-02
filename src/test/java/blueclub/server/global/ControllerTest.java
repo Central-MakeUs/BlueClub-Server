@@ -7,6 +7,10 @@ import blueclub.server.diary.controller.DiaryController;
 import blueclub.server.diary.service.DiaryService;
 import blueclub.server.monthlyGoal.controller.MonthlyGoalController;
 import blueclub.server.monthlyGoal.service.MonthlyGoalService;
+import blueclub.server.notice.controller.NoticeController;
+import blueclub.server.notice.service.NoticeService;
+import blueclub.server.reminder.controller.ReminderController;
+import blueclub.server.reminder.service.ReminderService;
 import blueclub.server.user.controller.UserController;
 import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,7 +36,9 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         AuthController.class,
         UserController.class,
         DiaryController.class,
-        MonthlyGoalController.class
+        MonthlyGoalController.class,
+        NoticeController.class,
+        ReminderController.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @Import(TestSecurityConfig.class)
@@ -55,6 +61,12 @@ public class ControllerTest {
 
     @MockBean
     protected MonthlyGoalService monthlyGoalService;
+
+    @MockBean
+    protected NoticeService noticeService;
+
+    @MockBean
+    protected ReminderService reminderService;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
