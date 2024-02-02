@@ -41,6 +41,8 @@ public class User extends BaseTimeEntity {
 
     private Boolean tosAgree;
 
+    private Boolean pushAgree;
+
     @Enumerated(EnumType.STRING)
     private Role role;
 
@@ -66,6 +68,19 @@ public class User extends BaseTimeEntity {
         this.job = job;
         this.monthlyTargetIncome = monthlyTargetIncome;
         this.tosAgree = tosAgree;
+        this.pushAgree = false;
         this.role = Role.USER;
+    }
+
+    public void updateDetails(String nickname, Job job, Long monthlyTargetIncome, String profileImage) {
+        this.nickname = nickname;
+        this.job = job;
+        this.monthlyTargetIncome = monthlyTargetIncome;
+        this.profileImage = profileImage;
+    }
+
+    public void updateAgreement(Boolean tosAgree, Boolean pushAgree) {
+        this.tosAgree = tosAgree;
+        this.pushAgree = pushAgree;
     }
 }

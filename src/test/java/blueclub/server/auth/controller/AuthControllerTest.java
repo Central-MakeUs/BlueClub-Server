@@ -11,15 +11,16 @@ import org.junit.jupiter.api.Test;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import static blueclub.server.fixture.JwtTokenFixture.ACCESS_TOKEN;
-import static blueclub.server.fixture.JwtTokenFixture.REFRESH_TOKEN;
+import static blueclub.server.fixture.JwtTokenFixture.*;
 import static blueclub.server.fixture.UserFixture.WIZ;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyString;
+import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
 import static org.springframework.restdocs.payload.JsonFieldType.*;
@@ -68,7 +69,8 @@ public class AuthControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("닉네임").optional(),
                                                     fieldWithPath("email").type(STRING).description("이메일").optional(),
                                                     fieldWithPath("phoneNumber").type(STRING).description("휴대전화번호").optional(),
-                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional()
+                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional(),
+                                                    fieldWithPath("fcmToken").type(STRING).description("FCM Token").optional()
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -129,7 +131,8 @@ public class AuthControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("닉네임").optional(),
                                                     fieldWithPath("email").type(STRING).description("이메일").optional(),
                                                     fieldWithPath("phoneNumber").type(STRING).description("휴대전화번호").optional(),
-                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional()
+                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional(),
+                                                    fieldWithPath("fcmToken").type(STRING).description("FCM Token").optional()
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -191,7 +194,8 @@ public class AuthControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("닉네임").optional(),
                                                     fieldWithPath("email").type(STRING).description("이메일").optional(),
                                                     fieldWithPath("phoneNumber").type(STRING).description("휴대전화번호").optional(),
-                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional()
+                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional(),
+                                                    fieldWithPath("fcmToken").type(STRING).description("FCM Token").optional()
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -240,7 +244,8 @@ public class AuthControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("닉네임").optional(),
                                                     fieldWithPath("email").type(STRING).description("이메일").optional(),
                                                     fieldWithPath("phoneNumber").type(STRING).description("휴대전화번호").optional(),
-                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional()
+                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional(),
+                                                    fieldWithPath("fcmToken").type(STRING).description("FCM Token").optional()
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -410,6 +415,47 @@ public class AuthControllerTest extends ControllerTest {
                                             .queryParameters(
                                                     parameterWithName("nickname").description("[필수] 중복체크할 닉네임")
                                             )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
+    @Nested
+    @DisplayName("로그아웃 API [GET /auth/logout]")
+    class logout {
+        private static final String BASE_URL = "/auth/logout";
+
+        @Test
+        @DisplayName("로그아웃에 성공한다")
+        void logoutSuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(authService)
+                    .logout(any());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .post(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "Logout",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Auth API")
+                                            .summary("로그아웃 API")
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),

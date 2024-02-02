@@ -12,7 +12,7 @@ public record UpdateUserDetailsRequest (
         @Length(max = 10, message = "닉네임은 10글자 이하로 작성해주세요")
         String nickname,
         @NotBlank(message = "직업을 선택해주세요")
-        String jobTitle,
+        String job,
         @Min(value = 100000, message = "월 수입 목표는 10만원 이상으로 입력해주세요")
         @Max(value = 99990000, message = "월 수입 목표는 9999만원 이하로 입력해주세요")
         Long monthlyTargetIncome
