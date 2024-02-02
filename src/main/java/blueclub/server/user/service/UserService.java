@@ -32,7 +32,7 @@ public class UserService {
         User user = userFindService.findByUserDetails(userDetails);
         user.addDetails(
                 addUserDetailsRequest.nickname(),
-                Job.findByTitle(addUserDetailsRequest.jobTitle()),
+                Job.findByTitle(addUserDetailsRequest.job()),
                 addUserDetailsRequest.monthlyTargetIncome(),
                 addUserDetailsRequest.tosAgree()
         );
@@ -42,7 +42,7 @@ public class UserService {
         User user = userFindService.findByUserDetails(userDetails);
         user.updateDetails(
                 updateUserDetailsRequest.nickname(),
-                Job.valueOf(updateUserDetailsRequest.jobTitle()),
+                Job.valueOf(updateUserDetailsRequest.job()),
                 updateUserDetailsRequest.monthlyTargetIncome(),
                 uploadProfileImage(user, multipartFile)
         );
