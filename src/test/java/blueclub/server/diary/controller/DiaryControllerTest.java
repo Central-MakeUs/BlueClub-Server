@@ -4,6 +4,7 @@ import blueclub.server.diary.domain.Rank;
 import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
 import blueclub.server.diary.dto.response.*;
 import blueclub.server.global.ControllerTest;
+import blueclub.server.user.domain.Job;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import org.junit.jupiter.api.DisplayName;
@@ -538,6 +539,48 @@ public class DiaryControllerTest extends ControllerTest {
                             )
                     ));
         }
+
+        @Test
+        @DisplayName("일용직 노동자의 자랑하기 상세조회에 성공한다")
+        void getDayworkerBoastDiarySuccess() throws Exception {
+            // given
+            doReturn(getDayworkerBoastDiaryResponse())
+                    .when(diaryService)
+                    .getBoastDiary(any(), anyLong());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, 1)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetDayworkerBoastDiaryResponse",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("자랑하기 상세조회 API")
+                                            .pathParameters(
+                                                    parameterWithName("diaryId").description("근무 일지 ID")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.job").type(STRING).description("직업"),
+                                                    fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
+                                                    fieldWithPath("result.rank").type(STRING).description("근무 순위"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
+                                                    fieldWithPath("result.cases").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("GetDayworkerBoastDiaryResponse"))
+                                            .build()
+                            )
+                    ));
+        }
     }
 
     private UpdateCaddyDiaryRequest updateCaddyDiaryRequest() {
@@ -660,6 +703,15 @@ public class DiaryControllerTest extends ControllerTest {
                 .rank(Rank.UNDER_FIVE_PERCENT.getKey())
                 .income(CADDY_DIARY.getIncome())
                 .cases(CADDY_DIARY.getRounding())
+                .build();
+    }
+
+    private GetBoastDiaryResponse getDayworkerBoastDiaryResponse() {
+        return GetBoastDiaryResponse.builder()
+                .job(Job.DAYWORKER.getTitle())
+                .workAt(DAYWORKER_DIARY.getDate())
+                .rank(Rank.UNDER_FIVE_PERCENT.getKey())
+                .income(DAYWORKER_DIARY.getIncome())
                 .build();
     }
 }
