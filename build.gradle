@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.5.3-SNAPSHOT'
+version = '0.6.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.5.3"
+	version = "0.6.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -115,7 +115,6 @@ task swaggerConfig {
                     saving: 0
                     date: 2024-01-25
                     imageUrlList: null
-                    jobTitle: 골프 캐디
                     rounding: 3
                     caddyFee: 200000
                     overFee: 0
@@ -350,6 +349,9 @@ dependencies {
 
 	// Firebase
 	implementation 'com.google.firebase:firebase-admin:9.1.1'
+
+	// Emoji
+	implementation 'com.vdurmont:emoji-java:5.1.1'
 
 	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.apache.commons:commons-collections4:4.0'

@@ -47,6 +47,7 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     // Diary
     WORKTYPE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_001", "존재하지 않는 근무 형태입니다."),
     DIARY_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_002", "존재하지 않는 근무 일지입니다."),
+    DIARY_USER_NOT_MATCH_ERROR(HttpStatus.NOT_FOUND, "DIARY_003", "사용자의 근무 일지가 아닙니다."),
 
     // Notice
     NOTICE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "NOTICE_001", "존재하지 않는 공지입니다."),

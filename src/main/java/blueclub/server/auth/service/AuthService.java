@@ -9,6 +9,7 @@ import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
 import blueclub.server.user.service.UserFindService;
+import com.vdurmont.emoji.EmojiParser;
 import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -27,32 +28,47 @@ public class AuthService {
     private final UserFindService userFindService;
     private final UserRepository userRepository;
 
-    private static final Integer NICKNAME_MAX_LENGTH = 10;
+    private static final Integer RANDOM_NICKNAME_LENGTH = 3;
 
     public SocialLoginResponse socialLogin(SocialLoginRequest socialLoginRequest) {
-        User user = isRegister(socialLoginRequest);
-        String refreshToken = jwtService.createRefreshToken();
-        jwtService.updateRefreshToken(user.getId(), refreshToken);
-        // 유저 정보, accesstoken, refreshtoken 전달 필요
-        if (user.getRole().equals(Role.USER)) {
+        if (userRepository.existsBySocialTypeAndSocialId(SocialType.valueOf(socialLoginRequest.socialType()), socialLoginRequest.socialId())) {
+            User user = isRegister(socialLoginRequest);
+            String refreshToken = jwtService.createRefreshToken();
+            jwtService.updateRefreshToken(user.getId(), refreshToken);
             fcmTokenService.saveFcmToken(user.getId(), socialLoginRequest.fcmToken());
+
+            // 유저 정보, accesstoken, refreshtoken 전달 필요
+            if (user.getRole().equals(Role.USER)) {
+                return SocialLoginResponse.builder()
+                        .id(user.getId())
+                        .email(user.getEmail())
+                        .name(user.getName())
+                        .nickname(user.getNickname())
+                        .phoneNumber(user.getPhoneNumber())
+                        .profileImage(user.getProfileImage())
+                        .job(user.getJob().getTitle())
+                        .monthlyTargetIncome(user.getMonthlyTargetIncome())
+                        .tosAgree(user.getTosAgree())
+                        .role(user.getRole().getTitle())
+                        .socialType(user.getSocialType().name())
+                        .socialId(user.getSocialId())
+                        .accessToken(jwtService.createAccessToken(user.getEmail()))
+                        .refreshToken(refreshToken)
+                        .build();
+            }
             return SocialLoginResponse.builder()
                     .id(user.getId())
-                    .email(user.getEmail())
-                    .name(user.getName())
                     .nickname(user.getNickname())
-                    .phoneNumber(user.getPhoneNumber())
-                    .profileImage(user.getProfileImage())
-                    .job(user.getJob().getTitle())
-                    .monthlyTargetIncome(user.getMonthlyTargetIncome())
-                    .tosAgree(user.getTosAgree())
                     .role(user.getRole().getTitle())
-                    .socialType(user.getSocialType().name())
-                    .socialId(user.getSocialId())
                     .accessToken(jwtService.createAccessToken(user.getEmail()))
                     .refreshToken(refreshToken)
                     .build();
         }
+
+        User user = isRegister(socialLoginRequest);
+        String refreshToken = jwtService.createRefreshToken();
+        jwtService.updateRefreshToken(user.getId(), refreshToken);
+
         return SocialLoginResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
@@ -90,6 +106,13 @@ public class AuthService {
         // 이메일 중복여부 체크
         if (userRepository.existsByEmail(email))
             throw new BaseException(BaseResponseStatus.DUPLICATED_EMAIL);
+        // 닉네임 이모티콘, 특수기호 존재 시 삭제
+        EmojiParser.removeAllEmojis(nickname);
+        nickname = nickname.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
+        // 닉네임 8자리 이상 시, 7자리로 자르기
+        if (nickname.length() > 7) {
+            nickname = nickname.substring(0, 7);
+        }
         // 분기 처리, 닉네임 중복 또는 공백 시 뒤에 랜덤값 추가
         if (nickname.isBlank() || checkNickname(nickname))
             nickname = createTemporaryNickname(nickname);
@@ -109,7 +132,6 @@ public class AuthService {
         StringBuilder stringBuilder = new StringBuilder();
         return stringBuilder
                 .append(nickname)
-                .append("#")
-                .append(RandomStringUtils.randomAlphabetic(NICKNAME_MAX_LENGTH-nickname.length()-1)).toString();
+                .append(RandomStringUtils.randomAlphabetic(RANDOM_NICKNAME_LENGTH)).toString();
     }
 }

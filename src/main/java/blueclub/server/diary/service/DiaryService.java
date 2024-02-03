@@ -42,7 +42,7 @@ public class DiaryService {
     private final RiderRepository riderRepository;
     private final DayworkerRepository dayworkerRepository;
 
-    public void saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByKey(createCaddyDiaryRequest.getWorktype()), createCaddyDiaryRequest.getMemo(),
@@ -58,9 +58,16 @@ public class DiaryService {
                 .build();
         caddyRepository.save(caddy);
         savedDiary.setCaddy(caddy);
+        return GetBoastDiaryResponse.builder()
+                .job(Job.CADDY.getTitle())
+                .workAt(createCaddyDiaryRequest.getDate())
+                .rank(getRank(createCaddyDiaryRequest.getIncome()).getKey())
+                .income(createCaddyDiaryRequest.getIncome())
+                .cases(createCaddyDiaryRequest.getRounding())
+                .build();
     }
 
-    public void saveRiderDiary(UserDetails userDetails, UpdateRiderDiaryRequest createRiderDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse saveRiderDiary(UserDetails userDetails, UpdateRiderDiaryRequest createRiderDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByKey(createRiderDiaryRequest.getWorktype()), createRiderDiaryRequest.getMemo(),
@@ -76,9 +83,16 @@ public class DiaryService {
                 .build();
         riderRepository.save(rider);
         savedDiary.setRider(rider);
+        return GetBoastDiaryResponse.builder()
+                .job(Job.RIDER.getTitle())
+                .workAt(createRiderDiaryRequest.getDate())
+                .rank(getRank(createRiderDiaryRequest.getIncome()).getKey())
+                .income(createRiderDiaryRequest.getIncome())
+                .cases(createRiderDiaryRequest.getNumberOfDeliveries())
+                .build();
     }
 
-    public void saveDayworkerDiary(UserDetails userDetails, UpdateDayworkerDiaryRequest createDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse saveDayworkerDiary(UserDetails userDetails, UpdateDayworkerDiaryRequest createDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByKey(createDayworkerDiaryRequest.getWorktype()), createDayworkerDiaryRequest.getMemo(),
@@ -94,9 +108,15 @@ public class DiaryService {
                 .build();
         dayworkerRepository.save(dayworker);
         savedDiary.setDayworker(dayworker);
+        return GetBoastDiaryResponse.builder()
+                .job(Job.DAYWORKER.getTitle())
+                .workAt(createDayworkerDiaryRequest.getDate())
+                .rank(getRank(createDayworkerDiaryRequest.getIncome()).getKey())
+                .income(createDayworkerDiaryRequest.getIncome())
+                .build();
     }
 
-    public void updateCaddyDiary(UserDetails userDetails, Long diaryId, UpdateCaddyDiaryRequest updateCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse updateCaddyDiary(UserDetails userDetails, Long diaryId, UpdateCaddyDiaryRequest updateCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<Diary> diary = diaryRepository.findById(diaryId);
         if (diary.isEmpty()) {
@@ -119,9 +139,16 @@ public class DiaryService {
                 updateCaddyDiaryRequest.getCaddyFee(),
                 updateCaddyDiaryRequest.getOverFee(),
                 updateCaddyDiaryRequest.getTopdressing());
+        return GetBoastDiaryResponse.builder()
+                .job(Job.CADDY.getTitle())
+                .workAt(updateCaddyDiaryRequest.getDate())
+                .rank(getRank(updateCaddyDiaryRequest.getIncome()).getKey())
+                .income(updateCaddyDiaryRequest.getIncome())
+                .cases(updateCaddyDiaryRequest.getRounding())
+                .build();
     }
 
-    public void updateRiderDiary(UserDetails userDetails, Long diaryId, UpdateRiderDiaryRequest updateRiderDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse updateRiderDiary(UserDetails userDetails, Long diaryId, UpdateRiderDiaryRequest updateRiderDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<Diary> diary = diaryRepository.findById(diaryId);
         if (diary.isEmpty()) {
@@ -144,9 +171,16 @@ public class DiaryService {
                 updateRiderDiaryRequest.getIncomeOfDeliveries(),
                 updateRiderDiaryRequest.getNumberOfPromotions(),
                 updateRiderDiaryRequest.getIncomeOfPromotions());
+        return GetBoastDiaryResponse.builder()
+                .job(Job.RIDER.getTitle())
+                .workAt(updateRiderDiaryRequest.getDate())
+                .rank(getRank(updateRiderDiaryRequest.getIncome()).getKey())
+                .income(updateRiderDiaryRequest.getIncome())
+                .cases(updateRiderDiaryRequest.getNumberOfDeliveries())
+                .build();
     }
 
-    public void updateDayworkerDiary(UserDetails userDetails, Long diaryId, UpdateDayworkerDiaryRequest updateDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
+    public GetBoastDiaryResponse updateDayworkerDiary(UserDetails userDetails, Long diaryId, UpdateDayworkerDiaryRequest updateDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<Diary> diary = diaryRepository.findById(diaryId);
         if (diary.isEmpty()) {
@@ -169,6 +203,12 @@ public class DiaryService {
                 updateDayworkerDiaryRequest.getDailyWage(),
                 updateDayworkerDiaryRequest.getTypeOfJob(),
                 updateDayworkerDiaryRequest.getNumberOfWork());
+        return GetBoastDiaryResponse.builder()
+                .job(Job.DAYWORKER.getTitle())
+                .workAt(updateDayworkerDiaryRequest.getDate())
+                .rank(getRank(updateDayworkerDiaryRequest.getIncome()).getKey())
+                .income(updateDayworkerDiaryRequest.getIncome())
+                .build();
     }
 
     @Transactional(readOnly = true)
@@ -245,6 +285,17 @@ public class DiaryService {
         return diaryRepository.getTotalMonthlyIncome(user, yearMonth);
     }
 
+    @Transactional(readOnly = true)
+    public GetBoastDiaryResponse getBoastDiary(UserDetails userDetails, Long id) {
+        User user = userFindService.findByUserDetails(userDetails);
+        Diary diary = diaryRepository.findById(id)
+                .orElseThrow(() -> new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR));
+        if (!diary.getUser().equals(user))
+            throw new BaseException(BaseResponseStatus.DIARY_USER_NOT_MATCH_ERROR);
+
+        return getBoastDiaryResponseByJob(user.getJob(), diary);
+    }
+
     private Diary saveDiary(User user, Worktype worktype, String memo, List<String> imageUrlList, Long income, Long expenditure, Long saving, LocalDate workAt) {
         return Diary.builder()
                 .worktype(worktype)
@@ -271,5 +322,41 @@ public class DiaryService {
             }
         }
         return imageUrlList;
+    }
+
+    private Rank getRank(Long income) {
+        if (income >= 190000)
+            return Rank.UNDER_FIVE_PERCENT;
+        else if (income >= 140000)
+            return Rank.UNDER_THIRTY_PERCENT;
+        return Rank.ELSE;
+    }
+
+    private GetBoastDiaryResponse getBoastDiaryResponseByJob(Job job, Diary diary) {
+        if (job.equals(Job.CADDY)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .cases(diary.getCaddy().getRounding())
+                    .build();
+        } else if (job.equals(Job.RIDER)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .cases(diary.getRider().getNumberOfDeliveries())
+                    .build();
+        } else if (job.equals(Job.DAYWORKER)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .build();
+        }
+        throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
     }
 }
