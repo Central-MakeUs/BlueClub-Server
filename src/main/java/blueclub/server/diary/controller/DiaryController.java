@@ -39,14 +39,12 @@ public class DiaryController {
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
         if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
-            diaryService.saveCaddyDiary(userDetails, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveCaddyDiary(userDetails, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList));
         } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
-            diaryService.saveRiderDiary(userDetails, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveRiderDiary(userDetails, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList));
         } else if (Job.DAYWORKER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
-            diaryService.saveDayworkerDiary(userDetails, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveDayworkerDiary(userDetails, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList));
         } else throw new BaseException(BaseResponseStatus.INVALID_INPUT_DTO);
-
-        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.CREATED);
     }
 
     @PatchMapping("/{diaryId}")
@@ -58,14 +56,12 @@ public class DiaryController {
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
         if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
-            diaryService.updateCaddyDiary(userDetails, diaryId, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsResult(diaryService.updateCaddyDiary(userDetails, diaryId, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList));
         } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
-            diaryService.updateRiderDiary(userDetails, diaryId, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsResult(diaryService.updateRiderDiary(userDetails, diaryId, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList));
         } else if (Job.DAYWORKER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
-            diaryService.updateDayworkerDiary(userDetails, diaryId, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList);
+            return BaseResponse.toResponseEntityContainsResult(diaryService.updateDayworkerDiary(userDetails, diaryId, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList));
         } else throw new BaseException(BaseResponseStatus.INVALID_INPUT_DTO);
-
-        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @GetMapping("/{diaryId}")
@@ -100,5 +96,13 @@ public class DiaryController {
             @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
     ) {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, yearMonth));
+    }
+
+    @GetMapping("/boast/{diaryId}")
+    public ResponseEntity<BaseResponse> getBoastDiary(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("diaryId") Long id
+    ) {
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getBoastDiary(userDetails, id));
     }
 }

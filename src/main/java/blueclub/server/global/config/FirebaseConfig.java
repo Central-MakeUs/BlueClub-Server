@@ -5,7 +5,6 @@ import com.google.firebase.FirebaseApp;
 import com.google.firebase.FirebaseOptions;
 import com.google.firebase.messaging.FirebaseMessaging;
 import com.google.gson.JsonObject;
-import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import java.io.InputStream;
 import java.util.Base64;
 import java.util.List;
 
-@Slf4j
 @Configuration
 public class FirebaseConfig {
     @Value("${firebase.type}")
@@ -51,8 +49,6 @@ public class FirebaseConfig {
                 "client_email", "client_id", "auth_uri", "token_uri", "auth_provider_x509_cert_url", "client_x509_cert_url", "universe_domain");
         final List<String> values = List.of(type, projectId, privateKeyId, originalKey, clientEmail, clientId, authUri,
                 tokenUri, authProviderCertUrl, clientCertUrl, universeDomain);
-
-        log.info(values.get(3));
 
         InputStream refreshToken = convertYmlToJson(keys, values);
 
