@@ -292,12 +292,8 @@ public class DiaryService {
                 .orElseThrow(() -> new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR));
         if (!diary.getUser().equals(user))
             throw new BaseException(BaseResponseStatus.DIARY_USER_NOT_MATCH_ERROR);
-        return GetBoastDiaryResponse.builder()
-                .job(user.getJob().getTitle())
-                .workAt(diary.getWorkAt())
-                .rank(getRank(diary.getIncome()).getKey())
-                .income(diary.getIncome())
-                .build();
+
+        return getBoastDiaryResponseByJob(user.getJob(), diary);
     }
 
     private Diary saveDiary(User user, Worktype worktype, String memo, List<String> imageUrlList, Long income, Long expenditure, Long saving, LocalDate workAt) {
@@ -334,5 +330,33 @@ public class DiaryService {
         else if (income >= 140000)
             return Rank.UNDER_THIRTY_PERCENT;
         return Rank.ELSE;
+    }
+
+    private GetBoastDiaryResponse getBoastDiaryResponseByJob(Job job, Diary diary) {
+        if (job.equals(Job.CADDY)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .cases(diary.getCaddy().getRounding())
+                    .build();
+        } else if (job.equals(Job.RIDER)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .cases(diary.getRider().getNumberOfDeliveries())
+                    .build();
+        } else if (job.equals(Job.DAYWORKER)) {
+            return GetBoastDiaryResponse.builder()
+                    .job(job.getTitle())
+                    .workAt(diary.getWorkAt())
+                    .rank(getRank(diary.getIncome()).getKey())
+                    .income(diary.getIncome())
+                    .build();
+        }
+        throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
     }
 }
