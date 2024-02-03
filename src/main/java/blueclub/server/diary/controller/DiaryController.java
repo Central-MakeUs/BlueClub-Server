@@ -38,11 +38,11 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateDiaryRequest updateDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
+        if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveCaddyDiary(userDetails, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList));
-        } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
+        } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveRiderDiary(userDetails, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList));
-        } else if (Job.DAYWORKER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
+        } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveDayworkerDiary(userDetails, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList));
         } else throw new BaseException(BaseResponseStatus.INVALID_INPUT_DTO);
     }
@@ -55,11 +55,11 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateDiaryRequest updateDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (Job.CADDY.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
+        if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             return BaseResponse.toResponseEntityContainsResult(diaryService.updateCaddyDiary(userDetails, diaryId, (UpdateCaddyDiaryRequest) updateDiaryRequest, multipartFileList));
-        } else if (Job.RIDER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
+        } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateRiderDiaryRequest) {
             return BaseResponse.toResponseEntityContainsResult(diaryService.updateRiderDiary(userDetails, diaryId, (UpdateRiderDiaryRequest) updateDiaryRequest, multipartFileList));
-        } else if (Job.DAYWORKER.getTitle().equals(jobTitle) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
+        } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", "")) && updateDiaryRequest instanceof UpdateDayworkerDiaryRequest) {
             return BaseResponse.toResponseEntityContainsResult(diaryService.updateDayworkerDiary(userDetails, diaryId, (UpdateDayworkerDiaryRequest) updateDiaryRequest, multipartFileList));
         } else throw new BaseException(BaseResponseStatus.INVALID_INPUT_DTO);
     }

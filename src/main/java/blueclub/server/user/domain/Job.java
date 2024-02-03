@@ -8,9 +8,9 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum Job {
-    CADDY("GOLF_CADDY", "골프 캐디"),
-    RIDER("DELIVERY_RIDER", "배달 라이더"),
-    DAYWORKER("DAYWORKER", "일용직 노동자");
+    CADDY("GOLF_CADDY", "골프캐디"),
+    RIDER("DELIVERY_RIDER", "배달라이더"),
+    DAYWORKER("DAYWORKER", "일용직노동자");
 
     private final String key;
     private final String title;

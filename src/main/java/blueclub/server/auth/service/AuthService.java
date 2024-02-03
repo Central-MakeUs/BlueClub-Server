@@ -78,7 +78,7 @@ public class AuthService {
     }
 
     public boolean checkNickname(String nickname) {
-        return userRepository.existsByNickname(nickname).equals(true);
+        return userRepository.existsByNicknameAndRole(nickname, Role.USER).equals(true);
     }
 
     public void logout(UserDetails userDetails) {
