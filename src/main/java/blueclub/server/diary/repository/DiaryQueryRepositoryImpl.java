@@ -8,7 +8,6 @@ import blueclub.server.diary.dto.response.QGetDailyInfoResponse;
 import blueclub.server.diary.dto.response.QMonthlyRecord;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
