@@ -1,5 +1,6 @@
 package blueclub.server.auth.controller;
 
+import blueclub.server.auth.domain.Role;
 import blueclub.server.auth.dto.request.SocialLoginRequest;
 import blueclub.server.auth.dto.response.SocialLoginResponse;
 import blueclub.server.global.ControllerTest;
@@ -92,6 +93,68 @@ public class AuthControllerTest extends ControllerTest {
                                             )
                                             .requestSchema(Schema.schema("RegisterRequest"))
                                             .responseSchema(Schema.schema("RegisterResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("소셜 로그인에 성공했으며 게스트의 회원가입을 진행한다")
+        void registerContinueSuccess() throws Exception {
+            // given
+            SocialLoginResponse socialLoginResponse = registerContinueResponse();
+            doReturn(socialLoginResponse)
+                    .when(authService)
+                    .socialLogin(any(SocialLoginRequest.class));
+
+            // when
+            final SocialLoginRequest socialLoginRequest = registerRequest();
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .post(BASE_URL)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(socialLoginRequest));
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "SocialLoginRegisterContinue",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Auth API")
+                                            .summary("인증 API - 신규 회원가입 / 기존 사용자 로그인")
+                                            .requestFields(
+                                                    fieldWithPath("socialId").type(STRING).description("[필수] 소셜 식별자"),
+                                                    fieldWithPath("socialType").type(STRING).description("[필수] 소셜 타입 (kakao, naver, apple)"),
+                                                    fieldWithPath("name").type(STRING).description("이름").optional(),
+                                                    fieldWithPath("nickname").type(STRING).description("닉네임").optional(),
+                                                    fieldWithPath("email").type(STRING).description("이메일").optional(),
+                                                    fieldWithPath("phoneNumber").type(STRING).description("휴대전화번호").optional(),
+                                                    fieldWithPath("profileImage").type(STRING).description("프로필 사진 url").optional(),
+                                                    fieldWithPath("fcmToken").type(STRING).description("FCM Token").optional()
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.id").type(NUMBER).description("유저 식별자"),
+                                                    fieldWithPath("result.email").type(NULL).description("이메일"),
+                                                    fieldWithPath("result.name").type(NULL).description("이름"),
+                                                    fieldWithPath("result.nickname").type(STRING).description("닉네임"),
+                                                    fieldWithPath("result.phoneNumber").type(NULL).description("휴대전화번호"),
+                                                    fieldWithPath("result.profileImage").type(NULL).description("프로필 사진 url"),
+                                                    fieldWithPath("result.job").type(NULL).description("직업명"),
+                                                    fieldWithPath("result.monthlyTargetIncome").type(NULL).description("월 목표 수입"),
+                                                    fieldWithPath("result.tosAgree").type(NULL).description("선택약관 동의여부"),
+                                                    fieldWithPath("result.role").type(STRING).description("권한(게스트, 일반 사용자)"),
+                                                    fieldWithPath("result.socialType").type(NULL).description("소셜 타입 (kakao, naver, apple)"),
+                                                    fieldWithPath("result.socialId").type(NULL).description("소셜 식별자"),
+                                                    fieldWithPath("result.accessToken").type(STRING).description("JWT AccessToken"),
+                                                    fieldWithPath("result.refreshToken").type(STRING).description("JWT RefreshToken")
+                                            )
+                                            .requestSchema(Schema.schema("RegisterContinueRequest"))
+                                            .responseSchema(Schema.schema("RegisterContinueResponse"))
                                             .build()
                             )
                     ));
@@ -527,6 +590,16 @@ public class AuthControllerTest extends ControllerTest {
         return SocialLoginResponse.builder()
                 .id(WIZ.getId())
                 .nickname(WIZ.getNickname())
+                .accessToken(ACCESS_TOKEN)
+                .refreshToken(REFRESH_TOKEN)
+                .build();
+    }
+
+    private SocialLoginResponse registerContinueResponse() {
+        return SocialLoginResponse.builder()
+                .id(WIZ.getId())
+                .nickname(WIZ.getNickname())
+                .role(Role.GUEST.getTitle())
                 .accessToken(ACCESS_TOKEN)
                 .refreshToken(REFRESH_TOKEN)
                 .build();
