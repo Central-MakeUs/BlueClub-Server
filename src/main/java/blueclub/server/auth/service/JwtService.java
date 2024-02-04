@@ -185,5 +185,10 @@ public class JwtService {
             return false;
         }
     }
+
+    public boolean isRefreshTokenExist(String refreshToken) {
+        return refreshTokenRepository.findByToken(refreshToken)
+                .isPresent();
+    }
 }
 
