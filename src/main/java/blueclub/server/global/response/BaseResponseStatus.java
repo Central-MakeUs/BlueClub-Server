@@ -22,7 +22,8 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     /**
      * 300 : 리다이렉션
      */
-    SEE_OTHER(HttpStatus.SEE_OTHER, "REDIRECT", "다른 주소로 요청해주세요."),
+    SEE_OTHER(HttpStatus.SEE_OTHER, "REDIRECT_001", "다른 주소로 요청해주세요."),
+    RETRY_REQUEST(HttpStatus.FOUND, "REDIRECT_002", "재발급된 AccessToken / RefreshToken 으로 재시도 해주세요."),
 
     /**
      * 400 : 요청 실패
