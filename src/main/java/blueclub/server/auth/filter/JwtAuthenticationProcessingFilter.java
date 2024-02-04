@@ -68,6 +68,12 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                 .filter(jwtService::isRefreshTokenExist)
                 .orElse(null);
 
+        // AccessToken 인증 시 다음 필터 진행
+        if (checkAccessTokenAndAuthentication(request, response, filterChain)) {
+            filterChain.doFilter(request, response);
+            return;
+        }
+
         // RefreshToken 없을 시 or 유효하지 않을 시 401 error
         if (refreshToken == null) {
             response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
@@ -88,11 +94,6 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
             return;
         }
 
-        // AccessToken 인증 시 다음 필터 진행
-        if (checkAccessTokenAndAuthentication(request, response, filterChain)) {
-            filterChain.doFilter(request, response);
-            return;
-        }
         // AccessToken 인증 실패 시 재발급
         checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
     }
@@ -110,8 +111,15 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     User user = userRepository.findById(token.getId())
                             .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR));
                     String reIssuedRefreshToken = reIssueRefreshToken(token);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
+                    try {
+                        jwtService.sendAccessAndRefreshToken(
+                                response,
+                                jwtService.createAccessToken(user.getEmail()),
+                                reIssuedRefreshToken
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
     }
 
