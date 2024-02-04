@@ -3,8 +3,12 @@ package blueclub.server.auth.filter;
 import blueclub.server.auth.domain.RefreshToken;
 import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.auth.service.JwtService;
+import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponse;
+import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.repository.UserRepository;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -20,6 +24,9 @@ import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import java.io.IOException;
+import java.util.List;
+import java.util.Optional;
+import java.util.concurrent.atomic.AtomicBoolean;
 
 /**
  * Jwt 인증 필터
@@ -37,7 +44,8 @@ import java.io.IOException;
 @RequiredArgsConstructor
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
-    private static final String NO_CHECK_URL = "/auth"; // "/auth"으로 들어오는 요청은 Filter 작동 X
+    private static final List<String> NO_CHECK_URL_LIST = List.of(
+            "/auth", "/health", "/css", "/images", "/js", "/favicon.ico", "/swagger", "/docs", "/swagger-ui", "/v3/api-docs", "/error"); // Filter 작동 X
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -47,33 +55,47 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
-        if (request.getRequestURI().equals(NO_CHECK_URL)) {
-            filterChain.doFilter(request, response); // "/login" 요청이 들어오면, 다음 필터 호출
-            return; // return으로 이후 현재 필터 진행 막기 (안해주면 아래로 내려가서 계속 필터 진행시킴)
+        for (String NO_CHECK_URL: NO_CHECK_URL_LIST) {
+            if (request.getRequestURI().contains(NO_CHECK_URL)) {
+                filterChain.doFilter(request, response);
+                return;
+            }
         }
 
-        // 사용자 요청 헤더에서 RefreshToken 추출
-        // -> RefreshToken이 없거나 유효하지 않다면(DB에 저장된 RefreshToken과 다르다면) null을 반환
-        // 사용자의 요청 헤더에 RefreshToken이 있는 경우는, AccessToken이 만료되어 요청한 경우밖에 없다.
-        // 따라서, 위의 경우를 제외하면 추출한 refreshToken은 모두 null
+        // RefreshToken 유효성 검사
         String refreshToken = jwtService.extractRefreshToken(request)
                 .filter(jwtService::isTokenValid)
+                .filter(jwtService::isRefreshTokenExist)
                 .orElse(null);
 
-        // 리프레시 토큰이 요청 헤더에 존재했다면, 사용자가 AccessToken이 만료되어서
-        // RefreshToken까지 보낸 것이므로 리프레시 토큰이 DB의 리프레시 토큰과 일치하는지 판단 후,
-        // 일치한다면 AccessToken을 재발급해준다.
-        if (refreshToken != null) {
-            checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
-            return; // RefreshToken을 보낸 경우에는 AccessToken을 재발급 하고 인증 처리는 하지 않게 하기위해 바로 return으로 필터 진행 막기
+        // AccessToken 인증 시 다음 필터 진행
+        if (checkAccessTokenAndAuthentication(request, response, filterChain)) {
+            filterChain.doFilter(request, response);
+            return;
         }
 
-        // RefreshToken이 없거나 유효하지 않다면, AccessToken을 검사하고 인증을 처리하는 로직 수행
-        // AccessToken이 없거나 유효하지 않다면, 인증 객체가 담기지 않은 상태로 다음 필터로 넘어가기 때문에 403 에러 발생
-        // AccessToken이 유효하다면, 인증 객체가 담긴 상태로 다음 필터로 넘어가기 때문에 인증 성공
+        // RefreshToken 없을 시 or 유효하지 않을 시 401 error
         if (refreshToken == null) {
-            checkAccessTokenAndAuthentication(request, response, filterChain);
+            response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+            response.setContentType("application/json");
+            response.setCharacterEncoding("utf-8");
+
+            ObjectMapper objectMapper = new ObjectMapper();
+
+            response.getWriter().write(
+                    objectMapper.writeValueAsString(
+                            BaseResponse.builder()
+                                    .code(BaseResponseStatus.INVALID_JWT.getCode())
+                                    .message(BaseResponseStatus.INVALID_JWT.getMessage())
+                                    .result(null)
+                                    .build()
+                    )
+            );
+            return;
         }
+
+        // AccessToken 인증 실패 시 재발급
+        checkRefreshTokenAndReIssueAccessToken(response, refreshToken);
     }
 
     /**
@@ -86,10 +108,18 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     public void checkRefreshTokenAndReIssueAccessToken(HttpServletResponse response, String refreshToken) {
         refreshTokenRepository.findByToken(refreshToken)
                 .ifPresent(token -> {
-                    User user = userRepository.findById(token.getId()).orElseThrow();
+                    User user = userRepository.findById(token.getId())
+                            .orElseThrow(() -> new BaseException(BaseResponseStatus.MEMBER_NOT_FOUND_ERROR));
                     String reIssuedRefreshToken = reIssueRefreshToken(token);
-                    jwtService.sendAccessAndRefreshToken(response, jwtService.createAccessToken(user.getEmail()),
-                            reIssuedRefreshToken);
+                    try {
+                        jwtService.sendAccessAndRefreshToken(
+                                response,
+                                jwtService.createAccessToken(user.getEmail()),
+                                reIssuedRefreshToken
+                        );
+                    } catch (IOException e) {
+                        throw new RuntimeException(e);
+                    }
                 });
     }
 
@@ -113,15 +143,20 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      * 인증 허가 처리된 객체를 SecurityContextHolder에 담기
      * 그 후 다음 인증 필터로 진행
      */
-    public void checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
+    public Boolean checkAccessTokenAndAuthentication(HttpServletRequest request, HttpServletResponse response,
                                                   FilterChain filterChain) throws ServletException, IOException {
+        AtomicBoolean isAuthSuccess = new AtomicBoolean(false);
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
                 .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
-                        .ifPresent(email -> userRepository.findByEmail(email)
-                                .ifPresent(this::saveAuthentication)));
-
-        filterChain.doFilter(request, response);
+                        .ifPresent(email -> {
+                            Optional<User> user = userRepository.findByEmail(email);
+                            if (user.isPresent()) {
+                                saveAuthentication(user.get());
+                                isAuthSuccess.set(true);
+                            }
+                        }));
+        return isAuthSuccess.get();
     }
 
     /**

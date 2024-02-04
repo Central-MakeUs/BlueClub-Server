@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.6.1-SNAPSHOT'
+version = '0.6.3-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.6.1"
+	version = "0.6.3"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -55,12 +55,17 @@ task swaggerConfig {
 		def newSwaggerUIFile = new File('build/api-spec/new.yaml')
 
 		def securitySchemesContent =  "  securitySchemes:\n" +  \
-                                      "    bearerAuth:\n" +  \
-                                      "      type: http\n" +  \
-                                      "      scheme: bearer\n" +  \
-                                      "      bearerFormat: JWT\n" + \
+                                      "    Authorization:\n" +  \
+                                      "      type: apiKey\n" +  \
+                                      "      name: Authorization\n" +  \
+                                      "      in: header\n" + \
+									  "    Authorization-refresh:\n" +  \
+                                      "      type: apiKey\n" +  \
+                                      "      name: Authorization-refresh\n" +  \
+                                      "      in: header\n" + \
                                       "security:\n" +
-									  "  - bearerAuth: []"
+									  "  - Authorization: []\n" + \
+ 									  "    Authorization-refresh: []\n"
 
 		swaggerUIFile.append(securitySchemesContent)
 
