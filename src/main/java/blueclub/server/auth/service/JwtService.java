@@ -3,10 +3,12 @@ package blueclub.server.auth.service;
 import blueclub.server.auth.domain.RefreshToken;
 import blueclub.server.auth.repository.RefreshTokenRepository;
 import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.repository.UserRepository;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.algorithms.Algorithm;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.Getter;
@@ -15,6 +17,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.io.IOException;
 import java.util.Date;
 import java.util.Optional;
 
@@ -90,11 +93,26 @@ public class JwtService {
     /**
      * AccessToken + RefreshToken 헤더에 실어서 보내기
      */
-    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) {
-        response.setStatus(HttpServletResponse.SC_OK);
+    public void sendAccessAndRefreshToken(HttpServletResponse response, String accessToken, String refreshToken) throws IOException {
+        response.setStatus(HttpServletResponse.SC_FOUND);
 
         setAccessTokenHeader(response, accessToken);
         setRefreshTokenHeader(response, refreshToken);
+
+        response.setContentType("application/json");
+        response.setCharacterEncoding("utf-8");
+
+        ObjectMapper objectMapper = new ObjectMapper();
+
+        response.getWriter().write(
+                objectMapper.writeValueAsString(
+                        BaseResponse.builder()
+                                .code(BaseResponseStatus.RETRY_REQUEST.getCode())
+                                .message(BaseResponseStatus.RETRY_REQUEST.getMessage())
+                                .result(null)
+                                .build()
+                )
+        );
     }
 
     /**
