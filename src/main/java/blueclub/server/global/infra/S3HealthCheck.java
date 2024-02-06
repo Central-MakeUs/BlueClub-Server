@@ -1,6 +1,6 @@
 package blueclub.server.global.infra;
 
-import blueclub.server.global.service.S3UploadService;
+import blueclub.server.s3.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;

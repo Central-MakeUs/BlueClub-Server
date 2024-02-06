@@ -1,4 +1,4 @@
-package blueclub.server.global.config;
+package blueclub.server.s3.config;
 
 import com.amazonaws.auth.AWSCredentials;
 import com.amazonaws.auth.AWSStaticCredentialsProvider;
