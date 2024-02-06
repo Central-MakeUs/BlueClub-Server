@@ -9,14 +9,9 @@ import com.epages.restdocs.apispec.Schema;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
-import org.springframework.mock.web.MockHttpServletRequest;
-import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
-import org.springframework.test.web.servlet.request.RequestPostProcessor;
-
-import java.nio.charset.StandardCharsets;
 
 import static blueclub.server.fixture.JwtTokenFixture.ACCESS_TOKEN;
 import static blueclub.server.fixture.JwtTokenFixture.BEARER;
@@ -414,29 +409,16 @@ public class UserControllerTest extends ControllerTest {
             // given
             doNothing()
                     .when(userService)
-                    .updateUserDetails(any(UserDetails.class), any(UpdateUserDetailsRequest.class), any());
+                    .updateUserDetails(any(UserDetails.class), any(UpdateUserDetailsRequest.class));
 
             // when
             final UpdateUserDetailsRequest updateUserDetailsRequest = updateUserDetailsRequest();
-            MockMultipartFile file = new MockMultipartFile("image", null,
-                    "multipart/form-data", new byte[]{});
-            MockMultipartFile mockRequest = new MockMultipartFile("dto", null,
-                    "application/json", objectMapper.writeValueAsString(updateUserDetailsRequest).getBytes(StandardCharsets.UTF_8));
 
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .multipart(BASE_URL)
-                    .file(file)
-                    .file(mockRequest)
-                    .accept(APPLICATION_JSON)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
-
-            requestBuilder.with(new RequestPostProcessor() {
-                @Override
-                public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
-                    request.setMethod("PATCH");
-                    return request;
-                }
-            });
+                    .patch(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(updateUserDetailsRequest));
 
             // then
             mockMvc.perform(requestBuilder)
@@ -449,11 +431,18 @@ public class UserControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("User API")
                                             .summary("회원 추가정보 수정 API")
+                                            .requestFields(
+                                                    fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 수입 목표")
+                                            )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result").type(NULL).description("null 반환")
                                             )
+                                            .requestSchema(Schema.schema("UpdateUserDetailsRequest"))
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));

@@ -11,7 +11,10 @@ import blueclub.server.diary.repository.DiaryRepository;
 import blueclub.server.diary.repository.RiderRepository;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
-import blueclub.server.global.service.S3UploadService;
+import blueclub.server.monthlyGoal.domain.MonthlyGoal;
+import blueclub.server.monthlyGoal.dto.response.GetMonthlyGoalResponse;
+import blueclub.server.monthlyGoal.repository.MonthlyGoalRepository;
+import blueclub.server.s3.service.S3UploadService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.service.UserFindService;
@@ -25,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -41,6 +45,9 @@ public class DiaryService {
     private final CaddyRepository caddyRepository;
     private final RiderRepository riderRepository;
     private final DayworkerRepository dayworkerRepository;
+    private final MonthlyGoalRepository monthlyGoalRepository;
+
+    private static final Integer PAGE_SIZE = 4;
 
     public GetBoastDiaryResponse saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
@@ -272,11 +279,82 @@ public class DiaryService {
     }
 
     @Transactional(readOnly = true)
+    public GetMonthlyRecordListResponse getMonthlyList(UserDetails userDetails, YearMonth yearMonth, Long id) {
+        User user = userFindService.findByUserDetails(userDetails);
+        List<MonthlyRecord> monthlyRecordList;
+        if (id == -1)
+            monthlyRecordList = diaryRepository.getMonthlyList(user, yearMonth, LocalDate.now().plusDays(1), PAGE_SIZE);
+        else {
+            Diary diary = diaryRepository.findById(id)
+                    .orElseThrow(() -> new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR));
+            monthlyRecordList = diaryRepository.getMonthlyList(user, yearMonth, diary.getWorkAt(), PAGE_SIZE);
+        }
+
+        return GetMonthlyRecordListResponse.builder()
+                .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
+                .monthlyRecord(monthlyRecordList)
+                .build();
+    }
+
     public GetMonthlyRecordResponse getMonthlyRecord(UserDetails userDetails, YearMonth yearMonth) {
         User user = userFindService.findByUserDetails(userDetails);
+        Integer straightWorkingDayLimitMonth, straightWorkingMonth;
+        LocalDate now = LocalDate.now();
+        Boolean isRenew;
+
+        if (diaryRepository.existsByWorkAt(now)) {
+            straightWorkingDayLimitMonth = diaryRepository.getStraightWorkingDayLimitMonth(user, now);
+            straightWorkingMonth = diaryRepository.getStraightWorkingMonth(user, now);
+            isRenew = diaryRepository.isRenew(user, now);
+        }
+        else {
+            if (now.equals(now.with(TemporalAdjusters.firstDayOfMonth())))
+                straightWorkingDayLimitMonth = 0;
+            else
+                straightWorkingDayLimitMonth = diaryRepository.getStraightWorkingDayLimitMonth(user, now.minusDays(1));
+            straightWorkingMonth = diaryRepository.getStraightWorkingMonth(user, now.minusDays(1));
+            isRenew = diaryRepository.isRenew(user, now.minusDays(1));
+        }
+
+        Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
+        if (monthlyGoal.isEmpty()) {
+            Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user);
+            // 첫 사용자에 대한 예외 처리
+            if (recentMonthlyGoal == -1) {
+                return GetMonthlyRecordResponse.builder()
+                        .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
+                        .straightDay(straightWorkingDayLimitMonth)
+                        .isRenew(isRenew)
+                        .straightMonth(straightWorkingMonth)
+                        .build();
+            }
+            MonthlyGoal newMonthlyGoal = MonthlyGoal.builder()
+                    .yearMonth(yearMonth)
+                    .targetIncome(recentMonthlyGoal)
+                    .user(user)
+                    .build();
+            monthlyGoalRepository.save(newMonthlyGoal);
+
+            Long totalIncome = getTotalMonthlyIncome(user, yearMonth);
+            return GetMonthlyRecordResponse.builder()
+                    .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
+                    .straightDay(straightWorkingDayLimitMonth)
+                    .isRenew(isRenew)
+                    .straightMonth(straightWorkingMonth)
+                    .targetIncome(recentMonthlyGoal)
+                    .totalIncome(totalIncome)
+                    .progress((int) Math.floor((double) totalIncome/recentMonthlyGoal*100))
+                    .build();
+        }
+        Long totalIncome = getTotalMonthlyIncome(user, yearMonth);
         return GetMonthlyRecordResponse.builder()
-                .totalWorkingDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
-                .monthlyRecord(diaryRepository.getMonthlyRecord(user, yearMonth))
+                .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
+                .straightDay(straightWorkingDayLimitMonth)
+                .isRenew(isRenew)
+                .straightMonth(straightWorkingMonth)
+                .targetIncome(monthlyGoal.get().getTargetIncome())
+                .totalIncome(totalIncome)
+                .progress((int) Math.floor((double) totalIncome/monthlyGoal.get().getTargetIncome()*100))
                 .build();
     }
 

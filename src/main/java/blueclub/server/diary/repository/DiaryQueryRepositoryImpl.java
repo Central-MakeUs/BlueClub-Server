@@ -13,7 +13,9 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.temporal.TemporalAdjusters;
 import java.util.List;
 
 import static blueclub.server.diary.domain.QDiary.diary;
@@ -62,14 +64,15 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
     }
 
     @Override
-    public List<MonthlyRecord> getMonthlyRecord(User user, YearMonth yearMonth) {
+    public List<MonthlyRecord> getMonthlyList(User user, YearMonth yearMonth, LocalDate lastDate, Integer pageSize) {
         return queryFactory
                 .selectDistinct(new QMonthlyRecord(diary.id, diary.workAt, diary.worktype.stringValue(), diary.income, getNumberOfCases(user)))
                 .from(diary)
                 .where(diary.user.eq(user),
                         diary.workAt.year().eq(yearMonth.getYear()),
-                        diary.workAt.month().eq(yearMonth.getMonthValue()))
-                .limit(4)
+                        diary.workAt.month().eq(yearMonth.getMonthValue()),
+                        diary.workAt.before(lastDate))
+                .limit(pageSize)
                 .orderBy(diary.workAt.desc())
                 .fetch();
     }
@@ -83,6 +86,92 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .fetchJoin()
                 .where(diary.id.eq(diaryId))
                 .fetch();
+    }
+
+    @Override
+    public Integer getStraightWorkingDayLimitMonth(User user, LocalDate workAt) {
+        List<LocalDate> workAtList = queryFactory
+                .selectDistinct(diary.workAt)
+                .from(diary)
+                .where(diary.user.eq(user),
+                        diary.workAt.year().eq(workAt.getYear()),
+                        diary.workAt.month().eq(workAt.getMonthValue()))
+                .orderBy(diary.workAt.desc())
+                .fetch();
+
+        LocalDate targetDate = workAt;
+        Integer straightWorkingDay = 0;
+        for (LocalDate compareDate: workAtList) {
+            if (!compareDate.isEqual(targetDate))
+                break;
+
+            targetDate = targetDate.minusDays(1);
+            straightWorkingDay++;
+        }
+        return straightWorkingDay;
+    }
+
+    @Override
+    public Boolean isRenew(User user, LocalDate workAt) {
+        List<LocalDate> workAtList = queryFactory
+                .selectDistinct(diary.workAt)
+                .from(diary)
+                .where(diary.user.eq(user))
+                .orderBy(diary.workAt.desc())
+                .fetch();
+
+        LocalDate targetDate = workAt;
+        Integer maxStraightWorkingDay = 0;
+        Integer straightWorkingDay = 0;
+        Integer currentStraightWorkingDay = 0;
+        Boolean isCurrent = true;
+        for (LocalDate compareDate: workAtList) {
+            if (!compareDate.isEqual(targetDate)) {
+                if (isCurrent) {
+                    currentStraightWorkingDay = straightWorkingDay;
+                    isCurrent = false;
+                }
+                if (maxStraightWorkingDay < straightWorkingDay)
+                    maxStraightWorkingDay = straightWorkingDay;
+                straightWorkingDay = 1;
+                targetDate = compareDate.minusDays(1);
+            }
+
+            targetDate = targetDate.minusDays(1);
+            straightWorkingDay++;
+        }
+        if (isCurrent)
+            currentStraightWorkingDay = straightWorkingDay;
+        if (maxStraightWorkingDay < straightWorkingDay)
+            maxStraightWorkingDay = straightWorkingDay;
+
+        return maxStraightWorkingDay.equals(currentStraightWorkingDay);
+    }
+
+    @Override
+    public Integer getStraightWorkingMonth(User user, LocalDate workAt) {
+        List<LocalDate> workAtList = queryFactory
+                .selectDistinct(diary.workAt)
+                .from(diary)
+                .where(diary.user.eq(user))
+                .orderBy(diary.workAt.desc())
+                .fetch();
+
+        LocalDate targetDate = workAt;
+        Integer straightWorkingMonth = 0;
+        for (LocalDate compareDate: workAtList) {
+            if (!compareDate.isEqual(targetDate))
+                break;
+
+            if (targetDate.equals(targetDate.with(TemporalAdjusters.firstDayOfMonth())))
+                straightWorkingMonth++;
+            targetDate = targetDate.minusDays(1);
+        }
+        if (!workAt.equals(targetDate.with(TemporalAdjusters.lastDayOfMonth())))
+            straightWorkingMonth--;
+        if (straightWorkingMonth.equals(-1))
+            return 0;
+        return straightWorkingMonth;
     }
 
     private NumberPath<Long> getNumberOfCases(User user) {

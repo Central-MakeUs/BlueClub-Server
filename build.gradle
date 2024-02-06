@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.6.3-SNAPSHOT'
+version = '0.7.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.6.3"
+	version = "0.7.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -69,7 +69,7 @@ task swaggerConfig {
 
 		swaggerUIFile.append(securitySchemesContent)
 
-		def UpdateUserDetailsContent =
+		def UpdateProfileImage =
 				"""
       requestBody:
         content:
@@ -77,16 +77,9 @@ task swaggerConfig {
             schema:
               type: object
               properties:
-                dto:
-                  type: object
-                  description: 마이페이지 회원 추가정보 DTO
-                  example:
-                    nickname: 위즈
-                    job: 배달 라이더
-                    monthlyTargetIncome: 3000000
                 image:
+                  description: 프로필 사진
                   type: string
-                  description: 사진
                   format: binary
 """
 
@@ -246,20 +239,6 @@ task swaggerConfig {
         numberOfWork:
           type: number
           description: "공수"
-    UpdateUserDetailsRequest:
-      title: UpdateUserDetailsRequest
-      type: object
-      description: 회원 추가정보 수정 DTO
-      properties:
-        nickname:
-          type: string
-          description: "[필수] 닉네임"
-        job:
-          type: string
-          description: "[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"
-        monthlyTargetIncome:
-          type: number
-          description: "[필수] 월별 목표 수입"
 """
 
 		def line = ""
@@ -276,8 +255,8 @@ task swaggerConfig {
 				writer.print(PostDiaryQueryContent)
 			if (line == "      operationId: SaveCaddyDiary" || line == "      operationId: UpdateCaddyDiary")
 				writer.print(PostDiaryContent)
-			if (line == "      operationId: UpdateUserDetails")
-				writer.print(UpdateUserDetailsContent)
+			if (line == "      operationId: UpdateProfileImage")
+				writer.print(UpdateProfileImage)
 		}
 		writer.flush()
 		writer.close()
@@ -335,6 +314,7 @@ dependencies {
 	// Test
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testImplementation 'org.springframework.security:spring-security-test'
+	testImplementation 'io.findify:s3mock_2.13:0.2.6'
 
 	// Rest Docs & Swagger
 	testImplementation 'org.springframework.restdocs:spring-restdocs-mockmvc'

@@ -90,6 +90,15 @@ public class DiaryController {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getDailyInfo(userDetails, yearMonth));
     }
 
+    @GetMapping("/list/{yearMonth}")
+    public ResponseEntity<BaseResponse> getMonthlyList(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth,
+            @RequestParam(value = "diaryId", defaultValue = "-1", required = false) Long id
+    ) {
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, yearMonth, id));
+    }
+
     @GetMapping("/record/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyRecord(
             @AuthenticationPrincipal UserDetails userDetails,
