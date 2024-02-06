@@ -1,5 +1,6 @@
 package blueclub.server.diary.dto.response;
 
+import blueclub.server.diary.domain.Worktype;
 import com.querydsl.core.annotations.QueryProjection;
 import lombok.Builder;
 import lombok.Getter;
@@ -21,7 +22,7 @@ public class MonthlyRecord {
     public MonthlyRecord(Long id, LocalDate date, String worktype, Long income, Long numberOfCases) {
         this.id = id;
         this.date = date;
-        this.worktype = worktype;
+        this.worktype = Worktype.valueOf(worktype).getKey();
         this.income = income;
         this.numberOfCases = numberOfCases;
     }
