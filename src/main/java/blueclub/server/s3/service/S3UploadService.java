@@ -1,4 +1,4 @@
-package blueclub.server.global.service;
+package blueclub.server.s3.service;
 
 import com.amazonaws.services.s3.AmazonS3;
 import com.amazonaws.services.s3.model.CannedAccessControlList;

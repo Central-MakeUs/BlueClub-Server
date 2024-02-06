@@ -13,7 +13,6 @@ import org.junit.jupiter.api.Test;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.mock.web.MockMultipartFile;
 import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
@@ -445,12 +444,65 @@ public class DiaryControllerTest extends ControllerTest {
     }
 
     @Nested
-    @DisplayName("월 최신 근무 내역 조회 API [GET /diary/record/{yearMonth}]")
+    @DisplayName("월 근무 리스트 조회 API [GET /diary/list/{yearMonth}]")
+    class getMonthlyList {
+        private static final String BASE_URL = "/diary/list/{yearMonth}";
+
+        @Test
+        @DisplayName("월 근무 리스트 조회에 성공한다")
+        void getMonthlyListSuccess() throws Exception {
+            // given
+            doReturn(getMonthlyListResponse())
+                    .when(diaryService)
+                    .getMonthlyList(any(), any(), any());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, "2024-01")
+                    .queryParam("diaryId", "-1")
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetMonthlyListResponse",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("월 근무 리스트 조회 API")
+                                            .pathParameters(
+                                                    parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
+                                            )
+                                            .queryParameters(
+                                                    parameterWithName("diaryId").description("마지막 근무 일지 ID").optional()
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.totalDay").type(NUMBER).description("해당 월의 총 근무일"),
+                                                    fieldWithPath("result.monthlyRecord[].id").type(NUMBER).description("근무 일지 ID"),
+                                                    fieldWithPath("result.monthlyRecord[].date").type(STRING).description("근무 날짜"),
+                                                    fieldWithPath("result.monthlyRecord[].worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.monthlyRecord[].income").type(NUMBER).description("총 수입"),
+                                                    fieldWithPath("result.monthlyRecord[].numberOfCases").type(NUMBER).description("총 건수")
+                                            )
+                                            .responseSchema(Schema.schema("GetMonthlyListResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
+    @Nested
+    @DisplayName("월 근무 기록 조회 API [GET /diary/record/{yearMonth}]")
     class getMonthlyRecord {
         private static final String BASE_URL = "/diary/record/{yearMonth}";
 
         @Test
-        @DisplayName("월 최신 근무 내역 조회에 성공한다")
+        @DisplayName("월 근무 기록 조회에 성공한다")
         void getMonthlyRecordSuccess() throws Exception {
             // given
             doReturn(getMonthlyRecordResponse())
@@ -466,25 +518,26 @@ public class DiaryControllerTest extends ControllerTest {
             mockMvc.perform(requestBuilder)
                     .andExpect(status().isOk())
                     .andDo(document(
-                            "GetMonthlyRecord",
+                            "GetMonthlyRecordResponse",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
                                     ResourceSnippetParameters.builder()
                                             .tag("Diary API")
-                                            .summary("월 최신 근무 내역 조회 API")
+                                            .summary("월 근무 기록 조회 API - 홈")
                                             .pathParameters(
                                                     parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result.totalWorkingDay").type(NUMBER).description("해당 월의 총 근무일"),
-                                                    fieldWithPath("result.monthlyRecord[].id").type(NUMBER).description("근무 일지 ID"),
-                                                    fieldWithPath("result.monthlyRecord[].date").type(STRING).description("근무 날짜"),
-                                                    fieldWithPath("result.monthlyRecord[].worktype").type(STRING).description("근무 형태"),
-                                                    fieldWithPath("result.monthlyRecord[].income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.monthlyRecord[].numberOfCases").type(NUMBER).description("총 건수")
+                                                    fieldWithPath("result.totalDay").type(NUMBER).description("월 총 근무기록일 수"),
+                                                    fieldWithPath("result.straightDay").type(NUMBER).description("월 연속 근무기록일 수"),
+                                                    fieldWithPath("result.isRenew").type(BOOLEAN).description("기록갱신 여부"),
+                                                    fieldWithPath("result.straightMonth").type(NUMBER).description("N달 연속 근무기록"),
+                                                    fieldWithPath("result.targetIncome").type(NUMBER).description("월 목표 수입"),
+                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("월 총 수입"),
+                                                    fieldWithPath("result.progress").type(NUMBER).description("달성률 (%)")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyRecordResponse"))
                                             .build()
@@ -659,7 +712,7 @@ public class DiaryControllerTest extends ControllerTest {
         return getDailyInfoResponseList;
     }
 
-    private GetMonthlyRecordResponse getMonthlyRecordResponse() {
+    private GetMonthlyRecordListResponse getMonthlyListResponse() {
         List<MonthlyRecord> monthlyRecordList = new ArrayList<>();
         monthlyRecordList.add(MonthlyRecord.builder()
                 .id(CADDY_DIARY.getDiaryId())
@@ -690,9 +743,21 @@ public class DiaryControllerTest extends ControllerTest {
                 .numberOfCases(CADDY_DIARY_THREE.getRounding())
                 .build());
 
-        return GetMonthlyRecordResponse.builder()
-                .totalWorkingDay(10)
+        return GetMonthlyRecordListResponse.builder()
+                .totalDay(10)
                 .monthlyRecord(monthlyRecordList)
+                .build();
+    }
+
+    private GetMonthlyRecordResponse getMonthlyRecordResponse() {
+        return GetMonthlyRecordResponse.builder()
+                .totalDay(1)
+                .straightDay(1)
+                .isRenew(true)
+                .straightMonth(0)
+                .targetIncome(200000L)
+                .totalIncome(20000L)
+                .progress(10)
                 .build();
     }
 

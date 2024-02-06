@@ -40,7 +40,6 @@ public class MonthlyGoalService {
                 .build());
     }
 
-    @Transactional(readOnly = true)
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
@@ -56,14 +55,18 @@ public class MonthlyGoalService {
                     .user(user)
                     .build();
             monthlyGoalRepository.save(newMonthlyGoal);
+            Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
             return GetMonthlyGoalResponse.builder()
                     .targetIncome(recentMonthlyGoal)
-                    .progress((int) Math.floor((double) diaryService.getTotalMonthlyIncome(user, yearMonth)/recentMonthlyGoal*100))
+                    .totalIncome(totalIncome)
+                    .progress((int) Math.floor((double) totalIncome/recentMonthlyGoal*100))
                     .build();
         }
+        Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
         return GetMonthlyGoalResponse.builder()
                 .targetIncome(monthlyGoal.get().getTargetIncome())
-                .progress((int) Math.floor((double) diaryService.getTotalMonthlyIncome(user, yearMonth)/monthlyGoal.get().getTargetIncome()*100))
+                .totalIncome(totalIncome)
+                .progress((int) Math.floor((double) totalIncome/monthlyGoal.get().getTargetIncome()*100))
                 .build();
     }
 }
