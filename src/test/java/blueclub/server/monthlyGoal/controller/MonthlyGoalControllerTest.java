@@ -117,6 +117,7 @@ public class MonthlyGoalControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.targetIncome").type(NUMBER).description("월 목표 수입"),
+                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("월 총 수입"),
                                                     fieldWithPath("result.progress").type(NUMBER).description("달성률 (%)")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyGoalResponse"))
@@ -136,6 +137,7 @@ public class MonthlyGoalControllerTest extends ControllerTest {
     private GetMonthlyGoalResponse getMonthlyGoalResponse() {
         return GetMonthlyGoalResponse.builder()
                 .targetIncome(200000L)
+                .totalIncome(20000L)
                 .progress(10)
                 .build();
     }
