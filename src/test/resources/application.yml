@@ -33,3 +33,16 @@ logging:
       amazonaws:
         util:
           EC2MetadataUtils: error
+
+cloud:
+  aws:
+    s3:
+      bucket: ${s3.bucket}
+    credentials:
+      access-key: ${s3.access.key}
+      secret-key: ${s3.secret.key}
+    region:
+      static: ap-northeast-2
+      auto: false
+    stack:
+      auto: false

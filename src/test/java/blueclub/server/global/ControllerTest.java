@@ -11,6 +11,7 @@ import blueclub.server.notice.controller.NoticeController;
 import blueclub.server.notice.service.NoticeService;
 import blueclub.server.reminder.controller.ReminderController;
 import blueclub.server.reminder.service.ReminderService;
+import blueclub.server.s3.controller.S3Controller;
 import blueclub.server.user.controller.UserController;
 import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -38,7 +39,8 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         DiaryController.class,
         MonthlyGoalController.class,
         NoticeController.class,
-        ReminderController.class
+        ReminderController.class,
+        S3Controller.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @Import(TestSecurityConfig.class)
