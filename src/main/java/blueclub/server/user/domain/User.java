@@ -7,6 +7,7 @@ import blueclub.server.global.entity.BaseTimeEntity;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
 import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,10 +73,13 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;
     }
 
-    public void updateDetails(String nickname, Job job, Long monthlyTargetIncome, String profileImage) {
+    public void updateDetails(String nickname, Job job, Long monthlyTargetIncome) {
         this.nickname = nickname;
         this.job = job;
         this.monthlyTargetIncome = monthlyTargetIncome;
+    }
+
+    public void updateProfileImage(String profileImage) {
         this.profileImage = profileImage;
     }
 

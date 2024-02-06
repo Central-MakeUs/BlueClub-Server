@@ -1,7 +1,9 @@
 package blueclub.server.user.service;
 
 import blueclub.server.auth.service.JwtService;
-import blueclub.server.global.service.S3UploadService;
+import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponseStatus;
+import blueclub.server.s3.service.S3UploadService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
@@ -15,8 +17,6 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @Service
 @RequiredArgsConstructor
@@ -27,6 +27,7 @@ public class UserService {
     private final S3UploadService s3UploadService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
+    private static final String IMAGE_FORMAT = "(.*?)\\.(jpg|jpeg|png|gif|bmp)$";
 
     public void addUserDetails(UserDetails userDetails, AddUserDetailsRequest addUserDetailsRequest) {
         User user = userFindService.findByUserDetails(userDetails);
@@ -38,13 +39,12 @@ public class UserService {
         );
     }
 
-    public void updateUserDetails(UserDetails userDetails, UpdateUserDetailsRequest updateUserDetailsRequest, MultipartFile multipartFile) {
+    public void updateUserDetails(UserDetails userDetails, UpdateUserDetailsRequest updateUserDetailsRequest) {
         User user = userFindService.findByUserDetails(userDetails);
         user.updateDetails(
                 updateUserDetailsRequest.nickname(),
                 Job.valueOf(updateUserDetailsRequest.job().replace(" ", "")),
-                updateUserDetailsRequest.monthlyTargetIncome(),
-                uploadProfileImage(user, multipartFile)
+                updateUserDetailsRequest.monthlyTargetIncome()
         );
     }
 
@@ -58,22 +58,24 @@ public class UserService {
         user.updateAgreement(updateAgreementRequest.tosAgree(), updateAgreementRequest.pushAgree());
     }
 
-    // user 관련 정보 삭제 (User, RefreshToken)
-    private void deleteUser(User user) {
-        jwtService.deleteRefreshToken(user.getId());
-        userRepository.delete(user);
-    }
+    public void uploadProfileImage(UserDetails userDetails, MultipartFile multipartFile) {
+        User user = userFindService.findByUserDetails(userDetails);
+        String fileName;
 
-    private String uploadProfileImage(User user, MultipartFile multipartFile) {
-        String fileName = user.getProfileImage();
-        if (multipartFile == null)
-            return fileName;
+        if (multipartFile == null || !multipartFile.getOriginalFilename().matches(IMAGE_FORMAT))
+            throw new BaseException(BaseResponseStatus.INVALID_FILE);
 
         try { // 파일 업로드
             fileName = s3UploadService.upload(multipartFile, "profile"); // S3 버킷의 images 디렉토리 안에 저장됨
         } catch (IOException e) {
-            throw new RuntimeException();
+            throw new BaseException(BaseResponseStatus.BAD_GATEWAY);
         }
-        return fileName;
+        user.updateProfileImage(fileName);
+    }
+
+    // user 관련 정보 삭제 (User, RefreshToken)
+    private void deleteUser(User user) {
+        jwtService.deleteRefreshToken(user.getId());
+        userRepository.delete(user);
     }
 }

@@ -41,10 +41,9 @@ public class UserController {
     @PatchMapping("/details")
     public ResponseEntity<BaseResponse> updateUserDetails(
             @AuthenticationPrincipal UserDetails userDetails,
-            @Valid @RequestPart("dto") UpdateUserDetailsRequest updateUserDetailsRequest,
-            @RequestPart(value = "image", required = false) MultipartFile multipartFile
+            @Valid @RequestBody UpdateUserDetailsRequest updateUserDetailsRequest
     ) {
-        userService.updateUserDetails(userDetails, updateUserDetailsRequest, multipartFile);
+        userService.updateUserDetails(userDetails, updateUserDetailsRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
