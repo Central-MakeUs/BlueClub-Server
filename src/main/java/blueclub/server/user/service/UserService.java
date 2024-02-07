@@ -9,6 +9,7 @@ import blueclub.server.user.domain.User;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
 import blueclub.server.user.dto.request.UpdateAgreementRequest;
 import blueclub.server.user.dto.request.UpdateUserDetailsRequest;
+import blueclub.server.user.dto.response.GetAgreementResponse;
 import blueclub.server.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -56,6 +57,15 @@ public class UserService {
     public void updateAgreement(UserDetails userDetails, UpdateAgreementRequest updateAgreementRequest) {
         User user = userFindService.findByUserDetails(userDetails);
         user.updateAgreement(updateAgreementRequest.tosAgree(), updateAgreementRequest.pushAgree());
+    }
+
+    @Transactional(readOnly = true)
+    public GetAgreementResponse getAgreement(UserDetails userDetails) {
+        User user = userFindService.findByUserDetails(userDetails);
+        return GetAgreementResponse.builder()
+                .tosAgree(user.getTosAgree())
+                .pushAgree(user.getPushAgree())
+                .build();
     }
 
     public void uploadProfileImage(UserDetails userDetails, MultipartFile multipartFile) {

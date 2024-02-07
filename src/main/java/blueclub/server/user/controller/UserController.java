@@ -9,10 +9,10 @@ import blueclub.server.user.service.UserService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.bind.annotation.*;
-import org.springframework.web.multipart.MultipartFile;
 
 @RestController
 @RequiredArgsConstructor
@@ -30,6 +30,7 @@ public class UserController {
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @DeleteMapping("/withdrawal")
     public ResponseEntity<BaseResponse> withdrawUser(
             @AuthenticationPrincipal UserDetails userDetails
@@ -38,6 +39,7 @@ public class UserController {
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PatchMapping("/details")
     public ResponseEntity<BaseResponse> updateUserDetails(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -47,6 +49,7 @@ public class UserController {
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @PostMapping("/agreement")
     public ResponseEntity<BaseResponse> updateAgreement(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -54,5 +57,13 @@ public class UserController {
     ) {
         userService.updateAgreement(userDetails, updateAgreementRequest);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
+    }
+
+    @PreAuthorize("hasRole('USER')")
+    @GetMapping("/agreement")
+    public ResponseEntity<BaseResponse> getAgreement(
+            @AuthenticationPrincipal UserDetails userDetails
+    ) {
+        return BaseResponse.toResponseEntityContainsResult(userService.getAgreement(userDetails));
     }
 }

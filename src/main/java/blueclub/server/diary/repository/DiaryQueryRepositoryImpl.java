@@ -1,14 +1,9 @@
 package blueclub.server.diary.repository;
 
 import blueclub.server.diary.domain.Diary;
-import blueclub.server.diary.domain.Worktype;
 import blueclub.server.diary.dto.response.GetDailyInfoResponse;
-import blueclub.server.diary.dto.response.MonthlyRecord;
 import blueclub.server.diary.dto.response.QGetDailyInfoResponse;
-import blueclub.server.diary.dto.response.QMonthlyRecord;
-import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
-import com.querydsl.core.types.dsl.NumberPath;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -57,23 +52,22 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .from(diary)
                 .where(diary.user.eq(user),
                         diary.workAt.year().eq(yearMonth.getYear()),
-                        diary.workAt.month().eq(yearMonth.getMonthValue()),
-                        diary.worktype.eq(Worktype.WORKING))
+                        diary.workAt.month().eq(yearMonth.getMonthValue()))
                 .fetch();
         return count != null ? count.get(0).intValue() : 0;
     }
 
     @Override
-    public List<MonthlyRecord> getMonthlyList(User user, YearMonth yearMonth, LocalDate lastDate, Integer pageSize) {
+    public List<Diary> getMonthlyList(User user, YearMonth yearMonth, LocalDate lastDate, Integer pageSize) {
         return queryFactory
-                .selectDistinct(new QMonthlyRecord(diary.id, diary.workAt, diary.worktype.stringValue(), diary.income, getNumberOfCases(user)))
+                .selectDistinct(diary)
                 .from(diary)
                 .where(diary.user.eq(user),
                         diary.workAt.year().eq(yearMonth.getYear()),
                         diary.workAt.month().eq(yearMonth.getMonthValue()),
                         diary.workAt.before(lastDate))
-                .limit(pageSize)
                 .orderBy(diary.workAt.desc())
+                .limit(pageSize)
                 .fetch();
     }
 
@@ -174,11 +168,18 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         return straightWorkingMonth;
     }
 
-    private NumberPath<Long> getNumberOfCases(User user) {
+    /*
+
+    public NumberPath<Long> getNumberOfCases(User user, QDiary diary) {
+        if (diary.worktype.toString().equals(Worktype.DAY_OFF.toString()))
+            return Expressions.numberPath(Long.class, "-1");
+
         if (Job.CADDY.equals(user.getJob()))
             return diary.caddy.rounding;
         else if (Job.RIDER.equals(user.getJob()))
             return diary.rider.numberOfDeliveries;
-        return null;
+        return Expressions.numberPath(Long.class, "-1");
     }
+
+     */
 }

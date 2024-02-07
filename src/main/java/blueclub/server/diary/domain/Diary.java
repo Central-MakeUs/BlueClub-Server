@@ -5,6 +5,7 @@ import blueclub.server.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.ColumnDefault;
+import org.hibernate.annotations.DynamicInsert;
 
 import java.time.LocalDate;
 import java.util.List;
@@ -12,6 +13,7 @@ import java.util.List;
 @Entity
 @Getter
 @Builder
+@DynamicInsert
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
 public class Diary extends BaseTimeEntity {
@@ -28,6 +30,7 @@ public class Diary extends BaseTimeEntity {
     @ElementCollection(fetch = FetchType.LAZY)
     private List<String> image;
 
+    @ColumnDefault("0")
     private Long income;
 
     @ColumnDefault("0")
@@ -70,5 +73,11 @@ public class Diary extends BaseTimeEntity {
         this.income = income;
         this.expenditure = expenditure;
         this.saving = saving;
+    }
+
+    public void unlink() {
+        this.caddy = null;
+        this.rider = null;
+        this.dayworker = null;
     }
 }

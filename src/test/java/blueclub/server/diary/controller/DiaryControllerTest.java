@@ -1,6 +1,8 @@
 package blueclub.server.diary.controller;
 
 import blueclub.server.diary.domain.Rank;
+import blueclub.server.diary.domain.Worktype;
+import blueclub.server.diary.dto.request.UpdateBaseDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
 import blueclub.server.diary.dto.response.*;
 import blueclub.server.global.ControllerTest;
@@ -91,7 +93,7 @@ public class DiaryControllerTest extends ControllerTest {
                                     .tag("Diary API")
                                     .summary("근무 일지 작성 API")
                                     .requestSchema(Schema.schema("UpdateCaddyDiaryRequest"))
-                                    .responseSchema(Schema.schema("BaseResponse")),
+                                    .responseSchema(Schema.schema("GetBoastDiaryResponse")),
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             requestParts(
@@ -121,8 +123,66 @@ public class DiaryControllerTest extends ControllerTest {
                                     fieldWithPath("result.job").type(STRING).description("직업"),
                                     fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
                                     fieldWithPath("result.rank").type(STRING).description("근무 순위"),
-                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                    fieldWithPath("result.cases").type(NUMBER).description("총 건수")
+                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("휴무일 근무 일지 작성에 성공한다")
+        void saveDayOffDiarySuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(diaryService)
+                    .saveDayOffDiary(any(), any());
+
+            // when
+            final UpdateBaseDiaryRequest updateBaseDiaryRequest = updateBaseDiaryRequest();
+            MockMultipartFile file = new MockMultipartFile("image", null,
+                    "multipart/form-data", new byte[]{});
+            MockMultipartFile mockRequest = new MockMultipartFile("dto", null,
+                    "application/json", objectMapper.writeValueAsString(updateBaseDiaryRequest).getBytes(StandardCharsets.UTF_8));
+
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .multipart(BASE_URL)
+                    .file(file)
+                    .file(file)
+                    .file(file)
+                    .file(file)
+                    .file(mockRequest)
+                    .accept(APPLICATION_JSON)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isCreated())
+                    .andDo(document(
+                            "SaveDayOffDiary",
+                            resourceDetails()
+                                    .tag("Diary API")
+                                    .summary("근무 일지 작성 API")
+                                    .requestSchema(Schema.schema("UpdateBaseDiaryRequest"))
+                                    .responseSchema(Schema.schema("BaseResponse")),
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            requestParts(
+                                    partWithName("dto").description("휴무 근무 일지 내용"),
+                                    partWithName("image").description("사진"),
+                                    partWithName("image").description("사진"),
+                                    partWithName("image").description("사진"),
+                                    partWithName("image").description("사진")
+                            ),
+                            requestPartFields(
+                                    "dto",
+                                    fieldWithPath("worktype").type(STRING).description("[필수] 근무 형태 (근무, 조퇴, 휴무)"),
+                                    fieldWithPath("date").type(STRING).description("[필수] 근무 일자 // 형식 : yyyy-mm-dd")
+                            ),
+                            responseFields(
+                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                    fieldWithPath("result").type(NULL).description("NULL 반환")
                             )
                     ));
         }
@@ -190,10 +250,72 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.job").type(STRING).description("직업"),
                                                     fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
                                                     fieldWithPath("result.rank").type(STRING).description("근무 순위"),
-                                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.cases").type(NUMBER).description("총 건수")
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetBoastDiaryResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("휴무일 근무 일지 수정에 성공한다")
+        void updateDayOffDiarySuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(diaryService)
+                    .updateDayOffDiary(any(), anyLong());
+
+            // when
+            final UpdateBaseDiaryRequest updateBaseDiaryRequest = updateBaseDiaryRequest();
+            MockMultipartFile file = new MockMultipartFile("image", null,
+                    "multipart/form-data", new byte[]{});
+            MockMultipartFile mockRequest = new MockMultipartFile("dto", null,
+                    "application/json", objectMapper.writeValueAsString(updateBaseDiaryRequest).getBytes(StandardCharsets.UTF_8));
+
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .multipart(BASE_URL, 1)
+                    .file(file)
+                    .file(file)
+                    .file(file)
+                    .file(file)
+                    .file(mockRequest)
+                    .accept(APPLICATION_JSON)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
+
+            requestBuilder.with(new RequestPostProcessor() {
+                @Override
+                public MockHttpServletRequest postProcessRequest(MockHttpServletRequest request) {
+                    request.setMethod("PATCH");
+                    return request;
+                }
+            });
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "UpdateDayOffDiary",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("근무 일지 수정 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
+                                            .pathParameters(
+                                                    parameterWithName("diaryId").description("근무 일지 ID")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("NULL 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));
@@ -240,15 +362,15 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
-                                                    fieldWithPath("result.memo").type(STRING).description("메모"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
-                                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.expenditure").type(NUMBER).description("지출액"),
-                                                    fieldWithPath("result.saving").type(NUMBER).description("저축액"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
                                                     fieldWithPath("result.rounding").type(NUMBER).description("라운딩 수"),
                                                     fieldWithPath("result.caddyFee").type(NUMBER).description("캐디피 수입"),
-                                                    fieldWithPath("result.overFee").type(NUMBER).description("오버피 수입"),
-                                                    fieldWithPath("result.topdressing").type(BOOLEAN).description("배토 여부")
+                                                    fieldWithPath("result.overFee").type(NUMBER).description("[DEFAULT 0] 오버피 수입"),
+                                                    fieldWithPath("result.topdressing").type(BOOLEAN).description("[DEFAULT FALSE] 배토 여부")
                                             )
                                             .responseSchema(Schema.schema("GetCaddyDiaryDetailsResponse"))
                                             .build()
@@ -291,15 +413,15 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
-                                                    fieldWithPath("result.memo").type(STRING).description("메모"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
-                                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.expenditure").type(NUMBER).description("지출액"),
-                                                    fieldWithPath("result.saving").type(NUMBER).description("저축액"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
                                                     fieldWithPath("result.numberOfDeliveries").type(NUMBER).description("배달 건수"),
                                                     fieldWithPath("result.incomeOfDeliveries").type(NUMBER).description("배달 수입"),
-                                                    fieldWithPath("result.numberOfPromotions").type(NUMBER).description("프로모션 건수"),
-                                                    fieldWithPath("result.incomeOfPromotions").type(NUMBER).description("프로모션 수입")
+                                                    fieldWithPath("result.numberOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 건수"),
+                                                    fieldWithPath("result.incomeOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 수입")
                                             )
                                             .responseSchema(Schema.schema("GetRiderDiaryDetailsResponse"))
                                             .build()
@@ -342,17 +464,59 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
-                                                    fieldWithPath("result.memo").type(STRING).description("메모"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
-                                                    fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.expenditure").type(NUMBER).description("지출액"),
-                                                    fieldWithPath("result.saving").type(NUMBER).description("저축액"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
                                                     fieldWithPath("result.place").type(STRING).description("현장명"),
                                                     fieldWithPath("result.dailyWage").type(NUMBER).description("일당"),
-                                                    fieldWithPath("result.typeOfJob").type(STRING).description("직종"),
-                                                    fieldWithPath("result.numberOfWork").type(NUMBER).description("공수")
+                                                    fieldWithPath("result.typeOfJob").type(STRING).description("[DEFAULT NULL] 직종"),
+                                                    fieldWithPath("result.numberOfWork").type(NUMBER).description("[DEFAULT 0.0] 공수")
                                             )
                                             .responseSchema(Schema.schema("GetDayworkerDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("휴무 근무 일지 상세조회에 성공한다")
+        void getDayOffDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getDayOffDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetails(any(), anyString(), anyLong());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, 1L)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetDayOffDiaryDetails",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
+                                            .pathParameters(
+                                                    parameterWithName("diaryId").description("근무 일지 ID")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태")
+                                            )
+                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
                                             .build()
                             )
                     ));
@@ -434,7 +598,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result[].id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result[].date").type(STRING).description("날짜"),
-                                                    fieldWithPath("result[].income").type(NUMBER).description("총 수입")
+                                                    fieldWithPath("result[].income").type(NUMBER).description("[DEFAULT 0] 총 수입")
                                             )
                                             .responseSchema(Schema.schema("GetDailyInfoResponse"))
                                             .build()
@@ -486,8 +650,8 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.monthlyRecord[].id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.monthlyRecord[].date").type(STRING).description("근무 날짜"),
                                                     fieldWithPath("result.monthlyRecord[].worktype").type(STRING).description("근무 형태"),
-                                                    fieldWithPath("result.monthlyRecord[].income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.monthlyRecord[].numberOfCases").type(NUMBER).description("총 건수")
+                                                    fieldWithPath("result.monthlyRecord[].income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.monthlyRecord[].cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 휴무, 일용직 노동자일 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyListResponse"))
                                             .build()
@@ -535,9 +699,9 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.straightDay").type(NUMBER).description("월 연속 근무기록일 수"),
                                                     fieldWithPath("result.isRenew").type(BOOLEAN).description("기록갱신 여부"),
                                                     fieldWithPath("result.straightMonth").type(NUMBER).description("N달 연속 근무기록"),
-                                                    fieldWithPath("result.targetIncome").type(NUMBER).description("월 목표 수입"),
-                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("월 총 수입"),
-                                                    fieldWithPath("result.progress").type(NUMBER).description("달성률 (%)")
+                                                    fieldWithPath("result.targetIncome").type(NUMBER).description("[DEFAULT NULL] 월 목표 수입 // 1번도 설정한 적 없을 때 TYPE : NULL"),
+                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("[DEFAULT NULL] 월 총 수입 // 1번도 설정한 적 없을 때 TYPE : NULL"),
+                                                    fieldWithPath("result.progress").type(NUMBER).description("[DEFAULT NULL] 달성률 (%) // 1번도 설정한 적 없을 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyRecordResponse"))
                                             .build()
@@ -585,7 +749,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
                                                     fieldWithPath("result.rank").type(STRING).description("근무 순위"),
                                                     fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.cases").type(NUMBER).description("총 건수")
+                                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetBoastDiaryResponse"))
                                             .build()
@@ -652,6 +816,13 @@ public class DiaryControllerTest extends ControllerTest {
                 .build();
     }
 
+    private UpdateBaseDiaryRequest updateBaseDiaryRequest() {
+        return UpdateBaseDiaryRequest.builder()
+                .worktype(Worktype.DAY_OFF.getKey())
+                .date(CADDY_DIARY.getDate())
+                .build();
+    }
+
     private GetCaddyDiaryDetailsResponse getCaddyDiaryDetailsResponse() {
         return GetCaddyDiaryDetailsResponse.builder()
                 .worktype(CADDY_DIARY.getWorktype())
@@ -697,6 +868,12 @@ public class DiaryControllerTest extends ControllerTest {
                 .build();
     }
 
+    private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsResponse() {
+        return GetDayOffDiaryDetailsResponse.builder()
+                .worktype(Worktype.DAY_OFF.getKey())
+                .build();
+    }
+
     private List<GetDailyInfoResponse> getDailyInfoResponseList() {
         List<GetDailyInfoResponse> getDailyInfoResponseList = new ArrayList<>();
         getDailyInfoResponseList.add(GetDailyInfoResponse.builder()
@@ -719,28 +896,28 @@ public class DiaryControllerTest extends ControllerTest {
                 .date(CADDY_DIARY.getDate())
                 .worktype(CADDY_DIARY.getWorktype())
                 .income(CADDY_DIARY.getIncome())
-                .numberOfCases(CADDY_DIARY.getRounding())
+                .cases(CADDY_DIARY.getRounding())
                 .build());
         monthlyRecordList.add(MonthlyRecord.builder()
                 .id(CADDY_DIARY_FOUR.getDiaryId())
                 .date(CADDY_DIARY_FOUR.getDate())
                 .worktype(CADDY_DIARY_FOUR.getWorktype())
                 .income(CADDY_DIARY_FOUR.getIncome())
-                .numberOfCases(CADDY_DIARY_FOUR.getRounding())
+                .cases(CADDY_DIARY_FOUR.getRounding())
                 .build());
         monthlyRecordList.add(MonthlyRecord.builder()
                 .id(CADDY_DIARY_TWO.getDiaryId())
                 .date(CADDY_DIARY_TWO.getDate())
                 .worktype(CADDY_DIARY_TWO.getWorktype())
                 .income(CADDY_DIARY_TWO.getIncome())
-                .numberOfCases(CADDY_DIARY_TWO.getRounding())
+                .cases(CADDY_DIARY_TWO.getRounding())
                 .build());
         monthlyRecordList.add(MonthlyRecord.builder()
                 .id(CADDY_DIARY_THREE.getDiaryId())
                 .date(CADDY_DIARY_THREE.getDate())
                 .worktype(CADDY_DIARY_THREE.getWorktype())
                 .income(CADDY_DIARY_THREE.getIncome())
-                .numberOfCases(CADDY_DIARY_THREE.getRounding())
+                .cases(CADDY_DIARY_THREE.getRounding())
                 .build());
 
         return GetMonthlyRecordListResponse.builder()

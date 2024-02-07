@@ -4,6 +4,7 @@ import blueclub.server.global.ControllerTest;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
 import blueclub.server.user.dto.request.UpdateAgreementRequest;
 import blueclub.server.user.dto.request.UpdateUserDetailsRequest;
+import blueclub.server.user.dto.response.GetAgreementResponse;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
 import org.junit.jupiter.api.DisplayName;
@@ -20,6 +21,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -498,6 +500,48 @@ public class UserControllerTest extends ControllerTest {
         }
     }
 
+    @Nested
+    @DisplayName("알림 설정 조회 API [GET /user/agreement]")
+    class getAgreement {
+        private static final String BASE_URL = "/user/agreement";
+
+        @Test
+        @DisplayName("알림 설정 조회에 성공한다")
+        void getAgreementSuccess() throws Exception {
+            // given
+            doReturn(getAgreementResponse())
+                    .when(userService)
+                    .getAgreement(any());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "UserGetAgreement",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("User API")
+                                            .summary("알림 설정 조회 API")
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.tosAgree").type(BOOLEAN).description("선택약관 동의여부"),
+                                                    fieldWithPath("result.pushAgree").type(BOOLEAN).description("[DEFAULT FALSE] 푸시알림 동의여부")
+                                            )
+                                            .responseSchema(Schema.schema("GetAgreementResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
     private AddUserDetailsRequest addDetailsRequest() {
         return AddUserDetailsRequest.builder()
                 .nickname(WIZ.getNickname())
@@ -573,6 +617,13 @@ public class UserControllerTest extends ControllerTest {
                 .nickname(WIZ.getNickname())
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
+                .build();
+    }
+
+    private GetAgreementResponse getAgreementResponse() {
+        return GetAgreementResponse.builder()
+                .tosAgree(true)
+                .pushAgree(false)
                 .build();
     }
 }
