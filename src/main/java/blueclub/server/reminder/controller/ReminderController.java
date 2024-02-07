@@ -51,6 +51,7 @@ public class ReminderController {
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse> getReminderList(
             @AuthenticationPrincipal UserDetails userDetails,

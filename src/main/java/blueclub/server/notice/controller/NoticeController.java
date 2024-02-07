@@ -50,6 +50,7 @@ public class NoticeController {
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("")
     public ResponseEntity<BaseResponse> getNoticeList(
             @AuthenticationPrincipal UserDetails userDetails,
@@ -58,6 +59,7 @@ public class NoticeController {
         return BaseResponse.toResponseEntityContainsResult(noticeService.getNoticeList(id));
     }
 
+    @PreAuthorize("hasRole('USER')")
     @GetMapping("/{noticeId}")
     public ResponseEntity<BaseResponse> getNoticeDetails(
             @AuthenticationPrincipal UserDetails userDetails,

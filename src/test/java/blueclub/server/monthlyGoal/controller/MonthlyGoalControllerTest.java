@@ -1,6 +1,8 @@
 package blueclub.server.monthlyGoal.controller;
 
 import blueclub.server.global.ControllerTest;
+import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.dto.response.GetMonthlyGoalResponse;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -20,8 +22,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.docume
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -121,6 +122,44 @@ public class MonthlyGoalControllerTest extends ControllerTest {
                                                     fieldWithPath("result.progress").type(NUMBER).description("달성률 (%)")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyGoalResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("한 번도 월 목표 수입을 작성한 적이 없으면 월 목표 수입 및 달성률 조회에 실패한다")
+        void throwExceptionByNotWrittenMonthlyGoal() throws Exception {
+            // given
+            doThrow(new BaseException(BaseResponseStatus.RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR))
+                    .when(monthlyGoalService)
+                    .getMonthlyGoalAndProgress(any(), any());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, "2024-01")
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isNotFound())
+                    .andDo(document(
+                            "NotWrittenMonthlyGoalError",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("MonthlyGoal API")
+                                            .summary("월 목표 수입 및 달성률 조회 API")
+                                            .pathParameters(
+                                                    parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("NULL 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));
