@@ -258,7 +258,7 @@ public class DiaryService {
         }
 
         if (diary.get(0).getWorktype().equals(Worktype.DAY_OFF)) {
-            return GetDayOffDiaryResponse.builder()
+            return GetDayOffDiaryDetailsResponse.builder()
                     .worktype(Worktype.DAY_OFF.getKey())
                     .build();
         }

@@ -3,7 +3,7 @@ package blueclub.server.diary.dto.response;
 import lombok.Builder;
 
 @Builder
-public record GetDayOffDiaryResponse(
+public record GetDayOffDiaryDetailsResponse(
         String worktype
 ) {
 }
