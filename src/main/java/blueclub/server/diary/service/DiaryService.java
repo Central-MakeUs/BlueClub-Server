@@ -1,6 +1,7 @@
 package blueclub.server.diary.service;
 
 import blueclub.server.diary.domain.*;
+import blueclub.server.diary.dto.request.UpdateBaseDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateDayworkerDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateRiderDiaryRequest;
@@ -12,7 +13,6 @@ import blueclub.server.diary.repository.RiderRepository;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
-import blueclub.server.monthlyGoal.dto.response.GetMonthlyGoalResponse;
 import blueclub.server.monthlyGoal.repository.MonthlyGoalRepository;
 import blueclub.server.s3.service.S3UploadService;
 import blueclub.server.user.domain.Job;
@@ -48,6 +48,12 @@ public class DiaryService {
     private final MonthlyGoalRepository monthlyGoalRepository;
 
     private static final Integer PAGE_SIZE = 4;
+
+    public void saveDayOffDiary(UserDetails userDetails, UpdateBaseDiaryRequest updateBaseDiaryRequest) {
+        User user = userFindService.findByUserDetails(userDetails);
+        Diary diary = saveBaseDiary(user, Worktype.DAY_OFF, updateBaseDiaryRequest.getDate());
+        diaryRepository.save(diary);
+    }
 
     public GetBoastDiaryResponse saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
@@ -121,6 +127,31 @@ public class DiaryService {
                 .rank(getRank(createDayworkerDiaryRequest.getIncome()).getKey())
                 .income(createDayworkerDiaryRequest.getIncome())
                 .build();
+    }
+
+    public void updateDayOffDiary(UserDetails userDetails, Long diaryId) {
+        User user = userFindService.findByUserDetails(userDetails);
+        Optional<Diary> diary = diaryRepository.findById(diaryId);
+        if (diary.isEmpty()) {
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
+        }
+
+        if (!diary.get().getWorktype().equals(Worktype.DAY_OFF)) {
+            switch (user.getJob()) {
+                case CADDY -> caddyRepository.deleteById(diary.get().getCaddy().getId());
+                case RIDER -> riderRepository.deleteById(diary.get().getRider().getId());
+                case DAYWORKER -> dayworkerRepository.deleteById(diary.get().getDayworker().getId());
+            }
+            diary.get().unlink();
+        }
+        diary.get().update(
+                Worktype.DAY_OFF,
+                null,
+                new ArrayList<>(),
+                0L,
+                0L,
+                0L
+        );
     }
 
     public GetBoastDiaryResponse updateCaddyDiary(UserDetails userDetails, Long diaryId, UpdateCaddyDiaryRequest updateCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
@@ -225,6 +256,13 @@ public class DiaryService {
         if (diary.isEmpty()) {
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
         }
+
+        if (diary.get(0).getWorktype().equals(Worktype.DAY_OFF)) {
+            return GetDayOffDiaryResponse.builder()
+                    .worktype(Worktype.DAY_OFF.getKey())
+                    .build();
+        }
+
         if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", ""))) {
             return GetCaddyDiaryDetailsResponse.builder()
                     .worktype(diary.get(0).getWorktype().getKey())
@@ -281,13 +319,25 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public GetMonthlyRecordListResponse getMonthlyList(UserDetails userDetails, YearMonth yearMonth, Long id) {
         User user = userFindService.findByUserDetails(userDetails);
-        List<MonthlyRecord> monthlyRecordList;
+        List<Diary> diaryList;
         if (id == -1)
-            monthlyRecordList = diaryRepository.getMonthlyList(user, yearMonth, LocalDate.now().plusDays(1), PAGE_SIZE);
+            diaryList = diaryRepository.getMonthlyList(user, yearMonth, LocalDate.now().plusDays(1), PAGE_SIZE);
         else {
             Diary diary = diaryRepository.findById(id)
                     .orElseThrow(() -> new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR));
-            monthlyRecordList = diaryRepository.getMonthlyList(user, yearMonth, diary.getWorkAt(), PAGE_SIZE);
+            diaryList = diaryRepository.getMonthlyList(user, yearMonth, diary.getWorkAt(), PAGE_SIZE);
+        }
+
+        List<MonthlyRecord> monthlyRecordList = new ArrayList<>();
+        for (Diary diary: diaryList) {
+            monthlyRecordList.add(MonthlyRecord.builder()
+                            .id(diary.getId())
+                            .date(diary.getWorkAt())
+                            .worktype(diary.getWorktype().getKey())
+                            .income(diary.getIncome())
+                            .cases((diary.getWorktype().equals(Worktype.DAY_OFF) || user.getJob().equals(Job.DAYWORKER)) ? null
+                                    : (user.getJob().equals(Job.CADDY)) ? diary.getCaddy().getRounding() : diary.getRider().getNumberOfDeliveries())
+                    .build());
         }
 
         return GetMonthlyRecordListResponse.builder()
@@ -372,6 +422,14 @@ public class DiaryService {
             throw new BaseException(BaseResponseStatus.DIARY_USER_NOT_MATCH_ERROR);
 
         return getBoastDiaryResponseByJob(user.getJob(), diary);
+    }
+
+    private Diary saveBaseDiary(User user, Worktype worktype, LocalDate workAt) {
+        return Diary.builder()
+                .worktype(worktype)
+                .workAt(workAt)
+                .user(user)
+                .build();
     }
 
     private Diary saveDiary(User user, Worktype worktype, String memo, List<String> imageUrlList, Long income, Long expenditure, Long saving, LocalDate workAt) {
