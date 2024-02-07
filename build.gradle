@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.7.0-SNAPSHOT'
+version = '0.8.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.7.0"
+	version = "0.8.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -239,6 +239,17 @@ task swaggerConfig {
         numberOfWork:
           type: number
           description: "공수"
+    UpdateDayOffDiaryRequest:
+      title: UpdateDayOffDiaryRequest
+      type: object
+      description: 휴무일 때 근무 일지 DTO
+      properties:
+        worktype:
+          type: string
+          description: "[필수] 근무 형태 (근무, 조퇴, 휴무)"
+        date:
+          type: string
+          description: "[필수] 근무 일자 // 형식 : yyyy-mm-dd"
 """
 
 		def line = ""
@@ -253,7 +264,7 @@ task swaggerConfig {
 			writer.println(line)
 			if (line == "      operationId: SaveCaddyDiary")
 				writer.print(PostDiaryQueryContent)
-			if (line == "      operationId: SaveCaddyDiary" || line == "      operationId: UpdateCaddyDiary")
+			if (line == "      operationId: Save" || line == "      operationId: Update")
 				writer.print(PostDiaryContent)
 			if (line == "      operationId: UpdateProfileImage")
 				writer.print(UpdateProfileImage)
