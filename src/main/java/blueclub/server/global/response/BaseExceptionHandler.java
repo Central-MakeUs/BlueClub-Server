@@ -8,6 +8,7 @@ import jakarta.validation.ConstraintViolationException;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.AccessDeniedException;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.MethodArgumentNotValidException;
 import org.springframework.web.bind.annotation.ControllerAdvice;
@@ -45,6 +46,15 @@ public class BaseExceptionHandler {
     public ResponseEntity<BaseResponse> constraintViolationException(ConstraintViolationException e) {
         String validExceptionMessage = e.getMessage().split(": ")[1];
         return BaseResponse.toResponseEntityContainsCustomMessage(BaseResponseStatus.INVALID_INPUT_VALUE, validExceptionMessage);
+    }
+
+    /**
+     * @PreAuthorize  권한 인가에 통과하지 못하면 AccessDeniedException이 발생한다.
+     */
+    @ExceptionHandler(AccessDeniedException.class)
+    public ResponseEntity<BaseResponse> accessDeniedException(AccessDeniedException e) {
+        String preAuthorizeExceptionMessage = e.getMessage();
+        return BaseResponse.toResponseEntityContainsCustomMessage(BaseResponseStatus.INVALID_AUTHORIZATION, preAuthorizeExceptionMessage);
     }
 
     /**
