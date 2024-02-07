@@ -479,6 +479,48 @@ public class DiaryControllerTest extends ControllerTest {
                             )
                     ));
         }
+
+        @Test
+        @DisplayName("휴무 근무 일지 상세조회에 성공한다")
+        void getDayOffDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getDayOffDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetails(any(), anyString(), anyLong());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, 1L)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetDayOffDiaryDetails",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                            )
+                                            .pathParameters(
+                                                    parameterWithName("diaryId").description("근무 일지 ID")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태")
+                                            )
+                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
     }
 
     @Nested
@@ -823,6 +865,12 @@ public class DiaryControllerTest extends ControllerTest {
                 .dailyWage(DAYWORKER_DIARY.getDailyWage())
                 .typeOfJob(DAYWORKER_DIARY.getTypeOfJob())
                 .numberOfWork(DAYWORKER_DIARY.getNumberOfWork())
+                .build();
+    }
+
+    private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsResponse() {
+        return GetDayOffDiaryDetailsResponse.builder()
+                .worktype(Worktype.DAY_OFF.getKey())
                 .build();
     }
 
