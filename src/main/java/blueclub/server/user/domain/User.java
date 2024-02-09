@@ -64,12 +64,12 @@ public class User extends BaseTimeEntity {
         this.role = Role.USER;
     }
 
-    public void addDetails(String nickname, Job job, Long monthlyTargetIncome, Boolean tosAgree) {
+    public void addDetails(String nickname, Job job, Long monthlyTargetIncome, Boolean tosAgree, Boolean pushAgree) {
         this.nickname = nickname;
         this.job = job;
         this.monthlyTargetIncome = monthlyTargetIncome;
         this.tosAgree = tosAgree;
-        this.pushAgree = false;
+        this.pushAgree = pushAgree;
         this.role = Role.USER;
     }
 
