@@ -14,7 +14,6 @@ import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
-import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.authority.mapping.GrantedAuthoritiesMapper;
@@ -45,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private static final List<String> NO_CHECK_URL_LIST = List.of(
-            "/auth", "/health", "/css", "/images", "/js", "/favicon.ico", "/swagger", "/docs", "/swagger-ui", "/v3/api-docs", "/error"); // Filter 작동 X
+            "/auth", "/health", "/css", "/image", "/js", "/favicon.ico", "/swagger", "/docs", "/swagger-ui", "/v3/api-docs", "/error"); // Filter 작동 X
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -56,7 +55,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         for (String NO_CHECK_URL: NO_CHECK_URL_LIST) {
-            if (request.getRequestURI().contains(NO_CHECK_URL)) {
+            if (request.getRequestURI().contains(NO_CHECK_URL) && !request.getRequestURI().equals("/auth/duplicated")) {
                 filterChain.doFilter(request, response);
                 return;
             }
@@ -114,7 +113,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
                     try {
                         jwtService.sendAccessAndRefreshToken(
                                 response,
-                                jwtService.createAccessToken(user.getEmail()),
+                                jwtService.createAccessToken(user.getSocialId()),
                                 reIssuedRefreshToken
                         );
                     } catch (IOException e) {
@@ -148,9 +147,9 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
         AtomicBoolean isAuthSuccess = new AtomicBoolean(false);
         jwtService.extractAccessToken(request)
                 .filter(jwtService::isTokenValid)
-                .ifPresent(accessToken -> jwtService.extractEmail(accessToken)
-                        .ifPresent(email -> {
-                            Optional<User> user = userRepository.findByEmail(email);
+                .ifPresent(accessToken -> jwtService.extractSocialId(accessToken)
+                        .ifPresent(socialId -> {
+                            Optional<User> user = userRepository.findBySocialId(socialId);
                             if (user.isPresent()) {
                                 saveAuthentication(user.get());
                                 isAuthSuccess.set(true);
@@ -176,8 +175,8 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
      */
     public void saveAuthentication(User myUser) {
         UserDetails userDetailsUser = org.springframework.security.core.userdetails.User.builder()
-                .username(myUser.getEmail())
-                .password(RandomStringUtils.random(10)) // 임시 비밀번호
+                .username(myUser.getSocialType().toString())    // socialType
+                .password(myUser.getSocialId())                 // socialId
                 .roles(myUser.getRole().name())
                 .build();
 
