@@ -11,8 +11,7 @@ import java.util.List;
 public interface DiaryQueryRepository {
     Long getTotalMonthlyIncome(User user, YearMonth yearMonth);
     Integer getTotalWorkingDay(User user, YearMonth yearMonth);
-    List<GetDailyInfoResponse> getDailyInfo(User user, YearMonth yearMonth);
-    List<Diary> getMonthlyList(User user, YearMonth yearMonth, LocalDate lastDate, Integer pageSize);
+    List<Diary> getMonthlyList(User user, YearMonth yearMonth);
     List<Diary> getDiaryById(Long diaryId);
     Integer getStraightWorkingDayLimitMonth(User user, LocalDate workAt);
     Boolean isRenew(User user, LocalDate workAt);
