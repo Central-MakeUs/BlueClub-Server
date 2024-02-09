@@ -33,6 +33,7 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     INVALID_JWT(HttpStatus.UNAUTHORIZED, "REQUEST_ERROR_003", "로그인 후 이용해주세요."),
     INVALID_FILE(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_004", "잘못된 File 형식입니다."),
     INVALID_AUTHORIZATION(HttpStatus.FORBIDDEN, "REQUEST_ERROR_005", "비정상적인 접근입니다."),
+    INVALID_ENUM(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_006", "변경할 수 없는 ENUM type 입니다."),
 
     // Auth
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "AUTH_001", "이메일 형식이 올바르지 않습니다."),
@@ -46,7 +47,6 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     JOB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_003", "존재하지 않는 직업입니다."),
 
     // MonthlyGoal
-    RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MONTHLY_GOAL_001", "월 목표 수입을 작성한 적이 없습니다."),
 
     // Diary
     WORKTYPE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_001", "존재하지 않는 근무 형태입니다."),

@@ -18,7 +18,7 @@ jwt:
   token:
     secret-key: ${jwt.secret}
   access:
-    expiration: 3600000  # 1시간
+    expiration: 31536000000 # 365일
     header: Authorization
   refresh:
     expiration: 1209600000 # 2주

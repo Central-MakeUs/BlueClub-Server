@@ -52,7 +52,7 @@ public class AuthService {
                         .role(user.getRole().getTitle())
                         .socialType(user.getSocialType().name())
                         .socialId(user.getSocialId())
-                        .accessToken(jwtService.createAccessToken(user.getEmail()))
+                        .accessToken(jwtService.createAccessToken(user.getSocialId()))
                         .refreshToken(refreshToken)
                         .build();
             }
@@ -60,7 +60,7 @@ public class AuthService {
                     .id(user.getId())
                     .nickname(user.getNickname())
                     .role(user.getRole().getTitle())
-                    .accessToken(jwtService.createAccessToken(user.getEmail()))
+                    .accessToken(jwtService.createAccessToken(user.getSocialId()))
                     .refreshToken(refreshToken)
                     .build();
         }
@@ -72,12 +72,15 @@ public class AuthService {
         return SocialLoginResponse.builder()
                 .id(user.getId())
                 .nickname(user.getNickname())
-                .accessToken(jwtService.createAccessToken(user.getEmail()))
+                .accessToken(jwtService.createAccessToken(user.getSocialId()))
                 .refreshToken(refreshToken)
                 .build();
     }
 
-    public boolean checkNickname(String nickname) {
+    public boolean checkNickname(UserDetails userDetails, String nickname) {
+        User user = userFindService.findByUserDetails(userDetails);
+        if (user.getRole().equals(Role.USER) && user.getNickname().equals(nickname))
+            return false;
         return userRepository.existsByNicknameAndRole(nickname, Role.USER).equals(true);
     }
 
@@ -133,5 +136,9 @@ public class AuthService {
         return stringBuilder
                 .append(nickname)
                 .append(RandomStringUtils.randomAlphabetic(RANDOM_NICKNAME_LENGTH)).toString();
+    }
+
+    private boolean checkNickname(String nickname) {
+        return userRepository.existsByNicknameAndRole(nickname, Role.USER).equals(true);
     }
 }

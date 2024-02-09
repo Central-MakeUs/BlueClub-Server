@@ -27,7 +27,7 @@ public class MonthlyGoalQueryRepositoryImpl implements MonthlyGoalQueryRepositor
                 .fetch();
         // 월 목표 수입 설정 이력이 없는 경우
         if (recentMonthlyGoal.isEmpty())
-            return -1L;
+            return 0L;
         return recentMonthlyGoal.get(0).getTargetIncome();
     }
 }

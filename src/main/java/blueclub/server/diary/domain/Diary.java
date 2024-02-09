@@ -1,6 +1,7 @@
 package blueclub.server.diary.domain;
 
 import blueclub.server.global.entity.BaseTimeEntity;
+import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -22,7 +23,7 @@ public class Diary extends BaseTimeEntity {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    @Enumerated(EnumType.STRING)
+    @Convert(converter = Worktype.WorktypeConverter.class)
     private Worktype worktype;
 
     private String memo;
@@ -45,6 +46,8 @@ public class Diary extends BaseTimeEntity {
     @JoinColumn(name = "user_id", referencedColumnName = "id")
     private User user;
 
+    private Job job;
+
     @OneToOne(mappedBy = "diary", cascade = CascadeType.ALL, orphanRemoval = true)
     private Caddy caddy;
 
@@ -66,13 +69,14 @@ public class Diary extends BaseTimeEntity {
         this.dayworker = dayworker;
     }
 
-    public void update(Worktype worktype, String memo, List<String> image, Long income, Long expenditure, Long saving) {
+    public void update(Worktype worktype, String memo, List<String> image, Long income, Long expenditure, Long saving, Job job) {
         this.worktype = worktype;
         this.memo = memo;
         this.image = image;
         this.income = income;
         this.expenditure = expenditure;
         this.saving = saving;
+        this.job = job;
     }
 
     public void unlink() {

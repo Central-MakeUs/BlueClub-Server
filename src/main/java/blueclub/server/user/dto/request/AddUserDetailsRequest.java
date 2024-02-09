@@ -18,6 +18,8 @@ public record AddUserDetailsRequest(
         @Max(value = 99990000, message = "월 수입 목표는 9999만원 이하로 입력해주세요")
         Long monthlyTargetIncome,
         @NotNull(message = "선택약관 동의여부를 입력해주세요")
-        Boolean tosAgree
+        Boolean tosAgree,
+        @NotNull(message = "푸시알림 동의여부를 입력해주세요")
+        Boolean pushAgree
 ) {
 }
