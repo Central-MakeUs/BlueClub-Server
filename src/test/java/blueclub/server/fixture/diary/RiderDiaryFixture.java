@@ -12,7 +12,7 @@ import static blueclub.server.user.domain.Job.RIDER;
 @Getter
 @RequiredArgsConstructor
 public enum RiderDiaryFixture {
-    RIDER_DIARY(Worktype.WORKING.getKey(), "memo2", 550000L, 0L, 0L, LocalDate.now().minusDays(1),
+    RIDER_DIARY(Worktype.WORKING.getValue(), "memo2", 550000L, 0L, 0L, LocalDate.now().minusDays(1),
             List.of("https://blueclubs3.s3.ap-northeast-2.amazonaws.com/diary/%E1%84%89%E1%85%B3%E1%84%8F%E1%85%B3%E1%84%85%E1%85%B5%E1%86%AB%E1%84%89%E1%85%A3%E1%86%BA%202023-06-13%20%E1%84%8B%E1%85%A9%E1%84%8C%E1%85%A5%E1%86%AB%201.44.20.png"),
             RIDER.getTitle(),
             7L, 500000L, 1L, 50000L);
