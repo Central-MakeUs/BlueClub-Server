@@ -57,7 +57,7 @@ public class UserControllerTest extends ControllerTest {
             mockMvc.perform(requestBuilder)
                     .andExpect(status().isOk())
                     .andDo(document(
-                            "UserAddDetails",
+                            "AddUserDetails",
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             resource(
@@ -68,7 +68,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -115,7 +116,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -162,7 +164,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -209,7 +212,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -256,7 +260,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -303,7 +308,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -350,7 +356,8 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
                                                     fieldWithPath("job").type(STRING).description("[필수] 직업명"),
                                                     fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
-                                                    fieldWithPath("tosAgree").type(NULL).description("[필수] 선택약관 동의 여부")
+                                                    fieldWithPath("tosAgree").type(NULL).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(BOOLEAN).description("[필수] 푸시알림 동의 여부")
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -358,6 +365,54 @@ public class UserControllerTest extends ControllerTest {
                                                     fieldWithPath("result").type(NULL).description("null 반환")
                                             )
                                             .requestSchema(Schema.schema("AddDetailsNullTosAgreeErrorRequest"))
+                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("푸시알림 동의여부가 입력되지 않면 회원 추가정보 작성에 실패한다")
+        void throwExceptionByNullPushAgree() throws Exception {
+            // given
+            String validExceptionMessage = "푸시알림 동의여부를 입력해주세요";
+
+            // when
+            final AddUserDetailsRequest addUserDetailsRequest = NullPushAgreeAddDetailsRequest();
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .post(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .contentType(APPLICATION_JSON)
+                    .content(objectMapper.writeValueAsString(addUserDetailsRequest));
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpectAll(
+                            status().isBadRequest(),
+                            jsonPath("$.message").exists(),
+                            jsonPath("$.message").value(validExceptionMessage)
+                    )
+                    .andDo(document(
+                            "DetailsNullPushAgreeError",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("User API")
+                                            .summary("회원 추가정보 작성 API")
+                                            .requestFields(
+                                                    fieldWithPath("nickname").type(STRING).description("[필수] 닉네임"),
+                                                    fieldWithPath("job").type(STRING).description("[필수] 직업명"),
+                                                    fieldWithPath("monthlyTargetIncome").type(NUMBER).description("[필수] 월 목표 수입"),
+                                                    fieldWithPath("tosAgree").type(BOOLEAN).description("[필수] 선택약관 동의 여부"),
+                                                    fieldWithPath("pushAgree").type(NULL).description("[필수] 푸시알림 동의 여부")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .requestSchema(Schema.schema("AddDetailsNullPushAgreeErrorRequest"))
                                             .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
@@ -548,6 +603,7 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -557,6 +613,7 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -566,6 +623,7 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -575,6 +633,7 @@ public class UserControllerTest extends ControllerTest {
                 .job("")
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -584,6 +643,7 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(99L)
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -593,6 +653,7 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(9999999999L)
                 .tosAgree(WIZ.isTosAgree())
+                .pushAgree(WIZ.isPushAgree())
                 .build();
     }
 
@@ -602,6 +663,17 @@ public class UserControllerTest extends ControllerTest {
                 .job(WIZ.getJob().getTitle())
                 .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
                 .tosAgree(null)
+                .pushAgree(WIZ.isPushAgree())
+                .build();
+    }
+
+    private AddUserDetailsRequest NullPushAgreeAddDetailsRequest() {
+        return AddUserDetailsRequest.builder()
+                .nickname(WIZ.getNickname())
+                .job(WIZ.getJob().getTitle())
+                .monthlyTargetIncome(WIZ.getMonthlyTargetIncome())
+                .tosAgree(WIZ.isTosAgree())
+                .pushAgree(null)
                 .build();
     }
 

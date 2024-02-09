@@ -3,7 +3,7 @@ package blueclub.server.user.service;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
-import blueclub.server.s3.service.S3UploadService;
+import blueclub.server.file.service.S3UploadService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
@@ -36,7 +36,8 @@ public class UserService {
                 addUserDetailsRequest.nickname(),
                 Job.findByTitle(addUserDetailsRequest.job().replace(" ", "")),
                 addUserDetailsRequest.monthlyTargetIncome(),
-                addUserDetailsRequest.tosAgree()
+                addUserDetailsRequest.tosAgree(),
+                addUserDetailsRequest.pushAgree()
         );
     }
 
@@ -44,7 +45,7 @@ public class UserService {
         User user = userFindService.findByUserDetails(userDetails);
         user.updateDetails(
                 updateUserDetailsRequest.nickname(),
-                Job.valueOf(updateUserDetailsRequest.job().replace(" ", "")),
+                Job.findByTitle(updateUserDetailsRequest.job().replace(" ", "")),
                 updateUserDetailsRequest.monthlyTargetIncome()
         );
     }

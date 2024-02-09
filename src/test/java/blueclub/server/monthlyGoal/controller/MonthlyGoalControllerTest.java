@@ -117,49 +117,11 @@ public class MonthlyGoalControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result.targetIncome").type(NUMBER).description("월 목표 수입"),
-                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("월 총 수입"),
-                                                    fieldWithPath("result.progress").type(NUMBER).description("달성률 (%)")
+                                                    fieldWithPath("result.targetIncome").type(NUMBER).description("[DEFAULT 0] 월 목표 수입"),
+                                                    fieldWithPath("result.totalIncome").type(NUMBER).description("[DEFAULT 0] 월 총 수입"),
+                                                    fieldWithPath("result.progress").type(NUMBER).description("[DEFAULT 0] 달성률 (%)")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyGoalResponse"))
-                                            .build()
-                            )
-                    ));
-        }
-
-        @Test
-        @DisplayName("한 번도 월 목표 수입을 작성한 적이 없으면 월 목표 수입 및 달성률 조회에 실패한다")
-        void throwExceptionByNotWrittenMonthlyGoal() throws Exception {
-            // given
-            doThrow(new BaseException(BaseResponseStatus.RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR))
-                    .when(monthlyGoalService)
-                    .getMonthlyGoalAndProgress(any(), any());
-
-            // when
-            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .get(BASE_URL, "2024-01")
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
-
-            // then
-            mockMvc.perform(requestBuilder)
-                    .andExpect(status().isNotFound())
-                    .andDo(document(
-                            "NotWrittenMonthlyGoalError",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .tag("MonthlyGoal API")
-                                            .summary("월 목표 수입 및 달성률 조회 API")
-                                            .pathParameters(
-                                                    parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
-                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result").type(NULL).description("NULL 반환")
-                                            )
-                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));

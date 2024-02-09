@@ -36,12 +36,13 @@ public class AuthController {
 
     @GetMapping("/duplicated")
     public ResponseEntity<BaseResponse> checkNickname(
+            @AuthenticationPrincipal UserDetails userDetails,
             @RequestParam("nickname")
             @NotBlank(message = "닉네임을 입력해주세요")
             @Length(max = 10, message = "닉네임은 10글자 이하로 작성해주세요")
             String nickname
     ) {
-        if (authService.checkNickname(nickname))
+        if (authService.checkNickname(userDetails, nickname))
             throw new BaseException(BaseResponseStatus.DUPLICATED_NICKNAME);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }

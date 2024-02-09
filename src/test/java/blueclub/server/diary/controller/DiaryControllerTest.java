@@ -19,7 +19,6 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.nio.charset.StandardCharsets;
-import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -562,52 +561,6 @@ public class DiaryControllerTest extends ControllerTest {
     }
 
     @Nested
-    @DisplayName("일자별 근무 정보 조회 API [GET /diary/calendar/{yearMonth}]")
-    class getDailyInfo {
-        private static final String BASE_URL = "/diary/calendar/{yearMonth}";
-
-        @Test
-        @DisplayName("일자별 근무 정보 조회에 성공한다")
-        void getDailyInfoSuccess() throws Exception {
-            // given
-            doReturn(getDailyInfoResponseList())
-                    .when(diaryService)
-                    .getDailyInfo(any(), any());
-
-            // when
-            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .get(BASE_URL, "2024-01")
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
-
-            // then
-            mockMvc.perform(requestBuilder)
-                    .andExpect(status().isOk())
-                    .andDo(document(
-                            "GetDailyInfo",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .tag("Diary API")
-                                            .summary("일자별 근무 정보 조회 API")
-                                            .pathParameters(
-                                                    parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
-                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result[].id").type(NUMBER).description("근무 일지 ID"),
-                                                    fieldWithPath("result[].date").type(STRING).description("날짜"),
-                                                    fieldWithPath("result[].income").type(NUMBER).description("[DEFAULT 0] 총 수입")
-                                            )
-                                            .responseSchema(Schema.schema("GetDailyInfoResponse"))
-                                            .build()
-                            )
-                    ));
-        }
-    }
-
-    @Nested
     @DisplayName("월 근무 리스트 조회 API [GET /diary/list/{yearMonth}]")
     class getMonthlyList {
         private static final String BASE_URL = "/diary/list/{yearMonth}";
@@ -618,12 +571,11 @@ public class DiaryControllerTest extends ControllerTest {
             // given
             doReturn(getMonthlyListResponse())
                     .when(diaryService)
-                    .getMonthlyList(any(), any(), any());
+                    .getMonthlyList(any(), any());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL, "2024-01")
-                    .queryParam("diaryId", "-1")
                     .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
@@ -639,9 +591,6 @@ public class DiaryControllerTest extends ControllerTest {
                                             .summary("월 근무 리스트 조회 API")
                                             .pathParameters(
                                                     parameterWithName("yearMonth").description("년·월 // 형식 : yyyy-mm")
-                                            )
-                                            .queryParameters(
-                                                    parameterWithName("diaryId").description("마지막 근무 일지 ID").optional()
                                             )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
@@ -818,7 +767,7 @@ public class DiaryControllerTest extends ControllerTest {
 
     private UpdateBaseDiaryRequest updateBaseDiaryRequest() {
         return UpdateBaseDiaryRequest.builder()
-                .worktype(Worktype.DAY_OFF.getKey())
+                .worktype(Worktype.DAY_OFF.getValue())
                 .date(CADDY_DIARY.getDate())
                 .build();
     }
@@ -870,23 +819,8 @@ public class DiaryControllerTest extends ControllerTest {
 
     private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsResponse() {
         return GetDayOffDiaryDetailsResponse.builder()
-                .worktype(Worktype.DAY_OFF.getKey())
+                .worktype(Worktype.DAY_OFF.getValue())
                 .build();
-    }
-
-    private List<GetDailyInfoResponse> getDailyInfoResponseList() {
-        List<GetDailyInfoResponse> getDailyInfoResponseList = new ArrayList<>();
-        getDailyInfoResponseList.add(GetDailyInfoResponse.builder()
-                        .id(1L)
-                        .date(LocalDate.now().minusDays(1))
-                        .income(100000L)
-                .build());
-        getDailyInfoResponseList.add(GetDailyInfoResponse.builder()
-                .id(2L)
-                .date(LocalDate.now())
-                .income(357000L)
-                .build());
-        return getDailyInfoResponseList;
     }
 
     private GetMonthlyRecordListResponse getMonthlyListResponse() {

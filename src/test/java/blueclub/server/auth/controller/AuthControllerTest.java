@@ -336,12 +336,13 @@ public class AuthControllerTest extends ControllerTest {
             Boolean isDuplicated = true;
             doReturn(isDuplicated)
                     .when(authService)
-                    .checkNickname(anyString());
+                    .checkNickname(any(), anyString());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL)
-                    .queryParam("nickname", NICKNAME);
+                    .queryParam("nickname", NICKNAME)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -375,12 +376,13 @@ public class AuthControllerTest extends ControllerTest {
             Boolean isDuplicated = false;
             doReturn(isDuplicated)
                     .when(authService)
-                    .checkNickname(anyString());
+                    .checkNickname(any(), anyString());
 
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL)
-                    .queryParam("nickname", NICKNAME);
+                    .queryParam("nickname", NICKNAME)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -417,7 +419,8 @@ public class AuthControllerTest extends ControllerTest {
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL)
-                    .queryParam("nickname", BLANK_NICKNAME);
+                    .queryParam("nickname", BLANK_NICKNAME)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
             mockMvc.perform(requestBuilder)
@@ -458,7 +461,8 @@ public class AuthControllerTest extends ControllerTest {
             // when
             MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
                     .get(BASE_URL)
-                    .queryParam("nickname", OVER_LENGTH_NICKNAME);
+                    .queryParam("nickname", OVER_LENGTH_NICKNAME)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
 
             // then
             mockMvc.perform(requestBuilder)

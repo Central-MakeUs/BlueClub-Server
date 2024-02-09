@@ -38,7 +38,7 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateBaseDiaryRequest updateBaseDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getKey())) {
+        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue())) {
             diaryService.saveDayOffDiary(userDetails, updateBaseDiaryRequest);
             return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.CREATED);
         }
@@ -59,7 +59,7 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateBaseDiaryRequest updateBaseDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getKey())) {
+        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue())) {
             diaryService.updateDayOffDiary(userDetails, diaryId);
             return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
         }
@@ -90,21 +90,12 @@ public class DiaryController {
         return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
     }
 
-    @GetMapping("/calendar/{yearMonth}")
-    public ResponseEntity<BaseResponse> getDailyInfo(
-            @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
-    ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getDailyInfo(userDetails, yearMonth));
-    }
-
     @GetMapping("/list/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyList(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth,
-            @RequestParam(value = "diaryId", defaultValue = "-1", required = false) Long id
+            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, yearMonth, id));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, yearMonth));
     }
 
     @GetMapping("/record/{yearMonth}")
