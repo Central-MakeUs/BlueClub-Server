@@ -5,13 +5,14 @@ import blueclub.server.auth.controller.AuthController;
 import blueclub.server.auth.service.AuthService;
 import blueclub.server.diary.controller.DiaryController;
 import blueclub.server.diary.service.DiaryService;
+import blueclub.server.file.service.FileService;
 import blueclub.server.monthlyGoal.controller.MonthlyGoalController;
 import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.notice.controller.NoticeController;
 import blueclub.server.notice.service.NoticeService;
 import blueclub.server.reminder.controller.ReminderController;
 import blueclub.server.reminder.service.ReminderService;
-import blueclub.server.s3.controller.S3Controller;
+import blueclub.server.file.controller.FileController;
 import blueclub.server.user.controller.UserController;
 import blueclub.server.user.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -40,7 +41,7 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         MonthlyGoalController.class,
         NoticeController.class,
         ReminderController.class,
-        S3Controller.class
+        FileController.class
 })
 @ExtendWith(RestDocumentationExtension.class)
 @Import(TestSecurityConfig.class)
@@ -69,6 +70,9 @@ public class ControllerTest {
 
     @MockBean
     protected ReminderService reminderService;
+
+    @MockBean
+    protected FileService fileService;
 
     @BeforeEach
     void setUp(WebApplicationContext context, RestDocumentationContextProvider provider) {
