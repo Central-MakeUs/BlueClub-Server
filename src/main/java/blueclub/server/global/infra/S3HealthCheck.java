@@ -1,6 +1,6 @@
 package blueclub.server.global.infra;
 
-import blueclub.server.s3.service.S3UploadService;
+import blueclub.server.file.service.S3UploadService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,7 +12,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 
 @RestController
-@RequestMapping("/health/s3")
+@RequestMapping("/health/file")
 @RequiredArgsConstructor
 public class S3HealthCheck {
 
