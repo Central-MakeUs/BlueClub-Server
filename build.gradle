@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '0.8.0-SNAPSHOT'
+version = '0.9.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "0.8.0"
+	version = "0.9.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -262,7 +262,7 @@ task swaggerConfig {
 			if (line == "  securitySchemes:")
 				writer.print(PostDiaryDTOContent)
 			writer.println(line)
-			if (line == "      operationId: SaveCaddyDiary")
+			if (line == "      operationId: Save")
 				writer.print(PostDiaryQueryContent)
 			if (line == "      operationId: Save" || line == "      operationId: Update")
 				writer.print(PostDiaryContent)
