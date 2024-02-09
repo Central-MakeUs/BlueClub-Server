@@ -47,7 +47,6 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     JOB_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MEMBER_003", "존재하지 않는 직업입니다."),
 
     // MonthlyGoal
-    RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "MONTHLY_GOAL_001", "월 목표 수입을 작성한 적이 없습니다."),
 
     // Diary
     WORKTYPE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_001", "존재하지 않는 근무 형태입니다."),

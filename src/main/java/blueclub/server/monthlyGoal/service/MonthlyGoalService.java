@@ -43,26 +43,32 @@ public class MonthlyGoalService {
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
+        Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
+
         if (monthlyGoal.isEmpty()) {
             Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user);
             // 첫 사용자에 대한 예외 처리
-            if (recentMonthlyGoal == -1) {
-                throw new BaseException(BaseResponseStatus.RECENT_MONTHLY_GOAL_NOT_FOUND_ERROR);
+            if (recentMonthlyGoal == 0) {
+                return GetMonthlyGoalResponse.builder()
+                        .targetIncome(recentMonthlyGoal)
+                        .totalIncome(totalIncome)
+                        .progress(0)
+                        .build();
             }
+
             MonthlyGoal newMonthlyGoal = MonthlyGoal.builder()
                     .yearMonth(yearMonth)
                     .targetIncome(recentMonthlyGoal)
                     .user(user)
                     .build();
             monthlyGoalRepository.save(newMonthlyGoal);
-            Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
+
             return GetMonthlyGoalResponse.builder()
                     .targetIncome(recentMonthlyGoal)
                     .totalIncome(totalIncome)
                     .progress((int) Math.floor((double) totalIncome/recentMonthlyGoal*100))
                     .build();
         }
-        Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
         return GetMonthlyGoalResponse.builder()
                 .targetIncome(monthlyGoal.get().getTargetIncome())
                 .totalIncome(totalIncome)
