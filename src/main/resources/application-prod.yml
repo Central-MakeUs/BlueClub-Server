@@ -1,7 +1,7 @@
 spring:
   datasource:
     driver-class-name: com.mysql.cj.jdbc.Driver
-    url: jdbc:mysql://${rds.host}:${rds.port}/${rds.db.info}
+    url: jdbc:mysql://${rds.host}:${rds.port}/${rds.db.info}?serverTimezone=Asia/Seoul&useLegacyDatetimeCode=false&characterEncoding=UTF-8
     username: ${rds.username}
     password: ${rds.password}
   jpa:
