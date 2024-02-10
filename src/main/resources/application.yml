@@ -7,8 +7,8 @@ spring:
   cache:
     type: redis
   redis:
-    host: 127.0.0.1
-    port: 6379
+    host: ${redis.host}
+    port: ${redis.port}
 
   config:
     import:
