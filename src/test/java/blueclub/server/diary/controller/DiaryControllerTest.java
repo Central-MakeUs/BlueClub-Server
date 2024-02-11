@@ -61,7 +61,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("골프 캐디의 근무 일지 작성에 성공한다")
         void saveCaddyDiarySuccess() throws Exception {
             // given
-            doReturn(getBoastDiaryResponse())
+            doReturn(getDiaryIdResponse())
                     .when(diaryService)
                     .saveCaddyDiary(any(), any(UpdateCaddyDiaryRequest.class), any());
 
@@ -92,7 +92,7 @@ public class DiaryControllerTest extends ControllerTest {
                                     .tag("Diary API")
                                     .summary("근무 일지 작성 API")
                                     .requestSchema(Schema.schema("UpdateCaddyDiaryRequest"))
-                                    .responseSchema(Schema.schema("GetBoastDiaryResponse")),
+                                    .responseSchema(Schema.schema("GetDiaryIdResponse")),
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             requestParts(
@@ -119,11 +119,7 @@ public class DiaryControllerTest extends ControllerTest {
                             responseFields(
                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                    fieldWithPath("result.job").type(STRING).description("직업"),
-                                    fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
-                                    fieldWithPath("result.rank").type(STRING).description("근무 순위"),
-                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
-                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
+                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID")
                             )
                     ));
         }
@@ -132,7 +128,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("휴무일 근무 일지 작성에 성공한다")
         void saveDayOffDiarySuccess() throws Exception {
             // given
-            doNothing()
+            doReturn(getDiaryIdResponse())
                     .when(diaryService)
                     .saveDayOffDiary(any(), any());
 
@@ -163,7 +159,7 @@ public class DiaryControllerTest extends ControllerTest {
                                     .tag("Diary API")
                                     .summary("근무 일지 작성 API")
                                     .requestSchema(Schema.schema("UpdateBaseDiaryRequest"))
-                                    .responseSchema(Schema.schema("BaseResponse")),
+                                    .responseSchema(Schema.schema("GetDiaryIdResponse")),
                             preprocessRequest(prettyPrint()),
                             preprocessResponse(prettyPrint()),
                             requestParts(
@@ -181,7 +177,7 @@ public class DiaryControllerTest extends ControllerTest {
                             responseFields(
                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                    fieldWithPath("result").type(NULL).description("NULL 반환")
+                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID")
                             )
                     ));
         }
@@ -196,7 +192,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("골프 캐디의 근무 일지 수정에 성공한다")
         void updateCaddyDiarySuccess() throws Exception {
             // given
-            doReturn(getBoastDiaryResponse())
+            doReturn(getDiaryIdResponse())
                     .when(diaryService)
                     .updateCaddyDiary(any(), anyLong(), any(UpdateCaddyDiaryRequest.class), any());
 
@@ -246,13 +242,9 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result.job").type(STRING).description("직업"),
-                                                    fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
-                                                    fieldWithPath("result.rank").type(STRING).description("근무 순위"),
-                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
-                                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID")
                                             )
-                                            .responseSchema(Schema.schema("GetBoastDiaryResponse"))
+                                            .responseSchema(Schema.schema("GetDiaryIdResponse"))
                                             .build()
                             )
                     ));
@@ -262,7 +254,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("휴무일 근무 일지 수정에 성공한다")
         void updateDayOffDiarySuccess() throws Exception {
             // given
-            doNothing()
+            doReturn(getDiaryIdResponse())
                     .when(diaryService)
                     .updateDayOffDiary(any(), anyLong());
 
@@ -312,9 +304,9 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result").type(NULL).description("NULL 반환")
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID")
                                             )
-                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .responseSchema(Schema.schema("GetDiaryIdResponse"))
                                             .build()
                             )
                     ));
@@ -889,5 +881,9 @@ public class DiaryControllerTest extends ControllerTest {
                 .rank(Rank.UNDER_FIVE_PERCENT.getKey())
                 .income(DAYWORKER_DIARY.getIncome())
                 .build();
+    }
+
+    private GetDiaryIdResponse getDiaryIdResponse() {
+        return new GetDiaryIdResponse(1L);
     }
 }

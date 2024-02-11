@@ -33,11 +33,7 @@ public class MonthlyGoalService {
             monthlyGoal.get().updateMonthlyGoal(updateMonthlyGoalRequest.monthlyTargetIncome());
             return;
         }
-        monthlyGoalRepository.save(MonthlyGoal.builder()
-                .yearMonth(updateMonthlyGoalRequest.yearMonth())
-                .targetIncome(updateMonthlyGoalRequest.monthlyTargetIncome())
-                .user(user)
-                .build());
+        saveMonthlyGoal(user, updateMonthlyGoalRequest.yearMonth(), updateMonthlyGoalRequest.monthlyTargetIncome());
     }
 
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
@@ -56,23 +52,26 @@ public class MonthlyGoalService {
                         .build();
             }
 
-            MonthlyGoal newMonthlyGoal = MonthlyGoal.builder()
-                    .yearMonth(yearMonth)
-                    .targetIncome(recentMonthlyGoal)
-                    .user(user)
-                    .build();
-            monthlyGoalRepository.save(newMonthlyGoal);
+            saveMonthlyGoal(user, yearMonth, recentMonthlyGoal);
 
             return GetMonthlyGoalResponse.builder()
                     .targetIncome(recentMonthlyGoal)
                     .totalIncome(totalIncome)
-                    .progress((int) Math.floor((double) totalIncome/recentMonthlyGoal*100))
+                    .progress((int) Math.min(Math.floor((double) totalIncome/recentMonthlyGoal*100), 100))
                     .build();
         }
         return GetMonthlyGoalResponse.builder()
                 .targetIncome(monthlyGoal.get().getTargetIncome())
                 .totalIncome(totalIncome)
-                .progress((int) Math.floor((double) totalIncome/monthlyGoal.get().getTargetIncome()*100))
+                .progress((int) Math.min(Math.floor((double) totalIncome/monthlyGoal.get().getTargetIncome()*100), 100))
                 .build();
+    }
+
+    public void saveMonthlyGoal(User user, YearMonth yearMonth, Long monthlyTargetIncome) {
+        monthlyGoalRepository.save(MonthlyGoal.builder()
+                .yearMonth(yearMonth)
+                .targetIncome(monthlyTargetIncome)
+                .user(user)
+                .build());
     }
 }
