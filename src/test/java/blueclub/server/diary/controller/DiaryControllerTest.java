@@ -19,6 +19,7 @@ import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilde
 import org.springframework.test.web.servlet.request.RequestPostProcessor;
 
 import java.nio.charset.StandardCharsets;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +52,8 @@ public class DiaryControllerTest extends ControllerTest {
     private static final String CADDY = "골프 캐디";
     private static final String RIDER = "배달 라이더";
     private static final String DAYWORKER = "일용직 노동자";
+    private static final String DATE = "date";
+    private static final String TARGET_DATE = "2024-01-25";
 
     @Nested
     @DisplayName("근무 일지 작성 API [POST /diary]")
@@ -508,6 +511,243 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태")
                                             )
                                             .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
+    @Nested
+    @DisplayName("날짜로 근무 일지 상세조회 API [GET /diary]")
+    class getDiaryDetailsByDate {
+        private static final String BASE_URL = "/diary";
+
+        @Test
+        @DisplayName("골프 캐디의 날짜로 근무 일지 상세조회에 성공한다")
+        void getCaddyDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getCaddyDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY)
+                    .queryParam(DATE, TARGET_DATE);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetCaddyDiaryDetailsByDate",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("날짜로 근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
+                                                    fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
+                                                    fieldWithPath("result.rounding").type(NUMBER).description("라운딩 수"),
+                                                    fieldWithPath("result.caddyFee").type(NUMBER).description("캐디피 수입"),
+                                                    fieldWithPath("result.overFee").type(NUMBER).description("[DEFAULT 0] 오버피 수입"),
+                                                    fieldWithPath("result.topdressing").type(BOOLEAN).description("[DEFAULT FALSE] 배토 여부")
+                                            )
+                                            .responseSchema(Schema.schema("GetCaddyDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("배달 라이더의 날짜로 근무 일지 상세조회에 성공한다")
+        void getRiderDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getRiderDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, RIDER)
+                    .queryParam(DATE, TARGET_DATE);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetRiderDiaryDetailsByDate",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("날짜로 근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
+                                                    fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
+                                                    fieldWithPath("result.numberOfDeliveries").type(NUMBER).description("배달 건수"),
+                                                    fieldWithPath("result.incomeOfDeliveries").type(NUMBER).description("배달 수입"),
+                                                    fieldWithPath("result.numberOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 건수"),
+                                                    fieldWithPath("result.incomeOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 수입")
+                                            )
+                                            .responseSchema(Schema.schema("GetRiderDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("일용직 노동자의 날짜로 근무 일지 상세조회에 성공한다")
+        void getDayworkerDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getDayworkerDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, DAYWORKER)
+                    .queryParam(DATE, TARGET_DATE);
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetDayworkerDiaryDetailsByDate",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("날짜로 근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
+                                                    fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
+                                                    fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
+                                                    fieldWithPath("result.expenditure").type(NUMBER).description("[DEFAULT 0] 지출액"),
+                                                    fieldWithPath("result.saving").type(NUMBER).description("[DEFAULT 0] 저축액"),
+                                                    fieldWithPath("result.place").type(STRING).description("현장명"),
+                                                    fieldWithPath("result.dailyWage").type(NUMBER).description("일당"),
+                                                    fieldWithPath("result.typeOfJob").type(STRING).description("[DEFAULT NULL] 직종"),
+                                                    fieldWithPath("result.numberOfWork").type(NUMBER).description("[DEFAULT 0.0] 공수")
+                                            )
+                                            .responseSchema(Schema.schema("GetDayworkerDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("날짜로 휴무 근무 일지 상세조회에 성공한다")
+        void getDayOffDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(getDayOffDiaryDetailsResponse())
+                    .when(diaryService)
+                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY)
+                    .queryParam(DATE, TARGET_DATE);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetDayOffDiaryDetailsByDate",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("날짜로 근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태")
+                                            )
+                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+
+        @Test
+        @DisplayName("입력한 날짜의 휴무 근무 일지가 없다면 결과로 null을 반환한다")
+        void getNotFoundDiaryDetailsSuccess() throws Exception {
+            // given
+            doReturn(null)
+                    .when(diaryService)
+                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
+                    .queryParam(JOB, CADDY)
+                    .queryParam(DATE, TARGET_DATE);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "GetNotFoundDiaryDetailsByDate",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("날짜로 근무 일지 상세조회 API")
+                                            .queryParameters(
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));

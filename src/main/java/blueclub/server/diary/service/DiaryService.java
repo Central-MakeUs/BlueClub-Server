@@ -10,11 +10,11 @@ import blueclub.server.diary.repository.CaddyRepository;
 import blueclub.server.diary.repository.DayworkerRepository;
 import blueclub.server.diary.repository.DiaryRepository;
 import blueclub.server.diary.repository.RiderRepository;
+import blueclub.server.file.service.S3UploadService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
 import blueclub.server.monthlyGoal.repository.MonthlyGoalRepository;
-import blueclub.server.file.service.S3UploadService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.service.UserFindService;
@@ -221,58 +221,28 @@ public class DiaryService {
     @Transactional(readOnly = true)
     public Object getDiaryDetails(UserDetails userDetails, String jobTitle, Long diaryId) {
         User user = userFindService.findByUserDetails(userDetails);
+        if (!user.getJob().equals(Job.findByTitle(jobTitle)))
+            throw new BaseException(BaseResponseStatus.JOB_USER_NOT_MATCH_ERROR);
+
         List<Diary> diary = diaryRepository.getDiaryById(diaryId);
         if (diary.isEmpty()) {
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
         }
 
-        if (diary.get(0).getWorktype().equals(Worktype.DAY_OFF)) {
-            return GetDayOffDiaryDetailsResponse.builder()
-                    .worktype(Worktype.DAY_OFF.getValue())
-                    .build();
-        }
+        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0));
+    }
 
-        if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", ""))) {
-            return GetCaddyDiaryDetailsResponse.builder()
-                    .worktype(diary.get(0).getWorktype().getValue())
-                    .memo(diary.get(0).getMemo())
-                    .imageUrlList(diary.get(0).getImage())
-                    .income(diary.get(0).getIncome())
-                    .expenditure(diary.get(0).getExpenditure())
-                    .saving(diary.get(0).getSaving())
-                    .rounding(diary.get(0).getCaddy().getRounding())
-                    .caddyFee(diary.get(0).getCaddy().getCaddyFee())
-                    .overFee(diary.get(0).getCaddy().getOverFee())
-                    .topdressing(diary.get(0).getCaddy().getTopdressing())
-                    .build();
-        } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            return GetRiderDiaryDetailsResponse.builder()
-                    .worktype(diary.get(0).getWorktype().getValue())
-                    .memo(diary.get(0).getMemo())
-                    .imageUrlList(diary.get(0).getImage())
-                    .income(diary.get(0).getIncome())
-                    .expenditure(diary.get(0).getExpenditure())
-                    .saving(diary.get(0).getSaving())
-                    .incomeOfDeliveries(diary.get(0).getRider().getIncomeOfDeliveries())
-                    .numberOfDeliveries(diary.get(0).getRider().getNumberOfDeliveries())
-                    .incomeOfPromotions(diary.get(0).getRider().getIncomeOfPromotions())
-                    .numberOfPromotions(diary.get(0).getRider().getNumberOfPromotions())
-                    .build();
-        } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            return GetDayworkerDiaryDetailsResponse.builder()
-                    .worktype(diary.get(0).getWorktype().getValue())
-                    .memo(diary.get(0).getMemo())
-                    .imageUrlList(diary.get(0).getImage())
-                    .income(diary.get(0).getIncome())
-                    .expenditure(diary.get(0).getExpenditure())
-                    .saving(diary.get(0).getSaving())
-                    .place(diary.get(0).getDayworker().getPlace())
-                    .dailyWage(diary.get(0).getDayworker().getDailyWage())
-                    .typeOfJob(diary.get(0).getDayworker().getTypeOfJob())
-                    .numberOfWork(diary.get(0).getDayworker().getNumberOfWork())
-                    .build();
-        }
-        throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
+    @Transactional(readOnly = true)
+    public Object getDiaryDetailsByDate(UserDetails userDetails, String jobTitle, LocalDate date) {
+        User user = userFindService.findByUserDetails(userDetails);
+        if (!user.getJob().equals(Job.findByTitle(jobTitle)))
+            throw new BaseException(BaseResponseStatus.JOB_USER_NOT_MATCH_ERROR);
+
+        List<Diary> diary = diaryRepository.getDiaryByDate(user, date);
+        if (diary.isEmpty())
+            return null;
+
+        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0));
     }
 
     public void deleteDiary(UserDetails userDetails, Long diaryId) {
@@ -449,6 +419,56 @@ public class DiaryService {
                     .workAt(diary.getWorkAt())
                     .rank(getRank(diary.getIncome()).getKey())
                     .income(diary.getIncome())
+                    .build();
+        }
+        throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
+    }
+
+    private Object getDiaryDetailsSplitByCase(String jobTitle, Diary diary) {
+        if (diary.getWorktype().equals(Worktype.DAY_OFF)) {
+            return GetDayOffDiaryDetailsResponse.builder()
+                    .worktype(Worktype.DAY_OFF.getValue())
+                    .build();
+        }
+
+        if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", ""))) {
+            return GetCaddyDiaryDetailsResponse.builder()
+                    .worktype(diary.getWorktype().getValue())
+                    .memo(diary.getMemo())
+                    .imageUrlList(diary.getImage())
+                    .income(diary.getIncome())
+                    .expenditure(diary.getExpenditure())
+                    .saving(diary.getSaving())
+                    .rounding(diary.getCaddy().getRounding())
+                    .caddyFee(diary.getCaddy().getCaddyFee())
+                    .overFee(diary.getCaddy().getOverFee())
+                    .topdressing(diary.getCaddy().getTopdressing())
+                    .build();
+        } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", ""))) {
+            return GetRiderDiaryDetailsResponse.builder()
+                    .worktype(diary.getWorktype().getValue())
+                    .memo(diary.getMemo())
+                    .imageUrlList(diary.getImage())
+                    .income(diary.getIncome())
+                    .expenditure(diary.getExpenditure())
+                    .saving(diary.getSaving())
+                    .incomeOfDeliveries(diary.getRider().getIncomeOfDeliveries())
+                    .numberOfDeliveries(diary.getRider().getNumberOfDeliveries())
+                    .incomeOfPromotions(diary.getRider().getIncomeOfPromotions())
+                    .numberOfPromotions(diary.getRider().getNumberOfPromotions())
+                    .build();
+        } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", ""))) {
+            return GetDayworkerDiaryDetailsResponse.builder()
+                    .worktype(diary.getWorktype().getValue())
+                    .memo(diary.getMemo())
+                    .imageUrlList(diary.getImage())
+                    .income(diary.getIncome())
+                    .expenditure(diary.getExpenditure())
+                    .saving(diary.getSaving())
+                    .place(diary.getDayworker().getPlace())
+                    .dailyWage(diary.getDayworker().getDailyWage())
+                    .typeOfJob(diary.getDayworker().getTypeOfJob())
+                    .numberOfWork(diary.getDayworker().getNumberOfWork())
                     .build();
         }
         throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);

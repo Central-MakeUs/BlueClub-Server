@@ -1,12 +1,7 @@
 package blueclub.server.diary.repository;
 
 import blueclub.server.diary.domain.Diary;
-import blueclub.server.diary.domain.Worktype;
-import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
-import com.querydsl.core.types.Ops;
-import com.querydsl.core.types.dsl.BooleanExpression;
-import com.querydsl.core.types.dsl.Expressions;
 import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
@@ -70,6 +65,18 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .leftJoin(diary.image)
                 .fetchJoin()
                 .where(diary.id.eq(diaryId))
+                .fetch();
+    }
+
+    @Override
+    public List<Diary> getDiaryByDate(User user, LocalDate date) {
+        return queryFactory
+                .selectDistinct(diary)
+                .from(diary)
+                .leftJoin(diary.image)
+                .fetchJoin()
+                .where(diary.workAt.eq(date),
+                        diary.job.eq(user.getJob()))
                 .fetch();
     }
 

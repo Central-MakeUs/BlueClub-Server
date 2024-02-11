@@ -39,8 +39,7 @@ public class UserService {
                 addUserDetailsRequest.nickname(),
                 Job.findByTitle(addUserDetailsRequest.job().replace(" ", "")),
                 addUserDetailsRequest.monthlyTargetIncome(),
-                addUserDetailsRequest.tosAgree(),
-                addUserDetailsRequest.pushAgree()
+                addUserDetailsRequest.tosAgree()
         );
         monthlyGoalService.saveMonthlyGoal(user, YearMonth.now(), addUserDetailsRequest.monthlyTargetIncome());
     }
