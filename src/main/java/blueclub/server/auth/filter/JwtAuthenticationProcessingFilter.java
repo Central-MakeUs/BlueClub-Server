@@ -44,7 +44,7 @@ import java.util.concurrent.atomic.AtomicBoolean;
 public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
 
     private static final List<String> NO_CHECK_URL_LIST = List.of(
-            "/auth", "/health", "/css", "/image", "/js", "/favicon.ico", "/swagger", "/docs", "/swagger-ui", "/v3/api-docs", "/error"); // Filter 작동 X
+            "/health", "/css", "/image", "/js", "/favicon.ico", "/swagger", "/docs", "/swagger-ui", "/v3/api-docs", "/error"); // Filter 작동 X
 
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -55,7 +55,7 @@ public class JwtAuthenticationProcessingFilter extends OncePerRequestFilter {
     @Override
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
         for (String NO_CHECK_URL: NO_CHECK_URL_LIST) {
-            if (request.getRequestURI().contains(NO_CHECK_URL) && !request.getRequestURI().equals("/auth/duplicated")) {
+            if (request.getRequestURI().contains(NO_CHECK_URL) || request.getRequestURI().equals("/auth")) {
                 filterChain.doFilter(request, response);
                 return;
             }
