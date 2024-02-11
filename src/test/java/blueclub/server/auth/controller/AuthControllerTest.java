@@ -495,7 +495,7 @@ public class AuthControllerTest extends ControllerTest {
     }
 
     @Nested
-    @DisplayName("로그아웃 API [GET /auth/logout]")
+    @DisplayName("로그아웃 API [POST /auth/logout]")
     class logout {
         private static final String BASE_URL = "/auth/logout";
 
@@ -523,6 +523,52 @@ public class AuthControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("Auth API")
                                             .summary("로그아웃 API")
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .build()
+                            )
+                    ));
+        }
+    }
+
+    @Nested
+    @DisplayName("fcm token 저장 API [POST /auth/fcm]")
+    class addFcmToken {
+        private static final String BASE_URL = "/auth/fcm";
+        private static final String FCM_TOKEN = "exampletokenname";
+
+        @Test
+        @DisplayName("fcm token 저장에 성공한다")
+        void addFcmTokenSuccess() throws Exception {
+            // given
+            doNothing()
+                    .when(authService)
+                    .addFcmToken(any(), anyString());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .post(BASE_URL)
+                    .queryParam("token", FCM_TOKEN)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isOk())
+                    .andDo(document(
+                            "AddFcmToken",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Auth API")
+                                            .summary("fcm token 저장 API")
+                                            .queryParameters(
+                                                    parameterWithName("token").description("[필수] fcm token")
+                                            )
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),

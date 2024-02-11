@@ -526,7 +526,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("골프 캐디의 날짜로 근무 일지 상세조회에 성공한다")
         void getCaddyDiaryDetailsSuccess() throws Exception {
             // given
-            doReturn(getCaddyDiaryDetailsResponse())
+            doReturn(getCaddyDiaryDetailsByDateResponse())
                     .when(diaryService)
                     .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
 
@@ -555,6 +555,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
@@ -566,7 +567,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.overFee").type(NUMBER).description("[DEFAULT 0] 오버피 수입"),
                                                     fieldWithPath("result.topdressing").type(BOOLEAN).description("[DEFAULT FALSE] 배토 여부")
                                             )
-                                            .responseSchema(Schema.schema("GetCaddyDiaryDetailsResponse"))
+                                            .responseSchema(Schema.schema("GetCaddyDiaryDetailsByDateResponse"))
                                             .build()
                             )
                     ));
@@ -576,7 +577,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("배달 라이더의 날짜로 근무 일지 상세조회에 성공한다")
         void getRiderDiaryDetailsSuccess() throws Exception {
             // given
-            doReturn(getRiderDiaryDetailsResponse())
+            doReturn(getRiderDiaryDetailsByDateResponse())
                     .when(diaryService)
                     .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
 
@@ -605,6 +606,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
@@ -616,7 +618,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.numberOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 건수"),
                                                     fieldWithPath("result.incomeOfPromotions").type(NUMBER).description("[DEFAULT 0] 프로모션 수입")
                                             )
-                                            .responseSchema(Schema.schema("GetRiderDiaryDetailsResponse"))
+                                            .responseSchema(Schema.schema("GetRiderDiaryDetailsByDateResponse"))
                                             .build()
                             )
                     ));
@@ -626,7 +628,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("일용직 노동자의 날짜로 근무 일지 상세조회에 성공한다")
         void getDayworkerDiaryDetailsSuccess() throws Exception {
             // given
-            doReturn(getDayworkerDiaryDetailsResponse())
+            doReturn(getDayworkerDiaryDetailsByDateResponse())
                     .when(diaryService)
                     .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
 
@@ -654,6 +656,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
@@ -665,7 +668,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.typeOfJob").type(STRING).description("[DEFAULT NULL] 직종"),
                                                     fieldWithPath("result.numberOfWork").type(NUMBER).description("[DEFAULT 0.0] 공수")
                                             )
-                                            .responseSchema(Schema.schema("GetDayworkerDiaryDetailsResponse"))
+                                            .responseSchema(Schema.schema("GetDayworkerDiaryDetailsByDateResponse"))
                                             .build()
                             )
                     ));
@@ -675,7 +678,7 @@ public class DiaryControllerTest extends ControllerTest {
         @DisplayName("날짜로 휴무 근무 일지 상세조회에 성공한다")
         void getDayOffDiaryDetailsSuccess() throws Exception {
             // given
-            doReturn(getDayOffDiaryDetailsResponse())
+            doReturn(getDayOffDiaryDetailsByDateResponse())
                     .when(diaryService)
                     .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
 
@@ -704,9 +707,10 @@ public class DiaryControllerTest extends ControllerTest {
                                             .responseFields(
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태")
                                             )
-                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
+                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsByDateResponse"))
                                             .build()
                             )
                     ));
@@ -774,7 +778,7 @@ public class DiaryControllerTest extends ControllerTest {
 
             // then
             mockMvc.perform(requestBuilder)
-                    .andExpect(status().isNoContent())
+                    .andExpect(status().isOk())
                     .andDo(document(
                             "DeleteDiary",
                             preprocessRequest(prettyPrint()),
@@ -786,6 +790,12 @@ public class DiaryControllerTest extends ControllerTest {
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
                                             )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));
@@ -1051,6 +1061,61 @@ public class DiaryControllerTest extends ControllerTest {
 
     private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsResponse() {
         return GetDayOffDiaryDetailsResponse.builder()
+                .worktype(Worktype.DAY_OFF.getValue())
+                .build();
+    }
+
+    private GetCaddyDiaryDetailsResponse getCaddyDiaryDetailsByDateResponse() {
+        return GetCaddyDiaryDetailsResponse.builder()
+                .id(DAYWORKER_DIARY.getId())
+                .worktype(CADDY_DIARY.getWorktype())
+                .memo(CADDY_DIARY.getMemo())
+                .imageUrlList(CADDY_DIARY.getImageUrlList())
+                .income(CADDY_DIARY.getIncome())
+                .expenditure(CADDY_DIARY.getExpenditure())
+                .saving(CADDY_DIARY.getSaving())
+                .rounding(CADDY_DIARY.getRounding())
+                .caddyFee(CADDY_DIARY.getCaddyFee())
+                .overFee(CADDY_DIARY.getOverFee())
+                .topdressing(CADDY_DIARY.getTopdressing())
+                .build();
+    }
+
+    private GetRiderDiaryDetailsResponse getRiderDiaryDetailsByDateResponse() {
+        return GetRiderDiaryDetailsResponse.builder()
+                .id(DAYWORKER_DIARY.getId())
+                .worktype(RIDER_DIARY.getWorktype())
+                .memo(RIDER_DIARY.getMemo())
+                .imageUrlList(RIDER_DIARY.getImageUrlList())
+                .income(RIDER_DIARY.getIncome())
+                .expenditure(RIDER_DIARY.getExpenditure())
+                .saving(RIDER_DIARY.getSaving())
+                .numberOfDeliveries(RIDER_DIARY.getNumberOfDeliveries())
+                .incomeOfDeliveries(RIDER_DIARY.getIncomeOfDeliveries())
+                .numberOfPromotions(RIDER_DIARY.getNumberOfPromotions())
+                .incomeOfPromotions(RIDER_DIARY.getIncomeOfPromotions())
+                .build();
+    }
+
+    private GetDayworkerDiaryDetailsResponse getDayworkerDiaryDetailsByDateResponse() {
+        return GetDayworkerDiaryDetailsResponse.builder()
+                .id(DAYWORKER_DIARY.getId())
+                .worktype(DAYWORKER_DIARY.getWorktype())
+                .memo(DAYWORKER_DIARY.getMemo())
+                .imageUrlList(DAYWORKER_DIARY.getImageUrlList())
+                .income(DAYWORKER_DIARY.getIncome())
+                .expenditure(DAYWORKER_DIARY.getExpenditure())
+                .saving(DAYWORKER_DIARY.getSaving())
+                .place(DAYWORKER_DIARY.getPlace())
+                .dailyWage(DAYWORKER_DIARY.getDailyWage())
+                .typeOfJob(DAYWORKER_DIARY.getTypeOfJob())
+                .numberOfWork(DAYWORKER_DIARY.getNumberOfWork())
+                .build();
+    }
+
+    private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsByDateResponse() {
+        return GetDayOffDiaryDetailsResponse.builder()
+                .id(DAYWORKER_DIARY.getId())
                 .worktype(Worktype.DAY_OFF.getValue())
                 .build();
     }

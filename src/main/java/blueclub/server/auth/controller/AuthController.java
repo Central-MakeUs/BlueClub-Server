@@ -11,6 +11,7 @@ import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.validator.constraints.Length;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.validation.annotation.Validated;
@@ -51,6 +52,17 @@ public class AuthController {
     public ResponseEntity<BaseResponse> logout(@AuthenticationPrincipal UserDetails userDetails
     ) {
         authService.logout(userDetails);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
+    }
+
+    @PostMapping("/fcm")
+    public ResponseEntity<BaseResponse> addFcmToken(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @RequestParam("token")
+            @NotBlank(message = "fcm token을 입력해주세요")
+            String fcmToken
+    ) {
+        authService.addFcmToken(userDetails, fcmToken);
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 }

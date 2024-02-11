@@ -47,7 +47,7 @@ public class NoticeController {
             @PathVariable("noticeId") Long id
     ) {
         noticeService.deleteNotice(id);
-        return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @PreAuthorize("hasRole('USER')")

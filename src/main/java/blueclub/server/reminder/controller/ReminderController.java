@@ -48,7 +48,7 @@ public class ReminderController {
             @PathVariable("reminderId") Long id
     ) {
         reminderService.deleteReminder(id);
-        return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @PreAuthorize("hasRole('USER')")

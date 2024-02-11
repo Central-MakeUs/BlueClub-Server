@@ -385,7 +385,7 @@ public class UserControllerTest extends ControllerTest {
 
             // then
             mockMvc.perform(requestBuilder)
-                    .andExpect(status().isNoContent())
+                    .andExpect(status().isOk())
                     .andDo(document(
                             "UserWithdrawal",
                             preprocessRequest(prettyPrint()),
@@ -394,6 +394,12 @@ public class UserControllerTest extends ControllerTest {
                                     ResourceSnippetParameters.builder()
                                             .tag("User API")
                                             .summary("회원 탈퇴 API")
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));

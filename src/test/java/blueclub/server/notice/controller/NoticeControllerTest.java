@@ -155,7 +155,7 @@ public class NoticeControllerTest extends ControllerTest {
 
             // then
             mockMvc.perform(requestBuilder)
-                    .andExpect(status().isNoContent())
+                    .andExpect(status().isOk())
                     .andDo(document(
                             "DeleteNotice",
                             preprocessRequest(prettyPrint()),
@@ -167,6 +167,12 @@ public class NoticeControllerTest extends ControllerTest {
                                             .pathParameters(
                                                     parameterWithName("noticeId").description("공지글 ID")
                                             )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
                                             .build()
                             )
                     ));
