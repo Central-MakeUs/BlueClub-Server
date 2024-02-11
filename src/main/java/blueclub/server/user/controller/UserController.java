@@ -30,13 +30,13 @@ public class UserController {
         return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
-    @PreAuthorize("hasRole('USER')")
+    @PreAuthorize("hasAnyRole('GUEST', 'USER')")
     @DeleteMapping("/withdrawal")
     public ResponseEntity<BaseResponse> withdrawUser(
             @AuthenticationPrincipal UserDetails userDetails
     ) {
         userService.withdrawUser(userDetails);
-        return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @PreAuthorize("hasRole('USER')")

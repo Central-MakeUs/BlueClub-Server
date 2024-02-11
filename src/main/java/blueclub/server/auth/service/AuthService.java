@@ -90,6 +90,11 @@ public class AuthService {
         fcmTokenService.deleteFcmToken(user.getId());
     }
 
+    public void addFcmToken(UserDetails userDetails, String fcmToken) {
+        User user = userFindService.findByUserDetails(userDetails);
+        fcmTokenService.saveFcmToken(user.getId(), fcmToken);
+    }
+
     // 분기 처리, 유저 정보 반환
     private User isRegister(SocialLoginRequest socialLoginRequest) {
         SocialType socialType = SocialType.valueOf(socialLoginRequest.socialType().toUpperCase());

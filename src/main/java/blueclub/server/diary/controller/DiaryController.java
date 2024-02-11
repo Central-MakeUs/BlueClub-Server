@@ -102,7 +102,7 @@ public class DiaryController {
             @PathVariable("diaryId") Long diaryId
     ) {
         diaryService.deleteDiary(userDetails, diaryId);
-        return BaseResponse.toResponseEntity(BaseResponseStatus.DELETED);
+        return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
     }
 
     @GetMapping("/list/{yearMonth}")
