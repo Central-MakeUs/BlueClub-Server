@@ -38,10 +38,9 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateBaseDiaryRequest updateBaseDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue())) {
-            diaryService.saveDayOffDiary(userDetails, updateBaseDiaryRequest);
-            return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.CREATED);
-        }
+        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue()))
+            return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveDayOffDiary(userDetails, updateBaseDiaryRequest));
+
         if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", "")) && updateBaseDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.CREATED, diaryService.saveCaddyDiary(userDetails, (UpdateCaddyDiaryRequest) updateBaseDiaryRequest, multipartFileList));
         } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", "")) && updateBaseDiaryRequest instanceof UpdateRiderDiaryRequest) {
@@ -59,10 +58,9 @@ public class DiaryController {
             @Valid @RequestPart("dto") UpdateBaseDiaryRequest updateBaseDiaryRequest,
             @RequestPart(value = "image", required = false) List<MultipartFile> multipartFileList
     ) {
-        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue())) {
-            diaryService.updateDayOffDiary(userDetails, diaryId);
-            return BaseResponse.toResponseEntityContainsStatus(BaseResponseStatus.SUCCESS);
-        }
+        if (updateBaseDiaryRequest.getWorktype().equals(Worktype.DAY_OFF.getValue()))
+            return BaseResponse.toResponseEntityContainsStatusAndResult(BaseResponseStatus.SUCCESS, diaryService.updateDayOffDiary(userDetails, diaryId));
+
         if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", "")) && updateBaseDiaryRequest instanceof UpdateCaddyDiaryRequest) {
             return BaseResponse.toResponseEntityContainsResult(diaryService.updateCaddyDiary(userDetails, diaryId, (UpdateCaddyDiaryRequest) updateBaseDiaryRequest, multipartFileList));
         } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", "")) && updateBaseDiaryRequest instanceof UpdateRiderDiaryRequest) {

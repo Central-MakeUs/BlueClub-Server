@@ -4,6 +4,7 @@ import blueclub.server.auth.service.JwtService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.file.service.S3UploadService;
+import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.dto.request.AddUserDetailsRequest;
@@ -18,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.IOException;
+import java.time.YearMonth;
 
 @Service
 @RequiredArgsConstructor
@@ -25,6 +27,7 @@ import java.io.IOException;
 public class UserService {
 
     private final UserFindService userFindService;
+    private final MonthlyGoalService monthlyGoalService;
     private final S3UploadService s3UploadService;
     private final JwtService jwtService;
     private final UserRepository userRepository;
@@ -39,6 +42,7 @@ public class UserService {
                 addUserDetailsRequest.tosAgree(),
                 addUserDetailsRequest.pushAgree()
         );
+        monthlyGoalService.saveMonthlyGoal(user, YearMonth.now(), addUserDetailsRequest.monthlyTargetIncome());
     }
 
     public void updateUserDetails(UserDetails userDetails, UpdateUserDetailsRequest updateUserDetailsRequest) {
