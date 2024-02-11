@@ -1,7 +1,10 @@
 package blueclub.server.diary.controller;
 
 import blueclub.server.diary.domain.Worktype;
-import blueclub.server.diary.dto.request.*;
+import blueclub.server.diary.dto.request.UpdateBaseDiaryRequest;
+import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
+import blueclub.server.diary.dto.request.UpdateDayworkerDiaryRequest;
+import blueclub.server.diary.dto.request.UpdateRiderDiaryRequest;
 import blueclub.server.diary.service.DiaryService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponse;
@@ -19,6 +22,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
+import java.time.LocalDate;
 import java.time.YearMonth;
 import java.util.List;
 
@@ -77,6 +81,19 @@ public class DiaryController {
             @PathVariable("diaryId") Long diaryId
     ) {
         return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetails(userDetails, jobTitle, diaryId));
+    }
+
+    @GetMapping("")
+    public ResponseEntity<BaseResponse> getDiaryDetailsByDate(
+            @AuthenticationPrincipal UserDetails userDetails,
+            @NotBlank(message = "직업명은 필수입니다")
+            @RequestParam("job")
+            String jobTitle,
+            @DateTimeFormat(pattern = "yyyy-mm-dd")
+            @RequestParam("date")
+            LocalDate date
+    ) {
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, date));
     }
 
     @DeleteMapping("/{diaryId}")
