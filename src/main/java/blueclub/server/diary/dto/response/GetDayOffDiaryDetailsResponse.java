@@ -1,9 +1,14 @@
 package blueclub.server.diary.dto.response;
 
-import lombok.Builder;
+import lombok.AllArgsConstructor;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.experimental.SuperBuilder;
 
-@Builder
-public record GetDayOffDiaryDetailsResponse(
-        String worktype
-) {
+@SuperBuilder
+@Getter
+@NoArgsConstructor
+@AllArgsConstructor
+public class GetDayOffDiaryDetailsResponse extends GetDiaryIdResponse {
+    private String worktype;
 }
