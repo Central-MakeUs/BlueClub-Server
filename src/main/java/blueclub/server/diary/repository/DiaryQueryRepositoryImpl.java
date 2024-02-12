@@ -59,13 +59,15 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
     }
 
     @Override
-    public List<Diary> getDiaryById(Long diaryId) {
+    public List<Diary> getDiaryById(User user, Long diaryId) {
         return queryFactory
                 .selectDistinct(diary)
                 .from(diary)
                 .leftJoin(diary.image)
                 .fetchJoin()
-                .where(diary.id.eq(diaryId))
+                .where(diary.user.eq(user),
+                        diary.id.eq(diaryId),
+                        diary.job.eq(user.getJob()))
                 .fetch();
     }
 
@@ -76,7 +78,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .from(diary)
                 .leftJoin(diary.image)
                 .fetchJoin()
-                .where(diary.workAt.eq(date),
+                .where(diary.user.eq(user),
+                        diary.workAt.eq(date),
                         diary.job.eq(user.getJob()))
                 .fetch();
     }
