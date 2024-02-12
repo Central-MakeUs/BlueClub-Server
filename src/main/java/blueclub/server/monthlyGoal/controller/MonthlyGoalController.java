@@ -1,12 +1,12 @@
 package blueclub.server.monthlyGoal.controller;
 
+import blueclub.server.global.annotation.LocalDatePattern;
 import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -37,8 +37,10 @@ public class MonthlyGoalController {
     @GetMapping("/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyGoalAndProgress(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+            @LocalDatePattern(pattern = "yyyy-MM")
+            @PathVariable("yearMonth")
+            String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(monthlyGoalService.getMonthlyGoalAndProgress(userDetails, yearMonth));
+        return BaseResponse.toResponseEntityContainsResult(monthlyGoalService.getMonthlyGoalAndProgress(userDetails, YearMonth.parse(yearMonth)));
     }
 }
