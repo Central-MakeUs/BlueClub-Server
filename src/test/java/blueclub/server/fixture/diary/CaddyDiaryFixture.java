@@ -29,7 +29,7 @@ public enum CaddyDiaryFixture {
             CADDY.getTitle(),
             6L, 200000L, 0L, true);
 
-    private final Long diaryId;
+    private final Long id;
     private final String worktype;
     private final String memo;
     private final Long income;
