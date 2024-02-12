@@ -269,7 +269,7 @@ public class DiaryService {
         if (diary.isEmpty())
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
 
-        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0), true);
+        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0));
     }
 
     @Transactional(readOnly = true)
@@ -282,10 +282,16 @@ public class DiaryService {
         if (diary.isEmpty())
             return null;
 
-        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0), false);
+        return getDiaryDetailsSplitByCase(jobTitle, diary.get(0));
     }
 
     public void deleteDiary(UserDetails userDetails, Long diaryId) {
+        User user = userFindService.findByUserDetails(userDetails);
+        Optional<Diary> diary = diaryRepository.findById(diaryId);
+        if (diary.isEmpty())
+            throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
+        if (!diary.get().getUser().equals(user))
+            throw new BaseException(BaseResponseStatus.DIARY_USER_NOT_MATCH_ERROR);
         diaryRepository.deleteById(diaryId);
     }
 
@@ -466,26 +472,11 @@ public class DiaryService {
         throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
     }
 
-    private Object getDiaryDetailsSplitByCase(String jobTitle, Diary diary, Boolean hasId) {
+    private Object getDiaryDetailsSplitByCase(String jobTitle, Diary diary) {
         if (diary.getWorktype().equals(Worktype.DAY_OFF))
-            return getDefaultDiaryDetails(jobTitle, diary, hasId);
+            return getDefaultDiaryDetails(jobTitle, diary);
 
         if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetCaddyDiaryDetailsResponse.builder()
-                        .worktype(diary.getWorktype().getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo(diary.getMemo())
-                        .imageUrlList(diary.getImage())
-                        .income(diary.getIncome())
-                        .expenditure(diary.getExpenditure())
-                        .saving(diary.getSaving())
-                        .rounding(diary.getCaddy().getRounding())
-                        .caddyFee(diary.getCaddy().getCaddyFee())
-                        .overFee(diary.getCaddy().getOverFee())
-                        .topdressing(diary.getCaddy().getTopdressing())
-                        .build();
-            }
             return GetCaddyDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(diary.getWorktype().getValue())
@@ -501,21 +492,6 @@ public class DiaryService {
                     .topdressing(diary.getCaddy().getTopdressing())
                     .build();
         } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetRiderDiaryDetailsResponse.builder()
-                        .worktype(diary.getWorktype().getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo(diary.getMemo())
-                        .imageUrlList(diary.getImage())
-                        .income(diary.getIncome())
-                        .expenditure(diary.getExpenditure())
-                        .saving(diary.getSaving())
-                        .incomeOfDeliveries(diary.getRider().getIncomeOfDeliveries())
-                        .numberOfDeliveries(diary.getRider().getNumberOfDeliveries())
-                        .incomeOfPromotions(diary.getRider().getIncomeOfPromotions())
-                        .numberOfPromotions(diary.getRider().getNumberOfPromotions())
-                        .build();
-            }
             return GetRiderDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(diary.getWorktype().getValue())
@@ -531,21 +507,6 @@ public class DiaryService {
                     .numberOfPromotions(diary.getRider().getNumberOfPromotions())
                     .build();
         } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetDayworkerDiaryDetailsResponse.builder()
-                        .worktype(diary.getWorktype().getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo(diary.getMemo())
-                        .imageUrlList(diary.getImage())
-                        .income(diary.getIncome())
-                        .expenditure(diary.getExpenditure())
-                        .saving(diary.getSaving())
-                        .place(diary.getDayworker().getPlace())
-                        .dailyWage(diary.getDayworker().getDailyWage())
-                        .typeOfJob(diary.getDayworker().getTypeOfJob())
-                        .numberOfWork(diary.getDayworker().getNumberOfWork())
-                        .build();
-            }
             return GetDayworkerDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(diary.getWorktype().getValue())
@@ -564,23 +525,8 @@ public class DiaryService {
         throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
     }
 
-    private Object getDefaultDiaryDetails(String jobTitle, Diary diary, Boolean hasId) {
+    private Object getDefaultDiaryDetails(String jobTitle, Diary diary) {
         if (Job.CADDY.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetCaddyDiaryDetailsResponse.builder()
-                        .worktype(Worktype.DAY_OFF.getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo("")
-                        .imageUrlList(new ArrayList<>())
-                        .income(0L)
-                        .expenditure(0L)
-                        .saving(0L)
-                        .rounding(0L)
-                        .caddyFee(0L)
-                        .overFee(0L)
-                        .topdressing(false)
-                        .build();
-            }
             return GetCaddyDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(Worktype.DAY_OFF.getValue())
@@ -596,21 +542,6 @@ public class DiaryService {
                     .topdressing(false)
                     .build();
         } else if (Job.RIDER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetRiderDiaryDetailsResponse.builder()
-                        .worktype(Worktype.DAY_OFF.getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo("")
-                        .imageUrlList(new ArrayList<>())
-                        .income(0L)
-                        .expenditure(0L)
-                        .saving(0L)
-                        .incomeOfDeliveries(0L)
-                        .numberOfDeliveries(0L)
-                        .incomeOfPromotions(0L)
-                        .numberOfPromotions(0L)
-                        .build();
-            }
             return GetRiderDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(Worktype.DAY_OFF.getValue())
@@ -626,21 +557,6 @@ public class DiaryService {
                     .numberOfPromotions(0L)
                     .build();
         } else if (Job.DAYWORKER.getTitle().equals(jobTitle.replace(" ", ""))) {
-            if (hasId) {
-                return GetDayworkerDiaryDetailsResponse.builder()
-                        .worktype(Worktype.DAY_OFF.getValue())
-                        .date(diary.getWorkAt().toString())
-                        .memo("")
-                        .imageUrlList(new ArrayList<>())
-                        .income(0L)
-                        .expenditure(0L)
-                        .saving(0L)
-                        .place("")
-                        .dailyWage(0L)
-                        .typeOfJob("")
-                        .numberOfWork(0.0)
-                        .build();
-            }
             return GetDayworkerDiaryDetailsResponse.builder()
                     .id(diary.getId())
                     .worktype(Worktype.DAY_OFF.getValue())
