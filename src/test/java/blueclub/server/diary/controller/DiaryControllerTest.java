@@ -6,6 +6,8 @@ import blueclub.server.diary.dto.request.UpdateBaseDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
 import blueclub.server.diary.dto.response.*;
 import blueclub.server.global.ControllerTest;
+import blueclub.server.global.response.BaseException;
+import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.user.domain.Job;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
 import com.epages.restdocs.apispec.Schema;
@@ -34,8 +36,7 @@ import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.resour
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.*;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.*;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -356,6 +357,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -407,6 +409,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -458,6 +461,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -469,48 +473,6 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.numberOfWork").type(NUMBER).description("[DEFAULT 0.0] 공수")
                                             )
                                             .responseSchema(Schema.schema("GetDayworkerDiaryDetailsResponse"))
-                                            .build()
-                            )
-                    ));
-        }
-
-        @Test
-        @DisplayName("휴무 근무 일지 상세조회에 성공한다")
-        void getDayOffDiaryDetailsSuccess() throws Exception {
-            // given
-            doReturn(getDayOffDiaryDetailsResponse())
-                    .when(diaryService)
-                    .getDiaryDetails(any(), anyString(), anyLong());
-
-            // when
-            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .get(BASE_URL, 1L)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
-                    .queryParam(JOB, CADDY);
-
-            // then
-            mockMvc.perform(requestBuilder)
-                    .andExpect(status().isOk())
-                    .andDo(document(
-                            "GetDayOffDiaryDetails",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .tag("Diary API")
-                                            .summary("근무 일지 상세조회 API")
-                                            .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
-                                            )
-                                            .pathParameters(
-                                                    parameterWithName("diaryId").description("근무 일지 ID")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
-                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태")
-                                            )
-                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsResponse"))
                                             .build()
                             )
                     ));
@@ -557,6 +519,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -608,6 +571,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -658,6 +622,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
                                                     fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
                                                     fieldWithPath("result.worktype").type(STRING).description("근무 형태"),
+                                                    fieldWithPath("result.date").type(STRING).description("근무 일자"),
                                                     fieldWithPath("result.memo").type(STRING).description("[DEFAULT NULL] 메모"),
                                                     fieldWithPath("result.imageUrlList[]").type(ARRAY).description("사진 URL 리스트"),
                                                     fieldWithPath("result.income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
@@ -675,49 +640,7 @@ public class DiaryControllerTest extends ControllerTest {
         }
 
         @Test
-        @DisplayName("날짜로 휴무 근무 일지 상세조회에 성공한다")
-        void getDayOffDiaryDetailsSuccess() throws Exception {
-            // given
-            doReturn(getDayOffDiaryDetailsByDateResponse())
-                    .when(diaryService)
-                    .getDiaryDetailsByDate(any(), anyString(), any(LocalDate.class));
-
-            // when
-            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
-                    .get(BASE_URL)
-                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN)
-                    .queryParam(JOB, CADDY)
-                    .queryParam(DATE, TARGET_DATE);
-
-            // then
-            mockMvc.perform(requestBuilder)
-                    .andExpect(status().isOk())
-                    .andDo(document(
-                            "GetDayOffDiaryDetailsByDate",
-                            preprocessRequest(prettyPrint()),
-                            preprocessResponse(prettyPrint()),
-                            resource(
-                                    ResourceSnippetParameters.builder()
-                                            .tag("Diary API")
-                                            .summary("날짜로 근무 일지 상세조회 API")
-                                            .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
-                                                    parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
-                                            )
-                                            .responseFields(
-                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
-                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
-                                                    fieldWithPath("result.id").type(NUMBER).description("근무 일지 ID"),
-                                                    fieldWithPath("result.worktype").type(STRING).description("근무 형태")
-                                            )
-                                            .responseSchema(Schema.schema("GetDayOffDiaryDetailsByDateResponse"))
-                                            .build()
-                            )
-                    ));
-        }
-
-        @Test
-        @DisplayName("입력한 날짜의 휴무 근무 일지가 없다면 결과로 null을 반환한다")
+        @DisplayName("입력한 날짜의 근무 일지가 없다면 결과로 null을 반환한다")
         void getNotFoundDiaryDetailsSuccess() throws Exception {
             // given
             doReturn(null)
@@ -989,6 +912,44 @@ public class DiaryControllerTest extends ControllerTest {
                             )
                     ));
         }
+
+        @Test
+        @DisplayName("휴무일인 근무 일지는 자랑하기 상세조회에 실패한다")
+        void throwExceptionByDayOffDiary() throws Exception {
+            // given
+            doThrow(new BaseException(BaseResponseStatus.CANT_BOAST_DIARY_ERROR))
+                    .when(diaryService)
+                    .getBoastDiary(any(), anyLong());
+
+            // when
+            MockHttpServletRequestBuilder requestBuilder = RestDocumentationRequestBuilders
+                    .get(BASE_URL, 1)
+                    .header(AUTHORIZATION, BEARER, ACCESS_TOKEN);
+
+            // then
+            mockMvc.perform(requestBuilder)
+                    .andExpect(status().isBadRequest())
+                    .andDo(document(
+                            "GetBoastDiaryDayOffError",
+                            preprocessRequest(prettyPrint()),
+                            preprocessResponse(prettyPrint()),
+                            resource(
+                                    ResourceSnippetParameters.builder()
+                                            .tag("Diary API")
+                                            .summary("자랑하기 상세조회 API")
+                                            .pathParameters(
+                                                    parameterWithName("diaryId").description("근무 일지 ID")
+                                            )
+                                            .responseFields(
+                                                    fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
+                                                    fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
+                                                    fieldWithPath("result").type(NULL).description("null 반환")
+                                            )
+                                            .responseSchema(Schema.schema("BaseResponse"))
+                                            .build()
+                            )
+                    ));
+        }
     }
 
     private UpdateCaddyDiaryRequest updateCaddyDiaryRequest() {
@@ -998,7 +959,7 @@ public class DiaryControllerTest extends ControllerTest {
                 .income(CADDY_DIARY.getIncome())
                 .expenditure(CADDY_DIARY.getExpenditure())
                 .saving(CADDY_DIARY.getSaving())
-                .date(CADDY_DIARY.getDate())
+                .date(CADDY_DIARY.getDate().toString())
                 .imageUrlList(CADDY_DIARY.getImageUrlList())
                 .rounding(CADDY_DIARY.getRounding())
                 .caddyFee(CADDY_DIARY.getCaddyFee())
@@ -1010,13 +971,14 @@ public class DiaryControllerTest extends ControllerTest {
     private UpdateBaseDiaryRequest updateBaseDiaryRequest() {
         return UpdateBaseDiaryRequest.builder()
                 .worktype(Worktype.DAY_OFF.getValue())
-                .date(CADDY_DIARY.getDate())
+                .date(CADDY_DIARY.getDate().toString())
                 .build();
     }
 
     private GetCaddyDiaryDetailsResponse getCaddyDiaryDetailsResponse() {
         return GetCaddyDiaryDetailsResponse.builder()
                 .worktype(CADDY_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(CADDY_DIARY.getMemo())
                 .imageUrlList(CADDY_DIARY.getImageUrlList())
                 .income(CADDY_DIARY.getIncome())
@@ -1032,6 +994,7 @@ public class DiaryControllerTest extends ControllerTest {
     private GetRiderDiaryDetailsResponse getRiderDiaryDetailsResponse() {
         return GetRiderDiaryDetailsResponse.builder()
                 .worktype(RIDER_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(RIDER_DIARY.getMemo())
                 .imageUrlList(RIDER_DIARY.getImageUrlList())
                 .income(RIDER_DIARY.getIncome())
@@ -1047,6 +1010,7 @@ public class DiaryControllerTest extends ControllerTest {
     private GetDayworkerDiaryDetailsResponse getDayworkerDiaryDetailsResponse() {
         return GetDayworkerDiaryDetailsResponse.builder()
                 .worktype(DAYWORKER_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(DAYWORKER_DIARY.getMemo())
                 .imageUrlList(DAYWORKER_DIARY.getImageUrlList())
                 .income(DAYWORKER_DIARY.getIncome())
@@ -1059,16 +1023,11 @@ public class DiaryControllerTest extends ControllerTest {
                 .build();
     }
 
-    private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsResponse() {
-        return GetDayOffDiaryDetailsResponse.builder()
-                .worktype(Worktype.DAY_OFF.getValue())
-                .build();
-    }
-
     private GetCaddyDiaryDetailsResponse getCaddyDiaryDetailsByDateResponse() {
         return GetCaddyDiaryDetailsResponse.builder()
                 .id(DAYWORKER_DIARY.getId())
                 .worktype(CADDY_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(CADDY_DIARY.getMemo())
                 .imageUrlList(CADDY_DIARY.getImageUrlList())
                 .income(CADDY_DIARY.getIncome())
@@ -1085,6 +1044,7 @@ public class DiaryControllerTest extends ControllerTest {
         return GetRiderDiaryDetailsResponse.builder()
                 .id(DAYWORKER_DIARY.getId())
                 .worktype(RIDER_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(RIDER_DIARY.getMemo())
                 .imageUrlList(RIDER_DIARY.getImageUrlList())
                 .income(RIDER_DIARY.getIncome())
@@ -1101,6 +1061,7 @@ public class DiaryControllerTest extends ControllerTest {
         return GetDayworkerDiaryDetailsResponse.builder()
                 .id(DAYWORKER_DIARY.getId())
                 .worktype(DAYWORKER_DIARY.getWorktype())
+                .date(CADDY_DIARY.getDate().toString())
                 .memo(DAYWORKER_DIARY.getMemo())
                 .imageUrlList(DAYWORKER_DIARY.getImageUrlList())
                 .income(DAYWORKER_DIARY.getIncome())
@@ -1110,13 +1071,6 @@ public class DiaryControllerTest extends ControllerTest {
                 .dailyWage(DAYWORKER_DIARY.getDailyWage())
                 .typeOfJob(DAYWORKER_DIARY.getTypeOfJob())
                 .numberOfWork(DAYWORKER_DIARY.getNumberOfWork())
-                .build();
-    }
-
-    private GetDayOffDiaryDetailsResponse getDayOffDiaryDetailsByDateResponse() {
-        return GetDayOffDiaryDetailsResponse.builder()
-                .id(DAYWORKER_DIARY.getId())
-                .worktype(Worktype.DAY_OFF.getValue())
                 .build();
     }
 

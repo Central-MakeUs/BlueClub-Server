@@ -1,8 +1,6 @@
 package blueclub.server.monthlyGoal.controller;
 
 import blueclub.server.global.ControllerTest;
-import blueclub.server.global.response.BaseException;
-import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.dto.response.GetMonthlyGoalResponse;
 import com.epages.restdocs.apispec.ResourceSnippetParameters;
@@ -14,15 +12,14 @@ import org.springframework.restdocs.mockmvc.RestDocumentationRequestBuilders;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 
-import java.time.YearMonth;
-
 import static blueclub.server.fixture.JwtTokenFixture.ACCESS_TOKEN;
 import static blueclub.server.fixture.JwtTokenFixture.BEARER;
 import static com.epages.restdocs.apispec.MockMvcRestDocumentationWrapper.document;
 import static com.epages.restdocs.apispec.ResourceDocumentation.parameterWithName;
 import static com.epages.restdocs.apispec.ResourceDocumentation.resource;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.doReturn;
 import static org.springframework.http.HttpHeaders.AUTHORIZATION;
 import static org.springframework.http.MediaType.APPLICATION_JSON;
 import static org.springframework.restdocs.operation.preprocess.Preprocessors.*;
@@ -130,7 +127,7 @@ public class MonthlyGoalControllerTest extends ControllerTest {
 
     private UpdateMonthlyGoalRequest updateMonthlyGoalRequest() {
         return UpdateMonthlyGoalRequest.builder()
-                .yearMonth(YearMonth.parse("2024-01"))
+                .yearMonth("2024-01")
                 .monthlyTargetIncome(200000L)
                 .build();
     }

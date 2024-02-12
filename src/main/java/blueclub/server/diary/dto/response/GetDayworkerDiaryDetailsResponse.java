@@ -13,6 +13,7 @@ import java.util.List;
 @AllArgsConstructor
 public class GetDayworkerDiaryDetailsResponse extends GetDiaryIdResponse {
     private String worktype;
+    private String date;
     private String memo;
     private List<String> imageUrlList;
     private Long income;

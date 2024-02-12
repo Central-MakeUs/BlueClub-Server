@@ -26,7 +26,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .from(diary)
                 .where(diary.user.eq(user),
                         diary.workAt.year().eq(yearMonth.getYear()),
-                        diary.workAt.month().eq(yearMonth.getMonthValue()))
+                        diary.workAt.month().eq(yearMonth.getMonthValue()),
+                        diary.job.eq(user.getJob()))
                 .fetch();
         return totalMonthlyIncome.get(0) != null ? totalMonthlyIncome.get(0) : 0;
     }
@@ -87,7 +88,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
                 .from(diary)
                 .where(diary.user.eq(user),
                         diary.workAt.year().eq(workAt.getYear()),
-                        diary.workAt.month().eq(workAt.getMonthValue()))
+                        diary.workAt.month().eq(workAt.getMonthValue()),
+                        diary.job.eq(user.getJob()))
                 .orderBy(diary.workAt.desc())
                 .fetch();
 
@@ -108,7 +110,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         List<LocalDate> workAtList = queryFactory
                 .selectDistinct(diary.workAt)
                 .from(diary)
-                .where(diary.user.eq(user))
+                .where(diary.user.eq(user),
+                        diary.job.eq(user.getJob()))
                 .orderBy(diary.workAt.desc())
                 .fetch();
 
@@ -145,7 +148,8 @@ public class DiaryQueryRepositoryImpl implements DiaryQueryRepository {
         List<LocalDate> workAtList = queryFactory
                 .selectDistinct(diary.workAt)
                 .from(diary)
-                .where(diary.user.eq(user))
+                .where(diary.user.eq(user),
+                        diary.job.eq(user.getJob()))
                 .orderBy(diary.workAt.desc())
                 .fetch();
 
