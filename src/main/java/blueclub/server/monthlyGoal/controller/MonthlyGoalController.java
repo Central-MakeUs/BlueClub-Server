@@ -37,7 +37,7 @@ public class MonthlyGoalController {
     @GetMapping("/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyGoalAndProgress(
             @AuthenticationPrincipal UserDetails userDetails,
-            @LocalDatePattern(pattern = "yyyy-MM")
+            @LocalDatePattern(pattern = "yyyy-M")
             @PathVariable("yearMonth")
             String yearMonth
     ) {

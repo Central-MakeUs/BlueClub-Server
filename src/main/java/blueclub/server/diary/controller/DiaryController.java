@@ -108,7 +108,7 @@ public class DiaryController {
     @GetMapping("/list/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyList(
             @AuthenticationPrincipal UserDetails userDetails,
-            @LocalDatePattern(pattern = "yyyy-MM")
+            @LocalDatePattern(pattern = "yyyy-M")
             @PathVariable("yearMonth")
             String yearMonth
     ) {
@@ -118,7 +118,7 @@ public class DiaryController {
     @GetMapping("/record/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyRecord(
             @AuthenticationPrincipal UserDetails userDetails,
-            @LocalDatePattern(pattern = "yyyy-MM")
+            @LocalDatePattern(pattern = "yyyy-M")
             @PathVariable("yearMonth")
             String yearMonth
     ) {

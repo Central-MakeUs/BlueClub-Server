@@ -20,5 +20,5 @@ public @interface LocalDatePattern {
 
     Class<? extends Payload>[] payload() default { };
 
-    String pattern() default "yyyy-MM-dd";
+    String pattern() default "yyyy-M-d";
 }

@@ -27,8 +27,8 @@ public class LocalDatePatternValidator implements ConstraintValidator<LocalDateP
             }
             return true;
         }
-        try{
-            // yyyy-MM
+        // yyyy-MM
+        try {
             YearMonth yearMonth = YearMonth.parse(value, DateTimeFormatter.ofPattern(this.pattern));
         } catch (Exception e) {
             return false;
