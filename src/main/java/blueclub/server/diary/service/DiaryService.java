@@ -49,12 +49,14 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveDayOffDiary(UserDetails userDetails, UpdateBaseDiaryRequest updateBaseDiaryRequest) {
         User user = userFindService.findByUserDetails(userDetails);
+        isValidDate(user, LocalDate.parse(updateBaseDiaryRequest.getDate()));
         Diary diary = diaryRepository.save(saveBaseDiary(user, Worktype.DAY_OFF, LocalDate.parse(updateBaseDiaryRequest.getDate()), user.getJob()));
         return new GetDiaryIdResponse(diary.getId());
     }
 
     public GetDiaryIdResponse saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
+        isValidDate(user, LocalDate.parse(createCaddyDiaryRequest.getDate()));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createCaddyDiaryRequest.getWorktype()), createCaddyDiaryRequest.getMemo(),
                 imageUrlList, createCaddyDiaryRequest.getIncome(), createCaddyDiaryRequest.getExpenditure(),
@@ -74,6 +76,7 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveRiderDiary(UserDetails userDetails, UpdateRiderDiaryRequest createRiderDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
+        isValidDate(user, LocalDate.parse(createRiderDiaryRequest.getDate()));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createRiderDiaryRequest.getWorktype()), createRiderDiaryRequest.getMemo(),
                 imageUrlList, createRiderDiaryRequest.getIncome(), createRiderDiaryRequest.getExpenditure(),
@@ -93,6 +96,7 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveDayworkerDiary(UserDetails userDetails, UpdateDayworkerDiaryRequest createDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
+        isValidDate(user, LocalDate.parse(createDayworkerDiaryRequest.getDate()));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createDayworkerDiaryRequest.getWorktype()), createDayworkerDiaryRequest.getMemo(),
                 imageUrlList, createDayworkerDiaryRequest.getIncome(), createDayworkerDiaryRequest.getExpenditure(),
@@ -559,5 +563,10 @@ public class DiaryService {
                     .build();
         }
         throw new BaseException(BaseResponseStatus.JOB_NOT_FOUND_ERROR);
+    }
+
+    private void isValidDate(User user, LocalDate date) {
+        if (diaryRepository.existsByUserAndWorkAtAndJob(user, date, user.getJob()))
+            throw new BaseException(BaseResponseStatus.DIARY_ALREADY_EXISTS_ERROR);
     }
 }
