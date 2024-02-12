@@ -111,9 +111,6 @@ public class AuthService {
     }
 
     private User createUser(String socialId, SocialType socialType, String name, String nickname, String email, String phoneNumber, String profileImage) {
-        // 이메일 중복여부 체크
-        if (userRepository.existsByEmail(email))
-            throw new BaseException(BaseResponseStatus.DUPLICATED_EMAIL);
         // 닉네임 이모티콘, 특수기호 존재 시 삭제
         EmojiParser.removeAllEmojis(nickname);
         nickname = nickname.replaceAll("[^ㄱ-ㅎㅏ-ㅣ가-힣a-zA-Z0-9]", "");
