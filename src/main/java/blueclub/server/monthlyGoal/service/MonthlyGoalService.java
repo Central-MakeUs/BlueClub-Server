@@ -15,6 +15,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.Optional;
 
 @Service
@@ -28,12 +29,12 @@ public class MonthlyGoalService {
 
     public void updateMonthlyGoal(UserDetails userDetails, UpdateMonthlyGoalRequest updateMonthlyGoalRequest) {
         User user = userFindService.findByUserDetails(userDetails);
-        Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, updateMonthlyGoalRequest.yearMonth());
+        Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, YearMonth.parse(updateMonthlyGoalRequest.yearMonth(), DateTimeFormatter.ofPattern("yyyy-M")));
         if (monthlyGoal.isPresent()) {
             monthlyGoal.get().updateMonthlyGoal(updateMonthlyGoalRequest.monthlyTargetIncome());
             return;
         }
-        saveMonthlyGoal(user, updateMonthlyGoalRequest.yearMonth(), updateMonthlyGoalRequest.monthlyTargetIncome());
+        saveMonthlyGoal(user, YearMonth.parse(updateMonthlyGoalRequest.yearMonth(), DateTimeFormatter.ofPattern("yyyy-M")), updateMonthlyGoalRequest.monthlyTargetIncome());
     }
 
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {

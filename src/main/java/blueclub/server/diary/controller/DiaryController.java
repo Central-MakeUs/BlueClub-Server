@@ -6,6 +6,7 @@ import blueclub.server.diary.dto.request.UpdateCaddyDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateDayworkerDiaryRequest;
 import blueclub.server.diary.dto.request.UpdateRiderDiaryRequest;
 import blueclub.server.diary.service.DiaryService;
+import blueclub.server.global.annotation.LocalDatePattern;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponse;
 import blueclub.server.global.response.BaseResponseStatus;
@@ -13,7 +14,6 @@ import blueclub.server.user.domain.Job;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotBlank;
 import lombok.RequiredArgsConstructor;
-import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @PreAuthorize("hasRole('USER')")
@@ -89,11 +90,11 @@ public class DiaryController {
             @NotBlank(message = "직업명은 필수입니다")
             @RequestParam("job")
             String jobTitle,
-            @DateTimeFormat(pattern = "yyyy-mm-dd")
+            @LocalDatePattern
             @RequestParam("date")
-            LocalDate date
+            String date
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, date));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d"))));
     }
 
     @DeleteMapping("/{diaryId}")
@@ -108,17 +109,21 @@ public class DiaryController {
     @GetMapping("/list/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyList(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+            @LocalDatePattern(pattern = "yyyy-M")
+            @PathVariable("yearMonth")
+            String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, yearMonth));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyy-M"))));
     }
 
     @GetMapping("/record/{yearMonth}")
     public ResponseEntity<BaseResponse> getMonthlyRecord(
             @AuthenticationPrincipal UserDetails userDetails,
-            @PathVariable("yearMonth") @DateTimeFormat(pattern = "yyyy-mm") YearMonth yearMonth
+            @LocalDatePattern(pattern = "yyyy-M")
+            @PathVariable("yearMonth")
+            String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, yearMonth));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyy-M"))));
     }
 
     @GetMapping("/boast/{diaryId}")

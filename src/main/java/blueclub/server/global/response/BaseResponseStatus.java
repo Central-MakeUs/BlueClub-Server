@@ -53,6 +53,8 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     DIARY_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "DIARY_002", "존재하지 않는 근무 일지입니다."),
     DIARY_USER_NOT_MATCH_ERROR(HttpStatus.NOT_FOUND, "DIARY_003", "사용자의 근무 일지가 아닙니다."),
     JOB_USER_NOT_MATCH_ERROR(HttpStatus.NOT_FOUND, "DIARY_004", "입력하신 직업과 사용자의 직업이 일치하지 않습니다."),
+    DIARY_ALREADY_EXISTS_ERROR(HttpStatus.NOT_FOUND, "DIARY_005", "이미 근무 일지가 존재하는 날짜입니다."),
+    CANT_BOAST_DIARY_ERROR(HttpStatus.BAD_REQUEST, "DIARY_006", "해당 근무 일지는 자랑하기 기능을 이용할 수 없습니다."),
 
     // Notice
     NOTICE_NOT_FOUND_ERROR(HttpStatus.NOT_FOUND, "NOTICE_001", "존재하지 않는 공지입니다."),
