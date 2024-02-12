@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '1.0.1-SNAPSHOT'
+version = '1.0.2-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "1.0.1"
+	version = "1.0.2"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
