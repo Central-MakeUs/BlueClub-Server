@@ -156,6 +156,18 @@ public class DiaryService {
                 updateCaddyDiaryRequest.getExpenditure(),
                 updateCaddyDiaryRequest.getSaving(),
                 user.getJob());
+        if (caddy == null) {
+            Caddy newCaddy = Caddy.builder()
+                    .diary(diary.get())
+                    .rounding(updateCaddyDiaryRequest.getRounding())
+                    .caddyFee(updateCaddyDiaryRequest.getCaddyFee())
+                    .overFee(updateCaddyDiaryRequest.getOverFee())
+                    .topdressing(updateCaddyDiaryRequest.getTopdressing())
+                    .build();
+            caddyRepository.save(newCaddy);
+            diary.get().setCaddy(newCaddy);
+            return new GetDiaryIdResponse(diary.get().getId());
+        }
         caddy.update(
                 updateCaddyDiaryRequest.getRounding(),
                 updateCaddyDiaryRequest.getCaddyFee(),
@@ -183,6 +195,18 @@ public class DiaryService {
                 updateRiderDiaryRequest.getExpenditure(),
                 updateRiderDiaryRequest.getSaving(),
                 user.getJob());
+        if (rider == null) {
+            Rider newRider = Rider.builder()
+                    .diary(diary.get())
+                    .numberOfDeliveries(updateRiderDiaryRequest.getNumberOfDeliveries())
+                    .incomeOfDeliveries(updateRiderDiaryRequest.getIncomeOfDeliveries())
+                    .numberOfPromotions(updateRiderDiaryRequest.getNumberOfPromotions())
+                    .incomeOfPromotions(updateRiderDiaryRequest.getIncomeOfPromotions())
+                    .build();
+            riderRepository.save(newRider);
+            diary.get().setRider(newRider);
+            return new GetDiaryIdResponse(diary.get().getId());
+        }
         rider.update(
                 updateRiderDiaryRequest.getNumberOfDeliveries(),
                 updateRiderDiaryRequest.getIncomeOfDeliveries(),
@@ -210,6 +234,18 @@ public class DiaryService {
                 updateDayworkerDiaryRequest.getExpenditure(),
                 updateDayworkerDiaryRequest.getSaving(),
                 user.getJob());
+        if (dayworker == null) {
+            Dayworker newDayworker = Dayworker.builder()
+                    .diary(diary.get())
+                    .place(updateDayworkerDiaryRequest.getPlace())
+                    .dailyWage(updateDayworkerDiaryRequest.getDailyWage())
+                    .typeOfJob(updateDayworkerDiaryRequest.getTypeOfJob())
+                    .numberOfWork(updateDayworkerDiaryRequest.getNumberOfWork())
+                    .build();
+            dayworkerRepository.save(newDayworker);
+            diary.get().setDayworker(newDayworker);
+            return new GetDiaryIdResponse(diary.get().getId());
+        }
         dayworker.update(
                 updateDayworkerDiaryRequest.getPlace(),
                 updateDayworkerDiaryRequest.getDailyWage(),
