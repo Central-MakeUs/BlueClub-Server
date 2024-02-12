@@ -265,10 +265,9 @@ public class DiaryService {
         if (!user.getJob().equals(Job.findByTitle(jobTitle)))
             throw new BaseException(BaseResponseStatus.JOB_USER_NOT_MATCH_ERROR);
 
-        List<Diary> diary = diaryRepository.getDiaryById(diaryId);
-        if (diary.isEmpty()) {
+        List<Diary> diary = diaryRepository.getDiaryById(user, diaryId);
+        if (diary.isEmpty())
             throw new BaseException(BaseResponseStatus.DIARY_NOT_FOUND_ERROR);
-        }
 
         return getDiaryDetailsSplitByCase(jobTitle, diary.get(0), true);
     }

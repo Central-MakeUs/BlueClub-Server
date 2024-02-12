@@ -1,5 +1,6 @@
 package blueclub.server.user.service;
 
+import blueclub.server.auth.domain.Role;
 import blueclub.server.auth.service.JwtService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
@@ -35,6 +36,8 @@ public class UserService {
 
     public void addUserDetails(UserDetails userDetails, AddUserDetailsRequest addUserDetailsRequest) {
         User user = userFindService.findByUserDetails(userDetails);
+        if (userRepository.existsByNicknameAndRole(addUserDetailsRequest.nickname(), Role.USER))
+            throw new BaseException(BaseResponseStatus.DUPLICATED_NICKNAME);
         user.addDetails(
                 addUserDetailsRequest.nickname(),
                 Job.findByTitle(addUserDetailsRequest.job().replace(" ", "")),
@@ -46,6 +49,8 @@ public class UserService {
 
     public void updateUserDetails(UserDetails userDetails, UpdateUserDetailsRequest updateUserDetailsRequest) {
         User user = userFindService.findByUserDetails(userDetails);
+        if (!user.getNickname().equals(updateUserDetailsRequest.nickname()) && userRepository.existsByNicknameAndRole(updateUserDetailsRequest.nickname(), Role.USER))
+            throw new BaseException(BaseResponseStatus.DUPLICATED_NICKNAME);
         user.updateDetails(
                 updateUserDetailsRequest.nickname(),
                 Job.findByTitle(updateUserDetailsRequest.job().replace(" ", "")),

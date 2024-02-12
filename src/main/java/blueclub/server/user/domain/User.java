@@ -7,7 +7,6 @@ import blueclub.server.global.entity.BaseTimeEntity;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
 import jakarta.persistence.*;
 import lombok.*;
-import org.hibernate.annotations.ColumnDefault;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,6 @@ import static jakarta.persistence.CascadeType.PERSIST;
 @Builder
 @NoArgsConstructor(access = AccessLevel.PROTECTED)
 @AllArgsConstructor
-@Table(uniqueConstraints = @UniqueConstraint(columnNames = "email", name = "unique_email"))
 public class User extends BaseTimeEntity {
 
     @Id

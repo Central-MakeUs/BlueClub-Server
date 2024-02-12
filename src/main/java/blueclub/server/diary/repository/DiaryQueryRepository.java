@@ -11,7 +11,7 @@ public interface DiaryQueryRepository {
     Long getTotalMonthlyIncome(User user, YearMonth yearMonth);
     Integer getTotalWorkingDay(User user, YearMonth yearMonth);
     List<Diary> getMonthlyList(User user, YearMonth yearMonth);
-    List<Diary> getDiaryById(Long diaryId);
+    List<Diary> getDiaryById(User user, Long diaryId);
     List<Diary> getDiaryByDate(User user, LocalDate date);
     Integer getStraightWorkingDayLimitMonth(User user, LocalDate workAt);
     Boolean isRenew(User user, LocalDate workAt);
