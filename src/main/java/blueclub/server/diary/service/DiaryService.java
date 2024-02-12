@@ -49,7 +49,7 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveDayOffDiary(UserDetails userDetails, UpdateBaseDiaryRequest updateBaseDiaryRequest) {
         User user = userFindService.findByUserDetails(userDetails);
-        Diary diary = diaryRepository.save(saveBaseDiary(user, Worktype.DAY_OFF, updateBaseDiaryRequest.getDate(), user.getJob()));
+        Diary diary = diaryRepository.save(saveBaseDiary(user, Worktype.DAY_OFF, LocalDate.parse(updateBaseDiaryRequest.getDate()), user.getJob()));
         return new GetDiaryIdResponse(diary.getId());
     }
 
@@ -58,7 +58,7 @@ public class DiaryService {
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createCaddyDiaryRequest.getWorktype()), createCaddyDiaryRequest.getMemo(),
                 imageUrlList, createCaddyDiaryRequest.getIncome(), createCaddyDiaryRequest.getExpenditure(),
-                createCaddyDiaryRequest.getSaving(), createCaddyDiaryRequest.getDate(), user.getJob());
+                createCaddyDiaryRequest.getSaving(), LocalDate.parse(createCaddyDiaryRequest.getDate()), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Caddy caddy = Caddy.builder()
                 .diary(savedDiary)
@@ -77,7 +77,7 @@ public class DiaryService {
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createRiderDiaryRequest.getWorktype()), createRiderDiaryRequest.getMemo(),
                 imageUrlList, createRiderDiaryRequest.getIncome(), createRiderDiaryRequest.getExpenditure(),
-                createRiderDiaryRequest.getSaving(), createRiderDiaryRequest.getDate(), user.getJob());
+                createRiderDiaryRequest.getSaving(), LocalDate.parse(createRiderDiaryRequest.getDate()), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Rider rider = Rider.builder()
                 .diary(savedDiary)
@@ -96,7 +96,7 @@ public class DiaryService {
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createDayworkerDiaryRequest.getWorktype()), createDayworkerDiaryRequest.getMemo(),
                 imageUrlList, createDayworkerDiaryRequest.getIncome(), createDayworkerDiaryRequest.getExpenditure(),
-                createDayworkerDiaryRequest.getSaving(), createDayworkerDiaryRequest.getDate(), user.getJob());
+                createDayworkerDiaryRequest.getSaving(), LocalDate.parse(createDayworkerDiaryRequest.getDate()), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Dayworker dayworker = Dayworker.builder()
                 .diary(savedDiary)

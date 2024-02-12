@@ -28,12 +28,12 @@ public class MonthlyGoalService {
 
     public void updateMonthlyGoal(UserDetails userDetails, UpdateMonthlyGoalRequest updateMonthlyGoalRequest) {
         User user = userFindService.findByUserDetails(userDetails);
-        Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, updateMonthlyGoalRequest.yearMonth());
+        Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, YearMonth.parse(updateMonthlyGoalRequest.yearMonth()));
         if (monthlyGoal.isPresent()) {
             monthlyGoal.get().updateMonthlyGoal(updateMonthlyGoalRequest.monthlyTargetIncome());
             return;
         }
-        saveMonthlyGoal(user, updateMonthlyGoalRequest.yearMonth(), updateMonthlyGoalRequest.monthlyTargetIncome());
+        saveMonthlyGoal(user, YearMonth.parse(updateMonthlyGoalRequest.yearMonth()), updateMonthlyGoalRequest.monthlyTargetIncome());
     }
 
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
