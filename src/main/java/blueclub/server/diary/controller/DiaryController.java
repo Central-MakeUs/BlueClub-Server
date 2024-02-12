@@ -24,6 +24,7 @@ import org.springframework.web.multipart.MultipartFile;
 
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.util.List;
 
 @PreAuthorize("hasRole('USER')")
@@ -93,7 +94,7 @@ public class DiaryController {
             @RequestParam("date")
             String date
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, LocalDate.parse(date)));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d"))));
     }
 
     @DeleteMapping("/{diaryId}")
@@ -112,7 +113,7 @@ public class DiaryController {
             @PathVariable("yearMonth")
             String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, YearMonth.parse(yearMonth)));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyList(userDetails, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyy-M"))));
     }
 
     @GetMapping("/record/{yearMonth}")
@@ -122,7 +123,7 @@ public class DiaryController {
             @PathVariable("yearMonth")
             String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, YearMonth.parse(yearMonth)));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getMonthlyRecord(userDetails, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyy-M"))));
     }
 
     @GetMapping("/boast/{diaryId}")

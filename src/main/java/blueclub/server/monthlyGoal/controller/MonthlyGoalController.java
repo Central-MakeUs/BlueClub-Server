@@ -15,6 +15,7 @@ import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
 
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 
 @PreAuthorize("hasRole('USER')")
 @Validated
@@ -41,6 +42,6 @@ public class MonthlyGoalController {
             @PathVariable("yearMonth")
             String yearMonth
     ) {
-        return BaseResponse.toResponseEntityContainsResult(monthlyGoalService.getMonthlyGoalAndProgress(userDetails, YearMonth.parse(yearMonth)));
+        return BaseResponse.toResponseEntityContainsResult(monthlyGoalService.getMonthlyGoalAndProgress(userDetails, YearMonth.parse(yearMonth, DateTimeFormatter.ofPattern("yyyy-M"))));
     }
 }

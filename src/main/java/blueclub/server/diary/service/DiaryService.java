@@ -28,6 +28,7 @@ import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
 import java.time.LocalDate;
 import java.time.YearMonth;
+import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.List;
@@ -49,18 +50,18 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveDayOffDiary(UserDetails userDetails, UpdateBaseDiaryRequest updateBaseDiaryRequest) {
         User user = userFindService.findByUserDetails(userDetails);
-        isValidDate(user, LocalDate.parse(updateBaseDiaryRequest.getDate()));
-        Diary diary = diaryRepository.save(saveBaseDiary(user, Worktype.DAY_OFF, LocalDate.parse(updateBaseDiaryRequest.getDate()), user.getJob()));
+        isValidDate(user, LocalDate.parse(updateBaseDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")));
+        Diary diary = diaryRepository.save(saveBaseDiary(user, Worktype.DAY_OFF, LocalDate.parse(updateBaseDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")), user.getJob()));
         return new GetDiaryIdResponse(diary.getId());
     }
 
     public GetDiaryIdResponse saveCaddyDiary(UserDetails userDetails, UpdateCaddyDiaryRequest createCaddyDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
-        isValidDate(user, LocalDate.parse(createCaddyDiaryRequest.getDate()));
+        isValidDate(user, LocalDate.parse(createCaddyDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createCaddyDiaryRequest.getWorktype()), createCaddyDiaryRequest.getMemo(),
                 imageUrlList, createCaddyDiaryRequest.getIncome(), createCaddyDiaryRequest.getExpenditure(),
-                createCaddyDiaryRequest.getSaving(), LocalDate.parse(createCaddyDiaryRequest.getDate()), user.getJob());
+                createCaddyDiaryRequest.getSaving(), LocalDate.parse(createCaddyDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Caddy caddy = Caddy.builder()
                 .diary(savedDiary)
@@ -76,11 +77,11 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveRiderDiary(UserDetails userDetails, UpdateRiderDiaryRequest createRiderDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
-        isValidDate(user, LocalDate.parse(createRiderDiaryRequest.getDate()));
+        isValidDate(user, LocalDate.parse(createRiderDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createRiderDiaryRequest.getWorktype()), createRiderDiaryRequest.getMemo(),
                 imageUrlList, createRiderDiaryRequest.getIncome(), createRiderDiaryRequest.getExpenditure(),
-                createRiderDiaryRequest.getSaving(), LocalDate.parse(createRiderDiaryRequest.getDate()), user.getJob());
+                createRiderDiaryRequest.getSaving(), LocalDate.parse(createRiderDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Rider rider = Rider.builder()
                 .diary(savedDiary)
@@ -96,11 +97,11 @@ public class DiaryService {
 
     public GetDiaryIdResponse saveDayworkerDiary(UserDetails userDetails, UpdateDayworkerDiaryRequest createDayworkerDiaryRequest, List<MultipartFile> multipartFileList) {
         User user = userFindService.findByUserDetails(userDetails);
-        isValidDate(user, LocalDate.parse(createDayworkerDiaryRequest.getDate()));
+        isValidDate(user, LocalDate.parse(createDayworkerDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")));
         List<String> imageUrlList = uploadDiaryImage(multipartFileList);
         Diary diary = saveDiary(user, Worktype.findByValue(createDayworkerDiaryRequest.getWorktype()), createDayworkerDiaryRequest.getMemo(),
                 imageUrlList, createDayworkerDiaryRequest.getIncome(), createDayworkerDiaryRequest.getExpenditure(),
-                createDayworkerDiaryRequest.getSaving(), LocalDate.parse(createDayworkerDiaryRequest.getDate()), user.getJob());
+                createDayworkerDiaryRequest.getSaving(), LocalDate.parse(createDayworkerDiaryRequest.getDate(), DateTimeFormatter.ofPattern("yyyy-M-d")), user.getJob());
         Diary savedDiary = diaryRepository.save(diary);
         Dayworker dayworker = Dayworker.builder()
                 .diary(savedDiary)
