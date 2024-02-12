@@ -81,7 +81,7 @@ public class DiaryController {
             @NotBlank(message = "직업명은 필수입니다") @RequestParam("job") String jobTitle,
             @PathVariable("diaryId") Long diaryId
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetails(userDetails, jobTitle, diaryId));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetails(userDetails, jobTitle.replace(" ", ""), diaryId));
     }
 
     @GetMapping("")
@@ -94,7 +94,7 @@ public class DiaryController {
             @RequestParam("date")
             String date
     ) {
-        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle, LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d"))));
+        return BaseResponse.toResponseEntityContainsResult(diaryService.getDiaryDetailsByDate(userDetails, jobTitle.replace(" ", ""), LocalDate.parse(date, DateTimeFormatter.ofPattern("yyyy-M-d"))));
     }
 
     @DeleteMapping("/{diaryId}")
