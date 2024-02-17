@@ -34,6 +34,7 @@ public enum BaseResponseStatus implements BaseResponseStatusImpl {
     INVALID_FILE(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_004", "잘못된 File 형식입니다."),
     INVALID_AUTHORIZATION(HttpStatus.FORBIDDEN, "REQUEST_ERROR_005", "비정상적인 접근입니다."),
     INVALID_ENUM(HttpStatus.BAD_REQUEST, "REQUEST_ERROR_006", "변경할 수 없는 ENUM type 입니다."),
+    TOO_MANY_REQUEST_ERROR(HttpStatus.TOO_MANY_REQUESTS, "REQUEST_ERROR_007", "요청이 너무 잦습니다. 잠시 후 다시 시도해주세요."),
 
     // Auth
     INVALID_EMAIL_FORMAT(HttpStatus.BAD_REQUEST, "AUTH_001", "이메일 형식이 올바르지 않습니다."),
