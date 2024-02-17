@@ -1,11 +1,14 @@
 package blueclub.server.global;
 
 import blueclub.server.auth.config.TestSecurityConfig;
+import blueclub.server.auth.config.TestWebConfig;
+import blueclub.server.auth.config.WebConfig;
 import blueclub.server.auth.controller.AuthController;
 import blueclub.server.auth.service.AuthService;
 import blueclub.server.diary.controller.DiaryController;
 import blueclub.server.diary.service.DiaryService;
 import blueclub.server.file.service.FileService;
+import blueclub.server.global.infra.ElasticBeanstalkHealthCheck;
 import blueclub.server.monthlyGoal.controller.MonthlyGoalController;
 import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.notice.controller.NoticeController;
@@ -22,6 +25,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.autoconfigure.restdocs.AutoConfigureRestDocs;
 import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.context.annotation.FilterType;
 import org.springframework.context.annotation.Import;
 import org.springframework.restdocs.RestDocumentationContextProvider;
 import org.springframework.restdocs.RestDocumentationExtension;
@@ -41,10 +46,14 @@ import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.
         MonthlyGoalController.class,
         NoticeController.class,
         ReminderController.class,
-        FileController.class
-})
+        FileController.class,
+        ElasticBeanstalkHealthCheck.class
+}, excludeFilters = @ComponentScan.Filter(type = FilterType.ASSIGNABLE_TYPE, classes = WebConfig.class))
 @ExtendWith(RestDocumentationExtension.class)
-@Import(TestSecurityConfig.class)
+@Import({
+        TestSecurityConfig.class,
+        TestWebConfig.class
+})
 @AutoConfigureRestDocs
 public class ControllerTest {
     @Autowired
