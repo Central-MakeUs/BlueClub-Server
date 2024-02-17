@@ -17,7 +17,7 @@ plugins {
 }
 
 group = 'blueclub'
-version = '1.0.3-SNAPSHOT'
+version = '1.1.0-SNAPSHOT'
 
 java {
 	sourceCompatibility = '17'
@@ -43,7 +43,7 @@ openapi3 {
 	]
 	title = "BlueClub Swagger UI"
 	description = "BlueClub Spring REST Docs with Swagger UI."
-	version = "1.0.3"
+	version = "1.1.0"
 	format = "yaml"
 	outputFileNamePrefix = 'index'
 }
@@ -88,7 +88,7 @@ task swaggerConfig {
       parameters:
       - name: job
         in: query
-        description: "[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"
+        description: "[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 근로자)"
         required: true
         schema:
           type: string
@@ -204,7 +204,7 @@ task swaggerConfig {
     UpdateDayworkerDiaryRequest:
       title: UpdateDayworkerDiaryRequest
       type: object
-      description: 일용직 노동자 근무 일지 DTO
+      description: 일용직 근로자 근무 일지 DTO
       properties:
         worktype:
           type: string
@@ -348,6 +348,9 @@ dependencies {
 
 	// Emoji
 	implementation 'com.vdurmont:emoji-java:5.1.1'
+
+	// Rate Limit
+	implementation 'com.bucket4j:bucket4j-core:8.3.0'
 
 	compileOnly 'com.fasterxml.jackson.datatype:jackson-datatype-jsr310'
 	implementation 'org.apache.commons:commons-collections4:4.0'
