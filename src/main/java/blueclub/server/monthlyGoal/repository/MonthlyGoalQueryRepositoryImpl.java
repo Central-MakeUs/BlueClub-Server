@@ -6,6 +6,7 @@ import com.querydsl.jpa.impl.JPAQueryFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.YearMonth;
 import java.util.List;
 
 import static blueclub.server.monthlyGoal.domain.QMonthlyGoal.monthlyGoal;
@@ -17,17 +18,18 @@ public class MonthlyGoalQueryRepositoryImpl implements MonthlyGoalQueryRepositor
     private final JPAQueryFactory queryFactory;
 
     @Override
-    public Long getRecentMonthlyGoal(User user) {
+    public Long getRecentMonthlyGoal(User user, YearMonth yearMonth) {
         List<MonthlyGoal> recentMonthlyGoal = queryFactory
                 .selectDistinct(monthlyGoal)
                 .from(monthlyGoal)
-                .where(monthlyGoal.user.eq(user))
+                .where(monthlyGoal.user.eq(user),
+                        monthlyGoal.yearMonth.loe(yearMonth))
                 .limit(1)
                 .orderBy(monthlyGoal.yearMonth.desc())
                 .fetch();
         // 월 목표 수입 설정 이력이 없는 경우
         if (recentMonthlyGoal.isEmpty())
-            return 0L;
+            return -1L;
         return recentMonthlyGoal.get(0).getTargetIncome();
     }
 }
