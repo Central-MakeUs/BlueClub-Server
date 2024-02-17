@@ -5,6 +5,7 @@ import blueclub.server.auth.service.JwtService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.file.service.S3UploadService;
+import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
@@ -56,6 +57,10 @@ public class UserService {
                 Job.findByTitle(updateUserDetailsRequest.job().replace(" ", "")),
                 updateUserDetailsRequest.monthlyTargetIncome()
         );
+        monthlyGoalService.updateMonthlyGoal(userDetails, UpdateMonthlyGoalRequest.builder()
+                .yearMonth(YearMonth.now().toString())
+                .monthlyTargetIncome(updateUserDetailsRequest.monthlyTargetIncome())
+                .build());
     }
 
     public void withdrawUser(UserDetails userDetails) {
