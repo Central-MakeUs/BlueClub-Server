@@ -1,8 +1,6 @@
 package blueclub.server.monthlyGoal.service;
 
-import blueclub.server.diary.service.DiaryService;
-import blueclub.server.global.response.BaseException;
-import blueclub.server.global.response.BaseResponseStatus;
+import blueclub.server.diary.repository.DiaryRepository;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
 import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.dto.response.GetMonthlyGoalResponse;
@@ -24,7 +22,7 @@ import java.util.Optional;
 public class MonthlyGoalService {
 
     private final UserFindService userFindService;
-    private final DiaryService diaryService;
+    private final DiaryRepository diaryRepository;
     private final MonthlyGoalRepository monthlyGoalRepository;
 
     public void updateMonthlyGoal(UserDetails userDetails, UpdateMonthlyGoalRequest updateMonthlyGoalRequest) {
@@ -40,20 +38,23 @@ public class MonthlyGoalService {
     public GetMonthlyGoalResponse getMonthlyGoalAndProgress(UserDetails userDetails, YearMonth yearMonth) {
         User user = userFindService.findByUserDetails(userDetails);
         Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
-        Long totalIncome = diaryService.getTotalMonthlyIncome(user, yearMonth);
+        Long totalIncome = diaryRepository.getTotalMonthlyIncome(user, yearMonth);
 
         if (monthlyGoal.isEmpty()) {
-            Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user);
+            Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user, yearMonth);
             // 첫 사용자에 대한 예외 처리
-            if (recentMonthlyGoal == 0) {
+            if (recentMonthlyGoal == -1L) {
                 return GetMonthlyGoalResponse.builder()
-                        .targetIncome(recentMonthlyGoal)
+                        .targetIncome(0L)
                         .totalIncome(totalIncome)
                         .progress(0)
                         .build();
             }
 
-            saveMonthlyGoal(user, yearMonth, recentMonthlyGoal);
+            updateMonthlyGoal(userDetails, UpdateMonthlyGoalRequest.builder()
+                    .yearMonth(yearMonth.toString())
+                    .monthlyTargetIncome(recentMonthlyGoal)
+                    .build());
 
             return GetMonthlyGoalResponse.builder()
                     .targetIncome(recentMonthlyGoal)
