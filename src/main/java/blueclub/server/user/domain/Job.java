@@ -10,7 +10,7 @@ import lombok.RequiredArgsConstructor;
 public enum Job {
     CADDY("GOLF_CADDY", "골프캐디"),
     RIDER("DELIVERY_RIDER", "배달라이더"),
-    DAYWORKER("DAYWORKER", "일용직노동자");
+    DAYWORKER("DAYWORKER", "일용직근로자");
 
     private final String key;
     private final String title;
