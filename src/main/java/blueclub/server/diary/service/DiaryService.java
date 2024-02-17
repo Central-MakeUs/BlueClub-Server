@@ -14,7 +14,9 @@ import blueclub.server.file.service.S3UploadService;
 import blueclub.server.global.response.BaseException;
 import blueclub.server.global.response.BaseResponseStatus;
 import blueclub.server.monthlyGoal.domain.MonthlyGoal;
+import blueclub.server.monthlyGoal.dto.request.UpdateMonthlyGoalRequest;
 import blueclub.server.monthlyGoal.repository.MonthlyGoalRepository;
+import blueclub.server.monthlyGoal.service.MonthlyGoalService;
 import blueclub.server.user.domain.Job;
 import blueclub.server.user.domain.User;
 import blueclub.server.user.service.UserFindService;
@@ -42,6 +44,7 @@ public class DiaryService {
 
     private final UserFindService userFindService;
     private final S3UploadService s3UploadService;
+    private final MonthlyGoalService monthlyGoalService;
     private final DiaryRepository diaryRepository;
     private final CaddyRepository caddyRepository;
     private final RiderRepository riderRepository;
@@ -340,24 +343,27 @@ public class DiaryService {
 
         Optional<MonthlyGoal> monthlyGoal = monthlyGoalRepository.findByUserAndYearMonth(user, yearMonth);
         if (monthlyGoal.isEmpty()) {
-            Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user);
+            Long recentMonthlyGoal = monthlyGoalRepository.getRecentMonthlyGoal(user, yearMonth);
+            Long totalIncome = getTotalMonthlyIncome(user, yearMonth);
+
             // 첫 사용자에 대한 예외 처리
-            if (recentMonthlyGoal == -1) {
+            if (recentMonthlyGoal == -1L) {
                 return GetMonthlyRecordResponse.builder()
                         .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
                         .straightDay(straightWorkingDayLimitMonth)
                         .isRenew(isRenew)
                         .straightMonth(straightWorkingMonth)
+                        .targetIncome(0L)
+                        .totalIncome(totalIncome)
+                        .progress(0)
                         .build();
             }
-            MonthlyGoal newMonthlyGoal = MonthlyGoal.builder()
-                    .yearMonth(yearMonth)
-                    .targetIncome(recentMonthlyGoal)
-                    .user(user)
-                    .build();
-            monthlyGoalRepository.save(newMonthlyGoal);
 
-            Long totalIncome = getTotalMonthlyIncome(user, yearMonth);
+            monthlyGoalService.updateMonthlyGoal(userDetails, UpdateMonthlyGoalRequest.builder()
+                    .yearMonth(yearMonth.toString())
+                    .monthlyTargetIncome(recentMonthlyGoal)
+                    .build());
+
             return GetMonthlyRecordResponse.builder()
                     .totalDay(diaryRepository.getTotalWorkingDay(user, yearMonth))
                     .straightDay(straightWorkingDayLimitMonth)
