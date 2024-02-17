@@ -52,7 +52,7 @@ public class DiaryControllerTest extends ControllerTest {
     private static final String JOB = "job";
     private static final String CADDY = "골프 캐디";
     private static final String RIDER = "배달 라이더";
-    private static final String DAYWORKER = "일용직 노동자";
+    private static final String DAYWORKER = "일용직 근로자";
     private static final String DATE = "date";
     private static final String TARGET_DATE = "2024-01-25";
 
@@ -238,7 +238,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("근무 일지 수정 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 근로자)")
                                             )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
@@ -300,7 +300,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("근무 일지 수정 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                                    parameterWithName("job").description("[필수] 직업명 (골프 캐디, 배달 라이더, 일용직 근로자)")
                                             )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
@@ -348,7 +348,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)")
                                             )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
@@ -401,7 +401,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)")
                                             )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
@@ -429,7 +429,7 @@ public class DiaryControllerTest extends ControllerTest {
         }
 
         @Test
-        @DisplayName("일용직 노동자의 근무 일지 상세조회에 성공한다")
+        @DisplayName("일용직 근로자의 근무 일지 상세조회에 성공한다")
         void getDayworkerDiaryDetailsSuccess() throws Exception {
             // given
             doReturn(getDayworkerDiaryDetailsResponse())
@@ -454,7 +454,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)")
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)")
                                             )
                                             .pathParameters(
                                                     parameterWithName("diaryId").description("근무 일지 ID")
@@ -514,7 +514,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("날짜로 근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)"),
                                                     parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
                                             )
                                             .responseFields(
@@ -566,7 +566,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("날짜로 근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)"),
                                                     parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
                                             )
                                             .responseFields(
@@ -592,7 +592,7 @@ public class DiaryControllerTest extends ControllerTest {
         }
 
         @Test
-        @DisplayName("일용직 노동자의 날짜로 근무 일지 상세조회에 성공한다")
+        @DisplayName("일용직 근로자의 날짜로 근무 일지 상세조회에 성공한다")
         void getDayworkerDiaryDetailsSuccess() throws Exception {
             // given
             doReturn(getDayworkerDiaryDetailsResponse())
@@ -617,7 +617,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("날짜로 근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)"),
                                                     parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
                                             )
                                             .responseFields(
@@ -669,7 +669,7 @@ public class DiaryControllerTest extends ControllerTest {
                                             .tag("Diary API")
                                             .summary("날짜로 근무 일지 상세조회 API")
                                             .queryParameters(
-                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 노동자)"),
+                                                    parameterWithName("job").description("직업명 (골프 캐디, 배달 라이더, 일용직 근로자)"),
                                                     parameterWithName("date").description("날짜 // 형식 : yyyy-mm-dd")
                                             )
                                             .responseFields(
@@ -768,7 +768,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.monthlyRecord[].date").type(STRING).description("근무 날짜"),
                                                     fieldWithPath("result.monthlyRecord[].worktype").type(STRING).description("근무 형태"),
                                                     fieldWithPath("result.monthlyRecord[].income").type(NUMBER).description("[DEFAULT 0] 총 수입"),
-                                                    fieldWithPath("result.monthlyRecord[].cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 휴무, 일용직 노동자일 때 TYPE : NULL")
+                                                    fieldWithPath("result.monthlyRecord[].cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 휴무, 일용직 근로자일 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetMonthlyListResponse"))
                                             .build()
@@ -866,7 +866,7 @@ public class DiaryControllerTest extends ControllerTest {
                                                     fieldWithPath("result.workAt").type(STRING).description("근무 날짜"),
                                                     fieldWithPath("result.rank").type(STRING).description("근무 순위"),
                                                     fieldWithPath("result.income").type(NUMBER).description("총 수입"),
-                                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 노동자일 때 TYPE : NULL")
+                                                    fieldWithPath("result.cases").type(NUMBER).description("[DEFAULT NULL] 총 건수 // 일용직 근로자일 때 TYPE : NULL")
                                             )
                                             .responseSchema(Schema.schema("GetBoastDiaryResponse"))
                                             .build()
@@ -875,7 +875,7 @@ public class DiaryControllerTest extends ControllerTest {
         }
 
         @Test
-        @DisplayName("일용직 노동자의 자랑하기 상세조회에 성공한다")
+        @DisplayName("일용직 근로자의 자랑하기 상세조회에 성공한다")
         void getDayworkerBoastDiarySuccess() throws Exception {
             // given
             doReturn(getDayworkerBoastDiaryResponse())
