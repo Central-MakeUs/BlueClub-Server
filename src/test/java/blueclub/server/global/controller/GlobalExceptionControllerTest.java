@@ -35,16 +35,7 @@ public class GlobalExceptionControllerTest extends ControllerTest {
                     .get(BASE_URL);
 
             // then
-            Thread first = new Thread(() -> {
-                try {
-                    mockMvc.perform(requestBuilder)
-                            .andExpect(status().isOk());
-                } catch (Exception e) {
-                    e.printStackTrace();
-                }
-            });
-
-            Thread second = new Thread(() -> {
+            Thread overRequest = new Thread(() -> {
                 try {
                     mockMvc.perform(requestBuilder)
                             .andExpect(status().isTooManyRequests())
@@ -55,7 +46,7 @@ public class GlobalExceptionControllerTest extends ControllerTest {
                                     resource(
                                             ResourceSnippetParameters.builder()
                                                     .tag("Global Exception")
-                                                    .summary("지나치게 잦은 요청(0.5초당 1회 초과) 시 예외")
+                                                    .summary("지나치게 잦은 요청(0.1초당 10회 초과) 시 예외")
                                                     .responseFields(
                                                             fieldWithPath("code").type(STRING).description("커스텀 상태 코드"),
                                                             fieldWithPath("message").type(STRING).description("커스텀 상태 메시지"),
@@ -70,9 +61,19 @@ public class GlobalExceptionControllerTest extends ControllerTest {
                 }
             });
 
-            first.start();
-            Thread.sleep(0, 1);
-            second.start();
+            for (int thread = 0; thread < 10; thread++) {
+                Thread normalRequest = new Thread(() -> {
+                    try {
+                        mockMvc.perform(requestBuilder)
+                                .andExpect(status().isOk());
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                    }
+                });
+                normalRequest.start();
+                Thread.sleep(0, 1);
+            }
+            overRequest.start();
         }
     }
 }
