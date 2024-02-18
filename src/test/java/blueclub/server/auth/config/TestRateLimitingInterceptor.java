@@ -34,8 +34,8 @@ public class TestRateLimitingInterceptor implements HandlerInterceptor {
     }
 
     private Bucket createBucket() {
-        Refill refill = Refill.intervally(1, Duration.ofMillis(10)); // 1밀리초당 1회 충전
-        Bandwidth limit = Bandwidth.classic(1, refill); // 최대 1회 가능
+        Refill refill = Refill.intervally(10, Duration.ofMillis(100)); // 0.1초당 10회 충전
+        Bandwidth limit = Bandwidth.classic(10, refill); // 최대 10회 가능
         return Bucket.builder()
                 .addLimit(limit)
                 .build();
